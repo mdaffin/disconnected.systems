@@ -20,9 +20,9 @@ author:
 
 # Custom vars
 version:             1.0.0
-markdown: kramdown
-highlighter: pygments
-permalink: :title/
+#markdown: kramdown
+#highlighter: pygments
+#permalink: :title/
 
 # Your disqus shortname, entering this will enable commenting on posts
 disqus: disconsys
