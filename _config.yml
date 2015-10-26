@@ -7,25 +7,35 @@ permalink:           pretty
 # Setup
 title:               Disconnected Systems
 tagline:             'Programming, Linux and all things Open Source'
-description:         ''
+description:         'A'
 url:                 http://disconnected.systems
-baseurl:             ''
-paginate:            5
 
 # About/contact
 author:
   name:              'Michael Daffin'
-  url:               ''
-  email:             michael@daffin.io
+  #url:               ''
+  #email:             michael@daffin.io
 
+paginate:            5
 # Custom vars
 version:             1.0.0
 #markdown: kramdown
 #highlighter: pygments
 #permalink: :title/
 
+defaults:
+  -
+    scope:
+      path: ""      # empty string for all files
+      type: posts   # limit to posts
+    values:
+      is_post: true # automatically set is_post=true for all posts
+
 # Your disqus shortname, entering this will enable commenting on posts
 #disqus: disconsys
 
 # Enter your Google Analytics web tracking code (e.g. UA-2110908-2) to activate tracking
 #google_analytics: UA-57006875-2
+
+gems:
+  - jekyll-redirect-from
