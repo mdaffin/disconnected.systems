@@ -15,11 +15,14 @@ paginate:            5
 # About/contact
 author:
   name:              'Michael Daffin'
-  url:               
+  url:
   email:             michael@daffin.io
 
 # Custom vars
 version:             1.0.0
+markdown: kramdown
+highlighter: pygments
+permalink: /:title/
 
 # Your disqus shortname, entering this will enable commenting on posts
 disqus: disconsys
