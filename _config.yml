@@ -14,14 +14,14 @@ url:                 http://disconnected.systems
 author:
   name:              'Michael Daffin'
   #url:               ''
-  #email:             michael@daffin.io
+  email:             michael@daffin.io
 
 paginate:            5
 # Custom vars
 version:             1.0.0
-#markdown: kramdown
-#highlighter: pygments
-#permalink: :title/
+markdown: kramdown
+highlighter: pygments
+permalink: /:title/
 
 defaults:
   -
