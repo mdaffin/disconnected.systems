@@ -51,8 +51,8 @@ cause it to randomly reset. The ground pins should be connected to the power sou
 Arduinos ground pins. The left servo to pin 5 on the Arduinos digital pins and the right servo to
 pin 6.
 
-[![Rover Servo layout](http://blog.james147.net/wp-content/uploads/2012/10/Rover-servos-288x300.png
-"Rover Servos")](http://blog.james147.net/index.php/arduino-powered-rover/rover-servos/)
+[![Rover Servo layout]({{site.url}}/images/arduino-powered-rover/Rover-servos-288x300.png
+"Rover Servos")]({{site.url}}/index.php/arduino-powered-rover/rover-servos/)
 
 ### The Bumpers and Switch
 
@@ -62,8 +62,8 @@ Arduinos digital pins 2 (switch), 3 (left bumper) or 4 (right bumper) as well as
 resistor to ground.
 
 [![The bumpers and switch
-circuits](http://blog.james147.net/wp-content/uploads/2012/10/Rover-bumpers-198x300.png
-"Rover-Bumpers")](http://blog.james147.net/index.php/arduino-powered-rover/rover-bumpers/)
+circuits]({{site.url}}/images/arduino-powered-rover/Rover-bumpers-198x300.png
+"Rover-Bumpers")]({{site.url}}/index.php/arduino-powered-rover/rover-bumpers/)
 
 ### The Range Finders
 
@@ -78,8 +78,8 @@ decide to use them).
 The power pins should be connected to the Arduinos +5v pins and the ground to the ground pins. The
 left range finder to the digital pin 7 and the right one to digital pin 8.
 
-[![Range finders](http://blog.james147.net/wp-content/uploads/2012/10/Rover-Range-300x295.png
-"Rover-Range")](http://blog.james147.net/index.php/arduino-powered-rover/rover-range/)
+[![Range finders]({{site.url}}/images/arduino-powered-rover/Rover-Range-300x295.png
+"Rover-Range")]({{site.url}}/index.php/arduino-powered-rover/rover-range/)
 
 ### The Potentiometer
 
@@ -87,8 +87,8 @@ The potentiometer is used to control the speed of the over. Its outer pins can b
 to the arduinos ground and +5v power supply and the central pin to the Arduinos analog pin 0.
 
 [![Potentiometer
-circuit](http://blog.james147.net/wp-content/uploads/2012/10/Rover-Potentiometer-296x300.png
-"Rover-Potentiometer")](http://blog.james147.net/index.php/arduino-powered-rover/rover-potentiometer/)
+circuit]({{site.url}}/images/arduino-powered-rover/Rover-Potentiometer-296x300.png
+"Rover-Potentiometer")]({{site.url}}/index.php/arduino-powered-rover/rover-potentiometer/)
 
 ### The LEDs
 
