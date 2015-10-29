@@ -1,9 +1,3 @@
-# Permalinks
-#
-# Use of `relative_permalinks` ensures post links from the index work properly.
-permalink:           pretty
-#relative_permalinks: true
-
 # Setup
 title:               Disconnected Systems
 tagline:             'Programming, Linux and all things Open Source'
@@ -17,7 +11,7 @@ author:
   email:             michael@daffin.io
 
 paginate:            5
-# Custom vars
+
 version:             1.0.0
 markdown: kramdown
 highlighter: pygments
