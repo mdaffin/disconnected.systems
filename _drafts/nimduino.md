@@ -180,6 +180,7 @@ void led_off() {
 }
 
 void delay(int ms) {
+  // Not the best way to do this, but it does not matter for this example
   for (int i = 0; i < ms; i++) {
     _delay_ms(1);
   }
@@ -187,7 +188,9 @@ void delay(int ms) {
 ```
 
 And now for the nim version of blink.
+
 <div class="code-header">blink.nim</div>
+
 ```nim
 {.compile: "led.c".}
 proc led_setup(): void {.importc.}
