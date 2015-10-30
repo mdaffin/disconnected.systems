@@ -207,7 +207,7 @@ when isMainModule:
     delay(1000);
 ```
 
-Finally the steps to compile and upload it, these are basically the same as above. Note that we led.c is compiled for us due to the  `{.compile: "led.c".}` line in the blink program.
+Finally the steps to compile and upload it, these are basically the same as above. Note that we led.c is compiled for us due to the  `{.compile: "led.c".}` line in blink.nim.
 
 ```bash
 nim c --os:standalone blink.nim
