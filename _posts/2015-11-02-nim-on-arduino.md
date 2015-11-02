@@ -13,16 +13,16 @@ After installing the latest version of [nim](http://nim-lang.org/download.html) 
 
 <div class="code-header">example.nim</div>
 
-```nim
+~~~ nim
 # This is a comment
 echo("What's your name? ")
 var name: string = readLine(stdin)
 echo("Hi, ", name, "!")
-```
+~~~
 
-```bash
+~~~ bash
 nim compile --run example.nim
-```
+~~~
 
 There are quite a few tutorials on how to program in nim, so I will skip on to the more interesting parts.
 
@@ -32,7 +32,7 @@ Before we start to look at how to compile and upload a nim program to and avr ch
 
 <div class="code-header">led.c</div>
 
-```bash
+~~~ bash
 #include <avr/io.h>
 #include <util/delay.h>
 
@@ -53,17 +53,17 @@ int main (void)
   _delay_ms(BLINK_DELAY_MS);
  }
 }
-```
+~~~
 
 Then to compile and upload to the Arduino UNO simply run the following
 
-```bash
+~~~ bash
 avr-gcc -Os -DF_CPU=16000000UL -mmcu=atmega328p -c -o led.o led.c
 avr-gcc -mmcu=atmega328p led.o -o led
 avr-objcopy -O ihex -R .eeprom led led.hex
 # Change /dev/ttyACM0 to the serial port of your arduino
 avrdude -F -V -c arduino -p ATMEGA328P -P /dev/ttyACM0 -b 115200 -U flash:w:led.hex
-```
+~~~
 
 And thats it, the on board LED should now be slowly blinking away.
 
@@ -75,13 +75,13 @@ So let us try it out
 
 <div class="code-header">hello.nim</div>
 
-```nim
+~~~ nim
 echo "Hello, world!"
-```
+~~~
 
 <div class="code-header">panicoverride.nim</div>
 
-```nim
+~~~ nim
 proc printf(frmt: cstring) {.varargs, importc, header: "<stdio.h>", cdecl.}
 proc exit(code: int) {.importc, header: "<stdlib.h>", cdecl.}
 
@@ -95,23 +95,23 @@ proc panic(s: string) =
   exit(1)
 
 {.pop.}
-```
+~~~
 
 The above files can be converted to c with the following, note that I needed to add the --gc:none from the example from the github issue.
 
-```bash
+~~~ bash
 nim c -c --gc:none --cpu:avr --os:standalone --deadCodeElim:on hello.nim
-```
+~~~
 
 This will give you a directory named `nimcache` with two c file inside, these can be compiled and uploaded to the Arduino UNO using the commands from our previous step, note that I added the include path to the nim libraries.
 
-```bash
+~~~ bash
 avr-gcc -Os -DF_CPU=16000000UL -mmcu=atmega328p -I/usr/lib/nim -c -o nimcache/hello.o nimcache/hello.c
 avr-gcc -Os -DF_CPU=16000000UL -mmcu=atmega328p -I/usr/lib/nim -c -o nimcache/system.o nimcache/system.c
 avr-gcc -mmcu=atmega328p -I/usr/lib/nim nimcache/hello.o nimcache/system.o -o nimcache/hello
 avr-objcopy -O ihex -R .eeprom nimcache/hello nimcache/hello.hex
 avrdude -F -V -c arduino -p ATMEGA328P -P /dev/ttyACM0 -b 115200 -U flash:w:nimcache/hello.hex
-```
+~~~
 
 And the led stops blinking - progress, but nim is able to directly compile to avr, so we should be able to skip the avr-gcc steps. In order to do this we need to specify a few options via the nim.cfg. I found these options by using the `--parallelBuild:1 --verbosity:2` flags to see how nim was compiling the program.
 
@@ -119,41 +119,41 @@ First I noticed it was using `gcc` not `gcc-avr`. This was fixed by adding the f
 
 <div class="code-header">nim.cfg</div>
 
-```
+~~~
 avr.standalone.gcc.path = "/usr/bin"
 avr.standalone.gcc.exe = "avr-gcc"
 avr.standalone.gcc.linkerexe = "avr-gcc"
-```
+~~~
 
 I then noticed some of the flags where missing from the compiler and linker. This was fixed by adding the following to the config
 
 <div class="code-header">nim.cfg</div>
 
-```
+~~~
 passC = "-Os"
 passC = "-DF_CPU=16000000UL"
 passC = "-mmcu=atmega328p"
 passL = "-mmcu=atmega328p"
-```
+~~~
 
 Finally I added a couple more options for convenience
 
 <div class="code-header">nim.cfg</div>
 
-```
+~~~
 cpu = "avr"
 gc = "none"
 define = "release"
 deadCodeElim = "on"
-```
+~~~
 
 I could not get the os flag to work in the config, so that is the only one that needs to be passed on the command line. You can now compile and upload the program with
 
-```bash
+~~~ bash
 nim c --os:standalone hello.nim
 avr-objcopy -O ihex -R .eeprom hello hello.hex
 avrdude -F -V -c arduino -p ATMEGA328P -P /dev/ttyACM0 -b 115200 -U flash:w:hello.hex
-```
+~~~
 
 Blink in nim
 ===============
@@ -162,7 +162,7 @@ Now its time to get nim to blink the led. We will only need the `nim.cfg` and `p
 
 <div class="code-header">led.c</div>
 
-```c
+~~~ c
 #include <avr/io.h>
 #include <util/delay.h>
 
@@ -184,13 +184,13 @@ void delay(int ms) {
     _delay_ms(1);
   }
 }
-```
+~~~
 
 And now for the nim version of blink.
 
 <div class="code-header">blink.nim</div>
 
-```nim
+~~~ nim
 {.compile: "led.c".}
 proc led_setup(): void {.importc.}
 proc led_on(): void {.importc.}
@@ -204,15 +204,15 @@ when isMainModule:
     delay(1000);
     led_off();
     delay(1000);
-```
+~~~
 
 Finally the steps to compile and upload it, these are basically the same as above. Note that we led.c is compiled for us due to the  `{.compile: "led.c".}` line in blink.nim.
 
-```bash
+~~~ bash
 nim c --os:standalone blink.nim
 avr-objcopy -O ihex -R .eeprom blink blink.hex
 avrdude -F -V -c arduino -p ATMEGA328P -P /dev/ttyACM0 -b 115200 -U flash:w:blink.hex
-```
+~~~
 
 Conclusion
 ==========
