@@ -216,4 +216,4 @@ avrdude -F -V -c arduino -p ATMEGA328P -P /dev/ttyACM0 -b 115200 -U flash:w:blin
 
 Conclusion
 ==========
-Overall the process was quite straight forward with the main issue being lack of documentation specific to the avr architecture.
+Overall the process was quite straight forward with the main issue being lack of documentation specific to the avr architecture. Although it is a good starting point to trying out nim on an Arduino we are still missing the Arduino libraries so it would be allot of work for any real project to be written in it without more work on supporting libraries or wrapping the Arduino libraries.
