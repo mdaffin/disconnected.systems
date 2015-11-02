@@ -32,7 +32,7 @@ Before we start to look at how to compile and upload a nim program to and avr ch
 
 <div class="code-header">led.c</div>
 
-~~~ bash
+~~~ c
 #include <avr/io.h>
 #include <util/delay.h>
 
