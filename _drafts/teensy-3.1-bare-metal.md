@@ -1,25 +1,20 @@
 ---
 layout: post
-title: Assembler on the Teensy 3.1 
+title: Assembler on the Teensy 3.1
 ---
 
-I started to look at bare metal programming on the teensy 3.1 and managed to
-find quite a few examples around the web, which are mostly based off the work
-of (Karl Lunt)[http://www.seanet.com/~karllunt/bareteensy31.html]. All of these
-examples however contain a bunch of files that are never explained what they
-are for or where they come from. So I started to dig a bit deeper and found an
-nice guide to low level arm programming (here)[http://bravegnu.org/gnu-eprog/]
-and a minimal working example in assembler on the teensy 3
-[here](https://forum.pjrc.com/threads/25762-Turn-the-LED-on-with-assembler-code-(-Teensy-3-1-)?p=47739&viewfull=1#post47739).
-Finially I also used the programmers manual for the MK20DX256VLH7 which you can
-find (here)[https://www.pjrc.com/teensy/K20P64M72SF1RM.pdf]
+I started to look at bare metal programming on the Teensy 3.1 and found quite a few examples mainly based off the work
+of [Karl Lunt](http://www.seanet.com/~karllunt/bareteensy31.html). All of these
+examples include sevrial files and do not explain what they are for or where they are obtained. I started to dig a bit deeper and found an
+nice guide to low level arm programming [here](http://bravegnu.org/gnu-eprog/) which explained what some of them where for. Then I found a minimal working example in pure assembly for the Teensy 3.0
+[here](https://forum.pjrc.com/threads/25762-Turn-the-LED-on-with-assembler-code-\(-Teensy-3-1-\)?p=47739&viewfull=1#post47739). I also found the [programmers manual](https://www.pjrc.com/teensy/K20P64M72SF1RM.pdf) for the MK20DX256VLH7 very useful.
 
-This post expands upon the minimal assembler example with what I learnt from
-other articles around the topic to give a more complete minimal example. The
-final source can be found
-(here)[https://github.com/james147/embedded-examples/tree/master/teensy-3-assembler]
-and only requires two files: the assembler source and the linker script, which
-I will explain in this post.
+I took the minimal assembly example above with what I learned from other
+articles around the topic to give a more complete, but still minimal, example.
+The final source can be found on [this github
+repository](https://github.com/james147/embedded-examples/tree/master/teensy-3-assembler)
+and only contains two files: the assembler source and the linker script, which I
+will explain in this post.
 
 # The Linker script - layout.ld
 This file is required by the linker in order to tell it where the various bits
@@ -42,7 +37,7 @@ MEMORY {
 
 The exact values are found in the programmers manual on pages 63 and 90. Note
 that you can split these up even more and give the various sections different
-premissions. For example, if you wanted the second half of the flash to be read
+permissions. For example, if you wanted the second half of the flash to be read
 only you could:
 
 ~~~
@@ -53,7 +48,8 @@ MEMORY {
 }
 ~~~
 
-The next block, SECTIONS, tells the linker where to place the various parts of the program:
+The next block, SECTIONS, tells the linker where to place the various parts of
+the program:
 
 <div class="code-header">layout.ld (continued)</div>
 
@@ -75,13 +71,14 @@ SECTIONS {
 
 `. = 0x000000000;` Sets the current location to the start of the block.
 
-`.text : {...} > FLASH` matches all the text (aka code) and tells it to place it in the FLASH section defined above.
+`.text : {...} > FLASH` matches all the text (aka code) and tells it to place it
+in the FLASH section defined above.
 
 The first part of all arm chips is where the exception vectors are placed. For
 a full list of them see the table on page 63 of the programmers manual. These
 hold locations that the arm chip will jump to in the event of various events.
 We tell the linker to place the vectors first with `KEEP(*(.vectors))`. To
-break this down further: 
+break this down further:
 
 * `KEEP(...)` tells the linker to not remove any
 dead/duplicate code as we do not want it moving or skipping various vectors.
@@ -103,9 +100,7 @@ Finally we set a variable `_estack` to point to the end of the ram.
 
 # The assembler code - crt0.s
 
-
-
-Arm assembler comes in two flavours, the 16bit thumb instruction set and the
+Arm assembler comes in two flavors, the 16bit thumb instruction set and the
 full 32bit arm instruction set. With the first line of code `.syntax unified`
 we well the assembler we are using a mix of the instruction sets.
 
@@ -137,9 +132,9 @@ the chip where to start executing from a reset, here we tell it to jump to the
 
 The *Inital Stack Pointer* tells the arm chip where to start the stack, which
 we defined at the end of the ram in the linker script. However we do not
-properly initlise or make use of the stack in this example.
+properly initialize or make use of the stack in this example.
 
-The rest of the vectors defined just jump to an infinte loop to halt the chip.
+The rest of the vectors defined just jump to an infinite loop to halt the chip.
 We have also skipped a whole bunch of other vectors that are described on page
 63 of the programmers manual as they will not be needed in this example.
 
@@ -147,7 +142,7 @@ Next we place the `.flashconfig` section, which will be placed at `0x400` due
 to our linker script described in the last section. This address and the values
 are described in the programmers manual on page 569 but we are not making any
 real use of these features in this example.
-  
+
 <div class="code-header">crt0.s</div>
 
 ~~~ assembler
@@ -160,9 +155,9 @@ real use of these features in this example.
 
 Now we move on to the setup code. This will be placed after the `.flashconfig`
 as we defined in the linker script. `.thumb_func` defines the following code as
-a function and `.global _startup` create a global config that can be referenced
+a function and `.global _startup` create a global reference that can be referenced
 from other files if needed. `_startup:` is the label that the arm chip will
-jump to when it resets as we defined in the execption vectors above.
+jump to when it resets as we defined in the exception vectors above.
 
 <div class="code-header">crt0.s</div>
 
@@ -200,8 +195,8 @@ There are a few things we need to do to setup the arm chip, first we reset all t
 The teensy 3 has a watchdog, which is enabled by default. This will cause the
 chip to reset if the watchdog is not reset frequently. We do not want to worry
 about the watchdog in this example so we are just going to disable it by
-disabling inttrupts, unlocking the watchdog (so it can be configured) then to
-disable it before enableing inttrupts again. You can read more about how to
+disabling interrupts, unlocking the watchdog (so it can be configured) then to
+disable it before enabling interrupts again. You can read more about how to
 configure the watchdog on page 463 of the programmers manual.
 
 <div class="code-header">crt0.s</div>
@@ -225,9 +220,9 @@ configure the watchdog on page 463 of the programmers manual.
     cpsie i // Enable interrupts
 ~~~
 
-With that the general configureation of the chip is done. We can now configure
+With that the general configuration of the chip is done. We can now configure
 the parts of the chip we want to use and start running our application loop. In
-this example that means to enable and set as an `OUTPUT` the GPIO pin hte led
+this example that means to enable and set as an `OUTPUT` the GPIO pin the led
 is connected to.
 
 <div class="code-header">crt0.s</div>
@@ -235,7 +230,7 @@ is connected to.
 ~~~ assembler
 
     // Enable system clock on all GPIO ports - page 254
-    ldr r6, = 0x40048038 
+    ldr r6, = 0x40048038
     ldr r0, = 0x00043F82 // 0b1000011111110000010
     str r0, [r6]
 
@@ -256,7 +251,7 @@ Our logic is very simple:
 * Busy wait
 * Turn off the led
 * Busy wait
-* Repet
+* Repeat
 
 Which is done by the following.
 
@@ -272,14 +267,13 @@ loop:
     b loop
 ~~~
 
-Rather then embeding logic in the loop above we have moved it into seperate
+Rather then embedding logic in the loop above we have moved it into separate
 functions to mimic an actual application closer. The two functions to turn the
 led on and off are as follows.
 
 <div class="code-header">crt0.s</div>
 
 ~~~ assembler
-
     // Function to turn the led off
     .thumb_func
     .global led_off
@@ -299,8 +293,8 @@ led_on:
     mov pc, r14
 ~~~
 
-And the last function just causes the processor to busy wait for a resonable
-ammount of time by counting down from a fairly large number.
+And the last function just causes the processor to busy wait for a reasonable
+amount of time by counting down from a fairly large number.
 
 <div class="code-header">crt0.s</div>
 
@@ -318,7 +312,7 @@ delay_loop:
 ~~~
 
 Finally we have the busy wait which will cause the chip to lockup in cause any
-of the intrrupts we defined at the start trigger.
+of the interrupts we defined at the start trigger.
 
 <div class="code-header">crt0.s</div>
 
@@ -327,12 +321,24 @@ _halt: b _halt
     .end
 ~~~
 
+## Compile and Upload
+
+To compile and upload to the teensy run:
+
+```bash
+arm-none-eabi-as -g -mcpu=cortex-m4 -mthumb -o crt0.o crt0.s
+arm-none-eabi-ld -T layout.ld -o crt0.elf crt0.o
+arm-none-eabi-objcopy -O ihex -R .eeprom crt0.elf crt0.hex
+echo "Reset teensy now"
+teensy-loader-cli -w --mcu=mk20dx256 crt0.hex
+```
+
 # Summary
 
-This was a very informative experiance for me, having never touch assembler to
+This was a very informative experience for me, having never touch assembler to
 bare metal programming on the arm before. There are still some bits missing
 that are required by higher level languages, like C, such as setting up global
-variables, copying them to ram and proper stack inilisation. I hope to expand
+variables, copying them to ram and proper stack initialization. I hope to expand
 on this in the future and see what it takes to convert the assembler to a
 higher level language.
 
