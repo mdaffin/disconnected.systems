@@ -3,11 +3,18 @@ layout: post
 title: Assembler on the Teensy 3.1
 ---
 
-I started to look at bare metal programming on the Teensy 3.1 and found quite a few examples mainly based off the work
-of [Karl Lunt](http://www.seanet.com/~karllunt/bareteensy31.html). All of these
-examples include sevrial files and do not explain what they are for or where they are obtained. I started to dig a bit deeper and found an
-nice guide to low level arm programming [here](http://bravegnu.org/gnu-eprog/) which explained what some of them where for. Then I found a minimal working example in pure assembly for the Teensy 3.0
-[here](https://forum.pjrc.com/threads/25762-Turn-the-LED-on-with-assembler-code-\(-Teensy-3-1-\)?p=47739&viewfull=1#post47739). I also found the [programmers manual](https://www.pjrc.com/teensy/K20P64M72SF1RM.pdf) for the MK20DX256VLH7 very useful.
+I started to look at bare metal programming on the Teensy 3.1 and found quite a
+few examples mainly based off the work of [Karl
+Lunt](http://www.seanet.com/~karllunt/bareteensy31.html). All of these examples
+include sevrial files and do not explain what they are for or where they are
+obtained. I started to dig a bit deeper and found an nice guide to low level arm
+programming [here](http://bravegnu.org/gnu-eprog/) which explained what some of
+them where for. Then I found a minimal working example in pure assembly for the
+Teensy 3.0
+[here](https://forum.pjrc.com/threads/25762-Turn-the-LED-on-with-assembler-code-\(-Teensy-3-1-\)?p=47739&viewfull=1#post47739).
+I also found the [programmers
+manual](https://www.pjrc.com/teensy/K20P64M72SF1RM.pdf) for the MK20DX256VLH7
+very useful.
 
 I took the minimal assembly example above with what I learned from other
 articles around the topic to give a more complete, but still minimal, example.
@@ -16,14 +23,26 @@ repository](https://github.com/james147/embedded-examples/tree/master/teensy-3-a
 and only contains two files: the assembler source and the linker script, which I
 will explain in this post.
 
-# The Linker script - layout.ld
-This file is required by the linker in order to tell it where the various bits
-of memory are located and to tell it where to put different bits of the code.
+# Requirements
 
-The MEMORY block tells the linker where various sections of the chip are
-located. For example on the MK20DX256VLH7 (and in general) the flash is located
-at the start of the chip `0x00000000` and is 256K long. Where as the ram starts
-at 0x1FFF8000 and is 64K long:
+This post is about what is needed to get the Teensy up and running rather then a
+guide to assembly programming so I assume you have a basic knowledge of
+assembly. You will also require the arm-none-eabi toolkit, explicitly the
+assembler `arm-none-eabi-as`, linker `arm-none-eabi-ld` and objcopy
+`arm-none-eabi-objcopy` binaries. These can be obtained from most Linux
+distribution's package managers or from inside a Arduino SDK's tools directory:
+`$ARDUINO_SDK/hardware/tools/arm/bin`.
+
+# The Linker script: `layout.ld`
+
+This file tells linker where the various bits of memory are located and tells it
+where to put different bits of the code. There are two main blocks to the linker
+script, the `MEMORY` block and the `SECTIONS` bock.
+
+The `MEMORY` block tells the linker where sections of storage on chip are
+located. The flash is located at the start of the chip `0x00000000` and on the
+MK20DX256VLH7 it is 256K long. Where as on the MK20DX256VLH7 the ram starts at
+0x1FFF8000 and is 64K long:
 
 <div class="code-header">layout.ld</div>
 
@@ -35,10 +54,11 @@ MEMORY {
 ...
 ~~~
 
-The exact values are found in the programmers manual on pages 63 and 90. Note
-that you can split these up even more and give the various sections different
-permissions. For example, if you wanted the second half of the flash to be read
-only you could:
+The values for these location can be found in the programmers manual on pages 63
+and 90. Note that you can split up the flash and ram even more to give greater
+control over the layout of code and give each section different permissions. For
+example, you could make the second part of the flash read only to store data
+without the worry about it being executed:
 
 ~~~
 MEMORY {
@@ -51,7 +71,7 @@ MEMORY {
 The next block, SECTIONS, tells the linker where to place the various parts of
 the program:
 
-<div class="code-header">layout.ld (continued)</div>
+<div class="code-header">layout.ld</div>
 
 ~~~
 ...
