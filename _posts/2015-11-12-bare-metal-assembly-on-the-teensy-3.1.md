@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Assembler on the Teensy 3.1
+title: Bare Metal Assembler on the Teensy 3.1
 ---
 
 I started to look at bare metal programming on the Teensy 3.1 and found quite a
