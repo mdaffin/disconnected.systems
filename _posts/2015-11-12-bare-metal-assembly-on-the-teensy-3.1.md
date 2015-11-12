@@ -20,7 +20,7 @@ I took the minimal assembly example above with what I learned from other
 articles around the topic to give a more complete, but still minimal, example.
 The final source can be found on [this github
 repository](https://github.com/james147/embedded-examples/tree/master/teensy-3-assembler)
-and only contains two files: the assembler source and the linker script, which I
+and only contains two files: the assembly source and the linker script, which I
 will explain in this post.
 
 # Requirements
@@ -106,7 +106,7 @@ dead/duplicate code as we do not want it moving or skipping various vectors.
 from within that file however you generally don't need to make use of this
 feature.
 * `.vectors` is the part of our code that we want to place here, we will
-look at how to label the code when we look at the assembler file below.
+look at how to label the code when we look at the assembly file below.
 
 Next `. = 0x400` causes us to skip to address `0x400` and tells the linker to
 place the `.flashconfig` section here. This address and the values in this
@@ -119,7 +119,7 @@ rest of the code with `*(.text)`.
 Finally we set a variable `_estack` to point to the end of the ram whcih will be
 used to set the stack pointer.
 
-# The assembler code: `crt0.s`
+# The assembly code: `crt0.s`
 
 Arm assembly comes in two flavors, the 16bit thumb instruction set and the
 full 32bit arm instruction set. With the first line of code `.syntax unified`
@@ -129,7 +129,7 @@ As we discussed above, we need to define the exception vectors:
 
 <div class="code-header">crt0.s</div>
 
-~~~ assembler
+~~~ assembly
 ...
     .section ".vectors"
     .long _estack  //  0 ARM: Initial Stack Pointer
@@ -168,7 +168,7 @@ real use of these features in this example.
 
 <div class="code-header">crt0.s</div>
 
-~~~ assembler
+~~~ assembly
     .section ".flashconfig"
     .long   0xFFFFFFFF
     .long   0xFFFFFFFF
@@ -182,7 +182,7 @@ will jump to when it resets as we defined in the exception vectors above.
 
 <div class="code-header">crt0.s</div>
 
-~~~ assembler
+~~~ assembly
     .section ".startup","x",%progbits
     .thumb_func
     .global _startup
@@ -195,7 +195,7 @@ the registers to 0.
 
 <div class="code-header">crt0.s</div>
 
-~~~ assembler
+~~~ assembly
 ...
     // Zero all the registers
     mov     r0,#0
@@ -223,7 +223,7 @@ configure the watchdog on page 463 of the programmers manual.
 
 <div class="code-header">crt0.s</div>
 
-~~~ assembler
+~~~ assembly
 ...
     cpsid i // Disable interrupts
 
@@ -249,7 +249,7 @@ is connected to.
 
 <div class="code-header">crt0.s</div>
 
-~~~ assembler
+~~~ assembly
 
     // Enable system clock on all GPIO ports - page 254
     ldr r6, = 0x40048038
@@ -279,7 +279,7 @@ Which is done by the following loop.
 
 <div class="code-header">crt0.s</div>
 
-~~~ assembler
+~~~ assembly
     // Main loop
 loop:
     bl led_on
@@ -295,7 +295,7 @@ led on and off are as follows.
 
 <div class="code-header">crt0.s</div>
 
-~~~ assembler
+~~~ assembly
     // Function to turn the led off
     .thumb_func
     .global led_off
@@ -320,7 +320,7 @@ amount of time by counting down from a fairly large number.
 
 <div class="code-header">crt0.s</div>
 
-~~~ assembler
+~~~ assembly
     // Uncalibrated busy wait
     .thumb_func
     .global delay
@@ -338,7 +338,7 @@ of the interrupts we defined at the start trigger.
 
 <div class="code-header">crt0.s</div>
 
-~~~ assembler
+~~~ assembly
 _halt: b _halt
     .end
 ~~~
@@ -357,7 +357,7 @@ teensy-loader-cli -w --mcu=mk20dx256 crt0.hex
 
 # Summary
 
-This was a very informative experience for me, having never touched assembler or
+This was a very informative experience for me, having never touched assembly or
 done any bare metal programming on the arm before. There are still some bits
 missing that are required by higher level languages or more complete programs
 but is nice start to understanding what happens on the arm ship at the lowest
