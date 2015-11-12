@@ -68,7 +68,7 @@ MEMORY {
 }
 ~~~
 
-The next block, SECTIONS, tells the linker where to place the various parts of
+The SECTIONS block tells the linker where to place the various parts of
 the program:
 
 <div class="code-header">layout.ld</div>
@@ -89,16 +89,16 @@ SECTIONS {
 }
 ~~~
 
-`. = 0x000000000;` Sets the current location to the start of the block.
+`. = 0x000000000;` sets the current location to the start of the block.
 
 `.text : {...} > FLASH` matches all the text (aka code) and tells it to place it
 in the FLASH section defined above.
 
-The first part of all arm chips is where the exception vectors are placed. For
-a full list of them see the table on page 63 of the programmers manual. These
-hold locations that the arm chip will jump to in the event of various events.
-We tell the linker to place the vectors first with `KEEP(*(.vectors))`. To
-break this down further:
+The first part of all arm chips is where the exception vectors are placed. These
+hold locations that the arm chip will jump to an events occurs, such as an
+interrupt firing or a memory fault occurs. For a full list of them see the table
+on page 63 of the programmers manual. We tell the linker to place the vectors
+first with `KEEP(*(.vectors))`. To break this down further:
 
 * `KEEP(...)` tells the linker to not remove any
 dead/duplicate code as we do not want it moving or skipping various vectors.
@@ -108,19 +108,20 @@ feature.
 * `.vectors` is the part of our code that we want to place here, we will
 look at how to label the code when we look at the assembler file below.
 
-Next we jump to address 0x400 with `. = 0x400` and tell the linker to place the
-`.flashconfig` section. This address and the values in this section allow you
-to configure the protection settings of the flash, you can read more about the
-values on page 569 of the programmers manual.
+Next `. = 0x400` causes us to skip to address `0x400` and tells the linker to
+place the `.flashconfig` section here. This address and the values in this
+section allow you to configure the protection settings of the flash, you can
+read more about the values on page 569 of the programmers manual.
 
-After the flash we place the startup code with `*(.startup)` and finally the
+After the flashconfig the startup code is placed with `*(.startup)` and finally the
 rest of the code with `*(.text)`.
 
-Finally we set a variable `_estack` to point to the end of the ram.
+Finally we set a variable `_estack` to point to the end of the ram whcih will be
+used to set the stack pointer.
 
 # The assembler code - crt0.s
 
-Arm assembler comes in two flavors, the 16bit thumb instruction set and the
+Arm assembly comes in two flavors, the 16bit thumb instruction set and the
 full 32bit arm instruction set. With the first line of code `.syntax unified`
 we well the assembler we are using a mix of the instruction sets.
 
@@ -144,7 +145,8 @@ As we discussed above, we need to define the exception vectors:
 The `.section ".vectors"` tells the assembler to place this bit of code in the
 `.vectors` section described in the linker script above, which we placed at the
 start of the flash section. Due to this it does not matter where in the file
-this code is placed, it will always be placed at the start of the flash.
+this code is placed, it will always be placed at the start of the flash by the
+linker script.
 
 In this example we only really make use of the *Inital Program Counter* to tell
 the chip where to start executing from a reset, here we tell it to jump to the
@@ -154,9 +156,10 @@ The *Inital Stack Pointer* tells the arm chip where to start the stack, which
 we defined at the end of the ram in the linker script. However we do not
 properly initialize or make use of the stack in this example.
 
-The rest of the vectors defined just jump to an infinite loop to halt the chip.
-We have also skipped a whole bunch of other vectors that are described on page
-63 of the programmers manual as they will not be needed in this example.
+The rest of the vectors defined just jump to an infinite loop to halt execution
+on the chip. We have also skipped a whole bunch of other vectors that are
+described on page 63 of the programmers manual as they will not be needed in
+this example.
 
 Next we place the `.flashconfig` section, which will be placed at `0x400` due
 to our linker script described in the last section. This address and the values
@@ -174,10 +177,8 @@ real use of these features in this example.
 ~~~
 
 Now we move on to the setup code. This will be placed after the `.flashconfig`
-as we defined in the linker script. `.thumb_func` defines the following code as
-a function and `.global _startup` create a global reference that can be referenced
-from other files if needed. `_startup:` is the label that the arm chip will
-jump to when it resets as we defined in the exception vectors above.
+as we defined in the linker script. `_startup:` is the label that the arm chip
+will jump to when it resets as we defined in the exception vectors above.
 
 <div class="code-header">crt0.s</div>
 
@@ -189,7 +190,8 @@ _startup:
 ...
 ~~~
 
-There are a few things we need to do to setup the arm chip, first we reset all the registers to 0.
+There are a few things we need to do to setup the arm chip, first we reset all
+the registers to 0.
 
 <div class="code-header">crt0.s</div>
 
@@ -212,10 +214,10 @@ There are a few things we need to do to setup the arm chip, first we reset all t
 ...
 ~~~
 
-The teensy 3 has a watchdog, which is enabled by default. This will cause the
+The Teensy 3 has a watchdog, which is enabled by default. This will cause the
 chip to reset if the watchdog is not reset frequently. We do not want to worry
-about the watchdog in this example so we are just going to disable it by
-disabling interrupts, unlocking the watchdog (so it can be configured) then to
+about the watchdog in this example so we are going to disable it. This involves
+disabling interrupts, unlocking the watchdog (so it can be configured) then
 disable it before enabling interrupts again. You can read more about how to
 configure the watchdog on page 463 of the programmers manual.
 
@@ -273,7 +275,7 @@ Our logic is very simple:
 * Busy wait
 * Repeat
 
-Which is done by the following.
+Which is done by the following loop.
 
 <div class="code-header">crt0.s</div>
 
@@ -343,26 +345,26 @@ _halt: b _halt
 
 ## Compile and Upload
 
-To compile and upload to the teensy run:
+To compile and upload to the Teensy run:
 
-```bash
+~~~ bash
 arm-none-eabi-as -g -mcpu=cortex-m4 -mthumb -o crt0.o crt0.s
 arm-none-eabi-ld -T layout.ld -o crt0.elf crt0.o
 arm-none-eabi-objcopy -O ihex -R .eeprom crt0.elf crt0.hex
 echo "Reset teensy now"
 teensy-loader-cli -w --mcu=mk20dx256 crt0.hex
-```
+~~~
 
 # Summary
 
-This was a very informative experience for me, having never touch assembler to
-bare metal programming on the arm before. There are still some bits missing
-that are required by higher level languages, like C, such as setting up global
-variables, copying them to ram and proper stack initialization. I hope to expand
-on this in the future and see what it takes to convert the assembler to a
-higher level language.
+This was a very informative experience for me, having never touched assembler or
+done any bare metal programming on the arm before. There are still some bits
+missing that are required by higher level languages or more complete programs
+but is nice start to understanding what happens on the arm ship at the lowest
+level. I hope to expand on this in the future and see what it takes to convert
+the assembler to a higher level language such as C.
 
 # References
-1) (Karl Lunt - Bare-metal Teensy 3.x Development)[http://www.seanet.com/~karllunt/bareteensy31.html]
-2) (Vijay Kumar B. - Embedded Programming with the GNU Toolchain)[http://bravegnu.org/gnu-eprog/]
-3) (glock45 - Turn the LED on with assembler code \( Teensy 3.1 \))[https://forum.pjrc.com/threads/25762-Turn-the-LED-on-with-assembler-code-(-Teensy-3-1-)?p=47739&viewfull=1#post47739]
+1. [Karl Lunt - Bare-metal Teensy 3.x Development](http://www.seanet.com/~karllunt/bareteensy31.html)
+2. [Vijay Kumar B. - Embedded Programming with the GNU Toolchain](http://bravegnu.org/gnu-eprog/)
+3. [glock45 - Turn the LED on with assembler code ( Teensy 3.1 )](https://forum.pjrc.com/threads/25762-Turn-the-LED-on-with-assembler-code-\(-Teensy-3-1-\)?p=47739&viewfull=1#post47739)
