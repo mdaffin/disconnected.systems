@@ -119,7 +119,7 @@ rest of the code with `*(.text)`.
 Finally we set a variable `_estack` to point to the end of the ram whcih will be
 used to set the stack pointer.
 
-# The assembler code - crt0.s
+# The assembler code: `crt0.s`
 
 Arm assembly comes in two flavors, the 16bit thumb instruction set and the
 full 32bit arm instruction set. With the first line of code `.syntax unified`
