@@ -2,7 +2,7 @@
   <link href="http://gmpg.org/xfn/11" rel="profile">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  {% if page.description.blank? %}
+  {% if page.description %}
   <meta name="description" content="{{ page.description }}">
   {% else %}
   <meta name="description" content="{{ page.excerpt | strip_html }}">
