@@ -7,8 +7,8 @@ There has been a few interesting projects over the past few years that have trie
 
 This post I will look at nim in an attempt to get it running on an Arduino UNO.
 
-Hello World in nim
-==================
+## Hello World in nim
+
 After installing the latest version of [nim](http://nim-lang.org/download.html) (0.12.0 at the time of writing) it was trivial to get an example program up and running:
 
 <div class="code-header">example.nim</div>
@@ -26,8 +26,8 @@ nim compile --run example.nim
 
 There are quite a few tutorials on how to program in nim, so I will skip on to the more interesting parts.
 
-Programming AVR without arduino
-===============================
+## Programming AVR without arduino
+
 Before we start to look at how to compile and upload a nim program to and avr chip we first need to see how this works without the Arduino SDK. Fortunately this process is quite easy and the example below where adapted from [Balau's blog](https://balau82.wordpress.com/2011/03/29/programming-arduino-uno-in-pure-c/) on the subject. I recommend reading his blog post for more details about the process.
 
 <div class="code-header">led.c</div>
@@ -67,8 +67,8 @@ avrdude -F -V -c arduino -p ATMEGA328P -P /dev/ttyACM0 -b 115200 -U flash:w:led.
 
 And thats it, the on board LED should now be slowly blinking away.
 
-Compile and example nim program for avr
-=======================================
+## Compile and example nim program for avr
+
 The only working example I could find of how to compile a nim program for avr was from this  [Github issue](https://github.com/nim-lang/Nim/issues/1964).
 
 So let us try it out
@@ -155,8 +155,8 @@ avr-objcopy -O ihex -R .eeprom hello hello.hex
 avrdude -F -V -c arduino -p ATMEGA328P -P /dev/ttyACM0 -b 115200 -U flash:w:hello.hex
 ~~~
 
-Blink in nim
-===============
+## Blink in nim
+
 
 Now its time to get nim to blink the led. We will only need the `nim.cfg` and `panicoverride.nim` files from the previous steps. Then we need to create a small c library to talk to the Arduino that we can wrap with nim. This is just the c example above split into separate functions.
 
@@ -214,6 +214,6 @@ avr-objcopy -O ihex -R .eeprom blink blink.hex
 avrdude -F -V -c arduino -p ATMEGA328P -P /dev/ttyACM0 -b 115200 -U flash:w:blink.hex
 ~~~
 
-Conclusion
-==========
+## Conclusion
+
 Overall the process was quite straight forward with the main issue being lack of documentation specific to the avr architecture. Although it is a good starting point to trying out nim on an Arduino we are still missing the Arduino libraries so it would be allot of work for any real project to be written in it without more work on supporting libraries or wrapping the Arduino libraries.

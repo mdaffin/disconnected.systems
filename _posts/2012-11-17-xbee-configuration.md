@@ -23,7 +23,7 @@ and send your data.
 ## Notes
 
 **&lt;CR&gt;** in this article (as well as other places on the internet) means _Carriage Return_,
-**and you should hit the _Enter_ or _Return_ key in place of it.
+and you should hit the _Enter_ or _Return_ key in place of it.
 
 ## Setup
 

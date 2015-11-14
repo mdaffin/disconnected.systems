@@ -50,7 +50,7 @@ following details
 and click ok to connect. The first run wizard should now launch, just follow it through to set up
 the admin user that you will use from now on to connect to the quassel server.
 
-# Enable SSL
+## Enable SSL
 
 This is important if you wish the communication between the core and the client to be encrypted, but
 is optional if you are just using it over a local network. The quasselcore package already has ssl
@@ -62,7 +62,7 @@ and then restart quassel:
 
     systemctl restart quassel
 
-# Add additional users
+## Add additional users
 
 After set up you can add new users by logging into the server and running `sudo quasselcore
 --configdir=/var/lib/quassel --add-user` and filling in the appropriate information when prompted.

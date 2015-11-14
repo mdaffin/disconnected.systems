@@ -23,7 +23,7 @@ repository](https://github.com/james147/embedded-examples/tree/master/teensy-3-a
 and only contains two files: the assembly source and the linker script, which I
 will explain in this post.
 
-# Requirements
+## Requirements
 
 This post is about what is needed to get the Teensy up and running rather then a
 guide to assembly programming so I assume you have a basic knowledge of
@@ -33,7 +33,7 @@ assembler `arm-none-eabi-as`, linker `arm-none-eabi-ld` and objcopy
 distribution's package managers or from inside a Arduino SDK's tools directory:
 `$ARDUINO_SDK/hardware/tools/arm/bin`.
 
-# The Linker script: `layout.ld`
+## The Linker script: `layout.ld`
 
 This file tells linker where the various bits of memory are located and tells it
 where to put different bits of the code. There are two main blocks to the linker
@@ -119,7 +119,7 @@ rest of the code with `*(.text)`.
 Finally we set a variable `_estack` to point to the end of the ram whcih will be
 used to set the stack pointer.
 
-# The assembly code: `crt0.s`
+## The assembly code: `crt0.s`
 
 Arm assembly comes in two flavors, the 16bit thumb instruction set and the
 full 32bit arm instruction set. With the first line of code `.syntax unified`
@@ -355,7 +355,7 @@ echo "Reset teensy now"
 teensy-loader-cli -w --mcu=mk20dx256 crt0.hex
 ~~~
 
-# Summary
+## Summary
 
 This was a very informative experience for me, having never touched assembly or
 done any bare metal programming on the arm before. There are still some bits
@@ -364,7 +364,7 @@ but is nice start to understanding what happens on the arm ship at the lowest
 level. I hope to expand on this in the future and see what it takes to convert
 the assembler to a higher level language such as C.
 
-# References
+## References
 1. [Karl Lunt - Bare-metal Teensy 3.x Development](http://www.seanet.com/~karllunt/bareteensy31.html)
 2. [Vijay Kumar B. - Embedded Programming with the GNU Toolchain](http://bravegnu.org/gnu-eprog/)
 3. [glock45 - Turn the LED on with assembler code ( Teensy 3.1 )](https://forum.pjrc.com/threads/25762-Turn-the-LED-on-with-assembler-code-\(-Teensy-3-1-\)?p=47739&viewfull=1#post47739)
