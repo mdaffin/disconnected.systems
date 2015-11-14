@@ -14,6 +14,8 @@ you will need the following equipment:
 &#42; I have tested this with the series 1 modules, but it should mostly work for the series 2 modules although some steps might be different.  
 &#42;&#42; Or any equivalent way of connecting the XBee to a computer.
 
+<!--more-->
+
 ---
 
 By default the XBee modules are configured in transparent mode where any data sent on the Din line

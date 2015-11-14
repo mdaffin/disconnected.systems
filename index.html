@@ -12,7 +12,7 @@ description: 'A blog about programming, Linux and all things open source'
     </h1>
     <span class="post-date">{{ post.date | date_to_string }}</span>
     {{ post.content | truncatewords: 140 }}
-    <a href="{{ post.url }}">Read more...</a>
+    </br><a href="{{ post.url }}">Read more...</a>
   </div>
   {% endfor %}
 </div>

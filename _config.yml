@@ -16,6 +16,7 @@ version:             1.0.0
 markdown: kramdown
 highlighter: pygments
 permalink: /:title/
+excerpt_separator: <!--more-->
 
 defaults:
   -

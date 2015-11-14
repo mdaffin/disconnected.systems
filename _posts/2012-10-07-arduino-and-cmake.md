@@ -12,6 +12,8 @@ So where do you go after you have outgrown the arduino ide? For me cmake was the
 and it turns out that someone else has already written a cmake
 module to build and upload programs to the arduino.<!--more-->
 
+<!--more-->
+  
 ## Installation
 
 You can download the module from [here](https://github.com/queezythegreat/arduino-cmake) and

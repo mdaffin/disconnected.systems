@@ -6,6 +6,8 @@ description: A simple arduino powered robot
 
 Over the past couple of weeks I have been developing an arduino powered autonomous rover.
 
+<!--more-->
+
 ## The Hardware
 
 The rover consists of the following hardware all fairly cheap and readily available;

@@ -24,6 +24,8 @@ repository](https://github.com/james147/embedded-examples/tree/master/teensy-3-a
 and only contains two files: the assembly source and the linker script, which I
 will explain in this post.
 
+<!--more-->
+
 ## Requirements
 
 This post is about what is needed to get the Teensy up and running rather then a

@@ -8,6 +8,8 @@ Having information displayed on a wall or monitor in an office or other public s
 useful to the people in that area. This post talks about how you can use a raspberry pi and any old
 monitor or tv to display an arbitrary webpage or application on it.
 
+<!--more-->
+
 ## Setup
 
 We are going to start with is a up-to-date ArchLinux image, read this if you don't know how to

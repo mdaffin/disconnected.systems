@@ -12,6 +12,8 @@ can you do about it? Well, this is where a [shrimp](http://shrimping.it/) comes 
 is basically a bare bones arduino, normally constructed on a breadboard or strip board, fully
 compatible with the arduino sdk, and only costs about a 10th of the price (&lt; £6).<!--more-->
 
+<!--more-->
+
 ## The Components
 
 The shrimp does not require many components, most of which can be bought very cheaply and are

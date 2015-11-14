@@ -8,6 +8,8 @@ There has been a few interesting projects over the past few years that have trie
 
 This post I will look at nim in an attempt to get it running on an Arduino UNO.
 
+<!--more-->
+
 ## Hello World in nim
 
 After installing the latest version of [nim](http://nim-lang.org/download.html) (0.12.0 at the time of writing) it was trivial to get an example program up and running:
