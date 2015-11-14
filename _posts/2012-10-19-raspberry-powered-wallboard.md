@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Raspberry Powered Wallboard
+description: A guide on how to setup a raspberry pi to use as a wallboard that once booted automatically loads a webpage.
 ---
 
 Having information displayed on a wall or monitor in an office or other public space can be very

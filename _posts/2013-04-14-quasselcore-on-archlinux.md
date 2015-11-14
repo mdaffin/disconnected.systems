@@ -1,6 +1,7 @@
 ---
 layout: post
 title: QuasselCore on Archlinux
+description: A guide to setting up a quassel server on Arch Linux server.
 ---
 
 I just set up a quassel server on an Arch Linux box. There is a serious lack of documentation around

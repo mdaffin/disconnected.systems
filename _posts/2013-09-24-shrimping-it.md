@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Shrimping it
+description: A quick tutorial on assembling a minimal DIY arduino known as the shrimp.
 ---
 
 The arduino platform is a great platform to work with, it is easy to code for and has a nice

@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Arduino Powered Rover
+description: A simple arduino powered robot
 ---
 
 Over the past couple of weeks I have been developing an arduino powered autonomous rover.

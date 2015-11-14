@@ -1,6 +1,7 @@
 ---
 layout: post
 title: XBee Configuration
+description: A beginners guide on configuring and communicating over two xbees.
 ---
 
 For my third year project I will be using a bunch of XBee connected to various devices, this post

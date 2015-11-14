@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Bare Metal Assembly on the Teensy 3.1
+description: A look at bare metal programming in assembly on the teensy 3.1 with out any external dependencies.
 ---
 
 I started to look at bare metal programming on the Teensy 3.1 and found quite a

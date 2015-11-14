@@ -1,6 +1,7 @@
 ---
 layout: post
-title: Arduino and Cmake
+title: Arduino and CMake
+description: A guide to building and uploading an arduino sketch with out the Arduino IDE using CMake.
 ---
 
 The arduino is a great platform for embedded development and the ide it comes with is a good
