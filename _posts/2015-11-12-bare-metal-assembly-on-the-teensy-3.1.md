@@ -19,7 +19,7 @@ very useful.
 
 I took the minimal assembly example above with what I learned from other
 articles around the topic to give a more complete, but still minimal, example.
-The final source can be found on [this github
+The final source can be found in [this github
 repository](https://github.com/james147/embedded-examples/tree/master/teensy-3-assembler)
 and only contains two files: the assembly source and the linker script, which I
 will explain in this post.
@@ -122,7 +122,7 @@ rest of the code with `*(.text)`.
 Finally we set a variable `_estack` to point to the end of the ram whcih will be
 used to set the stack pointer.
 
-## The assembly code: `crt0.s`
+## The assembly code: `blink.s`
 
 Arm assembly comes in two flavors, the 16bit thumb instruction set and the
 full 32bit arm instruction set. With the first line of code `.syntax unified`
@@ -130,7 +130,7 @@ we well the assembler we are using a mix of the instruction sets.
 
 As we discussed above, we need to define the exception vectors:
 
-<div class="code-header">crt0.s</div>
+<div class="code-header">blink.s</div>
 
 ~~~ assembly
 ...
@@ -169,7 +169,7 @@ to our linker script described in the last section. This address and the values
 are described in the programmers manual on page 569 but we are not making any
 real use of these features in this example.
 
-<div class="code-header">crt0.s</div>
+<div class="code-header">blink.s</div>
 
 ~~~ assembly
     .section ".flashconfig"
@@ -183,7 +183,7 @@ Now we move on to the setup code. This will be placed after the `.flashconfig`
 as we defined in the linker script. `_startup:` is the label that the arm chip
 will jump to when it resets as we defined in the exception vectors above.
 
-<div class="code-header">crt0.s</div>
+<div class="code-header">blink.s</div>
 
 ~~~ assembly
     .section ".startup","x",%progbits
@@ -196,7 +196,7 @@ _startup:
 There are a few things we need to do to setup the arm chip, first we reset all
 the registers to 0.
 
-<div class="code-header">crt0.s</div>
+<div class="code-header">blink.s</div>
 
 ~~~ assembly
 ...
@@ -224,7 +224,7 @@ disabling interrupts, unlocking the watchdog (so it can be configured) then
 disable it before enabling interrupts again. You can read more about how to
 configure the watchdog on page 463 of the programmers manual.
 
-<div class="code-header">crt0.s</div>
+<div class="code-header">blink.s</div>
 
 ~~~ assembly
 ...
@@ -250,7 +250,7 @@ the parts of the chip we want to use and start running our application loop. In
 this example that means to enable and set as an `OUTPUT` the GPIO pin the led
 is connected to.
 
-<div class="code-header">crt0.s</div>
+<div class="code-header">blink.s</div>
 
 ~~~ assembly
 
@@ -280,7 +280,7 @@ Our logic is very simple:
 
 Which is done by the following loop.
 
-<div class="code-header">crt0.s</div>
+<div class="code-header">blink.s</div>
 
 ~~~ assembly
     // Main loop
@@ -296,7 +296,7 @@ Rather then embedding logic in the loop above we have moved it into separate
 functions to mimic an actual application closer. The two functions to turn the
 led on and off are as follows.
 
-<div class="code-header">crt0.s</div>
+<div class="code-header">blink.s</div>
 
 ~~~ assembly
     // Function to turn the led off
@@ -321,7 +321,7 @@ led_on:
 And the last function just causes the processor to busy wait for a reasonable
 amount of time by counting down from a fairly large number.
 
-<div class="code-header">crt0.s</div>
+<div class="code-header">blink.s</div>
 
 ~~~ assembly
     // Uncalibrated busy wait
@@ -339,7 +339,7 @@ delay_loop:
 Finally we have the busy wait which will cause the chip to lockup in cause any
 of the interrupts we defined at the start trigger.
 
-<div class="code-header">crt0.s</div>
+<div class="code-header">blink.s</div>
 
 ~~~ assembly
 _halt: b _halt
@@ -351,11 +351,11 @@ _halt: b _halt
 To compile and upload to the Teensy run:
 
 ~~~ bash
-arm-none-eabi-as -g -mcpu=cortex-m4 -mthumb -o crt0.o crt0.s
-arm-none-eabi-ld -T layout.ld -o crt0.elf crt0.o
-arm-none-eabi-objcopy -O ihex -R .eeprom crt0.elf crt0.hex
+arm-none-eabi-as -g -mcpu=cortex-m4 -mthumb -o blink.o blink.s
+arm-none-eabi-ld -T layout.ld -o blink.elf blink.o
+arm-none-eabi-objcopy -O ihex -R .eeprom blink.elf blink.hex
 echo "Reset teensy now"
-teensy-loader-cli -w --mcu=mk20dx256 crt0.hex
+teensy-loader-cli -w --mcu=mk20dx256 blink.hex
 ~~~
 
 ## Summary
