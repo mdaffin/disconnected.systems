@@ -7,7 +7,7 @@ description: A look at bare metal programming in assembly on the teensy 3.1 with
 I started to look at bare metal programming on the Teensy 3.1 and found quite a
 few examples mainly based off the work of [Karl
 Lunt](http://www.seanet.com/~karllunt/bareteensy31.html). All of these examples
-include sevrial files and do not explain what they are for or where they are
+include several files and do not explain what they are for or where they are
 obtained. I started to dig a bit deeper and found an nice guide to low level arm
 programming [here](http://bravegnu.org/gnu-eprog/) which explained what some of
 them where for. Then I found a minimal working example in pure assembly for the
@@ -36,7 +36,7 @@ assembler `arm-none-eabi-as`, linker `arm-none-eabi-ld` and objcopy
 distribution's package managers or from inside a Arduino SDK's tools directory:
 `$ARDUINO_SDK/hardware/tools/arm/bin`.
 
-## The Linker script: `layout.ld`
+## The Linker script: [`layout.ld`](https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/layout.ld)
 
 This file tells linker where the various bits of memory are located and tells it
 where to put different bits of the code. There are two main blocks to the linker
@@ -47,7 +47,7 @@ located. The flash is located at the start of the chip `0x00000000` and on the
 MK20DX256VLH7 it is 256K long. Where as on the MK20DX256VLH7 the ram starts at
 0x1FFF8000 and is 64K long:
 
-<div class="code-header">layout.ld</div>
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/layout.ld#L29-L32">layout.ld</a></div>
 
 ~~~
 MEMORY {
@@ -74,7 +74,7 @@ MEMORY {
 The SECTIONS block tells the linker where to place the various parts of
 the program:
 
-<div class="code-header">layout.ld</div>
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/layout.ld#L34-L45">layout.ld</a></div>
 
 ~~~
 ...
@@ -119,10 +119,10 @@ read more about the values on page 569 of the programmers manual.
 After the flashconfig the startup code is placed with `*(.startup)` and finally the
 rest of the code with `*(.text)`.
 
-Finally we set a variable `_estack` to point to the end of the ram whcih will be
+Finally we set a variable `_estack` to point to the end of the ram which will be
 used to set the stack pointer.
 
-## The assembly code: `blink.s`
+## The assembly code: [`blink.s`](https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/blink.s)
 
 Arm assembly comes in two flavors, the 16bit thumb instruction set and the
 full 32bit arm instruction set. With the first line of code `.syntax unified`
@@ -130,7 +130,7 @@ we well the assembler we are using a mix of the instruction sets.
 
 As we discussed above, we need to define the exception vectors:
 
-<div class="code-header">blink.s</div>
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/blink.s#L32-L40">blink.s</a></div>
 
 ~~~ assembly
 ...
@@ -169,7 +169,7 @@ to our linker script described in the last section. This address and the values
 are described in the programmers manual on page 569 but we are not making any
 real use of these features in this example.
 
-<div class="code-header">blink.s</div>
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/blink.s#L42-L47">blink.s</a></div>
 
 ~~~ assembly
     .section ".flashconfig"
@@ -183,7 +183,7 @@ Now we move on to the setup code. This will be placed after the `.flashconfig`
 as we defined in the linker script. `_startup:` is the label that the arm chip
 will jump to when it resets as we defined in the exception vectors above.
 
-<div class="code-header">blink.s</div>
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/blink.s#L50-L53">blink.s</a></div>
 
 ~~~ assembly
     .section ".startup","x",%progbits
@@ -196,7 +196,7 @@ _startup:
 There are a few things we need to do to setup the arm chip, first we reset all
 the registers to 0.
 
-<div class="code-header">blink.s</div>
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/blink.s#L55-L67">blink.s</a></div>
 
 ~~~ assembly
 ...
@@ -224,7 +224,7 @@ disabling interrupts, unlocking the watchdog (so it can be configured) then
 disable it before enabling interrupts again. You can read more about how to
 configure the watchdog on page 463 of the programmers manual.
 
-<div class="code-header">blink.s</div>
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/blink.s#L69-L83">blink.s</a></div>
 
 ~~~ assembly
 ...
@@ -250,7 +250,7 @@ the parts of the chip we want to use and start running our application loop. In
 this example that means to enable and set as an `OUTPUT` the GPIO pin the led
 is connected to.
 
-<div class="code-header">blink.s</div>
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/blink.s#L85-L98">blink.s</a></div>
 
 ~~~ assembly
 
@@ -280,7 +280,7 @@ Our logic is very simple:
 
 Which is done by the following loop.
 
-<div class="code-header">blink.s</div>
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/blink.s#L100-L106">blink.s</a></div>
 
 ~~~ assembly
     // Main loop
@@ -296,7 +296,7 @@ Rather then embedding logic in the loop above we have moved it into separate
 functions to mimic an actual application closer. The two functions to turn the
 led on and off are as follows.
 
-<div class="code-header">blink.s</div>
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/blink.s#L108-L124">blink.s</a></div>
 
 ~~~ assembly
     // Function to turn the led off
@@ -321,7 +321,7 @@ led_on:
 And the last function just causes the processor to busy wait for a reasonable
 amount of time by counting down from a fairly large number.
 
-<div class="code-header">blink.s</div>
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/blink.s#L126-L135">blink.s</a></div>
 
 ~~~ assembly
     // Uncalibrated busy wait
@@ -339,7 +339,7 @@ delay_loop:
 Finally we have the busy wait which will cause the chip to lockup in cause any
 of the interrupts we defined at the start trigger.
 
-<div class="code-header">blink.s</div>
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/blink.s#L137-L138">blink.s</a></div>
 
 ~~~ assembly
 _halt: b _halt
