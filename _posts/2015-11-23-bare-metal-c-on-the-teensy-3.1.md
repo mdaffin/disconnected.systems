@@ -11,7 +11,6 @@ example that are more important in the C port, which I will cover in this post.
 The final source can be found in [this github
 repository](https://github.com/james147/embedded-examples/tree/master/teensy-3-c)
 and only contains two files: the c source and the linker script.
-
 <!--more-->
 
 # The Linker Script: [`layout.ld`](https://github.com/james147/embedded-examples/blob/master/teensy-3-c/layout.ld)
