@@ -12,6 +12,8 @@ The final source can be found in [this github
 repository](https://github.com/james147/embedded-examples/tree/master/teensy-3-c)
 and only contains two files: the c source and the linker script.
 
+<!--more-->
+
 # The Linker Script: [`layout.ld`](https://github.com/james147/embedded-examples/blob/master/teensy-3-c/layout.ld)
 
 The linker script is very similar to the assembly example, just with a couple of
