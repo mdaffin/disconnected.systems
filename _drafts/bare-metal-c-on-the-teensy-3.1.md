@@ -8,48 +8,33 @@ teensy 3.1](bare-metal-assembly-on-the-teensy-3.1/) I wanted to see what it
 would take to port it to C. There where a few bits missing from the assembly
 example that are more important in the C port, which I will cover in this post.
 
+The final source can be found in [this github
+repository](https://github.com/james147/embedded-examples/tree/master/teensy-3-c)
+and only contains two files: the c source and the linker script.
 
-
-# The Linker Script: `layout.ld`
+# The Linker Script: [`layout.ld`](https://github.com/james147/embedded-examples/blob/master/teensy-3-c/layout.ld)
 
 The linker script is very similar to the assembly example, just with a couple of
 additions. The `MEMORY` block is identical to the assembly example so we will
 skip over it.
 
-We have added three new lines to the `.text` part of the `SECTIONS` block.
+C places all `const` variables inside a section called `.rodata`, which we place
+after the code section with by adding the following to the end of the `.text`
+section in the `SECTIONS` block.
 
-<div class="code-header">layout.ld</div>
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/layout.ld#L44-L45">layout.ld</a></div>
 
 ~~~
         ...
         *(.rodata*)
         . = ALIGN(4);
-        _etext = .;
         ...
 ~~~
 
-The `.rodata` section is where C places all `const` variables, we simply put these
-after our code. We then align to the byte boundary and set a variable `_etext`
-that points to the end of our code and `const` data.
-
 Next we define the `.data` section. This is where C will place all initialized
-global variables, which can be modified so must be placed in `RAM`. This is done
-with `> RAM` at the end of the block, however we have a problem, RAM is
-volatile and will be empty when the chip first powers on.
+global variables, which can be modified so should be placed in `RAM`.
 
-Instead we want to store the values inside the `FLASH` section and copy them to
-the `RAM` when we boot up. We can tell the linker to store the values with `AT >
-FLASH`. Which causes the linker to reserve the section in `RAM` but to store the
-values in `FLASH`. We will deal with copying the values when the chip boots in
-C.
-
-We store the start and end addresses of this block in the `_sdata` and `_edata`
-variables. These point to the locations in RAM, but where are the values located
-in FLASH? That is what the `_etext` variable holds, since the values are
-appended to FLASH, they will start from the end of the last block, which we
-stored the variable `_etext`.
-
-<div class="code-header">layout.ld</div>
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/layout.ld#L48-L55">layout.ld</a></div>
 
 ~~~
     ...
@@ -64,10 +49,33 @@ stored the variable `_etext`.
     ...
 ~~~
 
-Now we have dealt with the initialized variables its time for the uninitialized
-variables which C store in a section called `.bss`. So we create that next, again storing the start and end in `_sbss` and `_ebss`.
+`RAM` is volatile so we cannot store the initial values of variables there
+directly. Instead we want to reserve space in `RAM` for them, but actually store
+them in the `FLASH` section. This will allow us to copy them from `FLASH` to
+`RAM` at runtime when the chip resets. We tell the linker to do this with `> RAM
+AT > FLASH`.
 
-<div class="code-header">layout.ld</div>
+To copy the data at runtime we need to know the start and end address of the
+data in `RAM`, which we store in the variables `_sdata` and `_edata`. We also
+need to know where the data starts in `FLASH`, which we obtain using `LOADADDR`
+and store in `_sflashdata`. This references the whole data block so much be
+located outside of it, we just place it at the top for convenience.
+
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/layout.ld#L29">layout.ld</a></div>
+
+~~~
+_sflashdata = LOADADDR(.data);
+~~~
+
+Note that we place two bits in the `.data` section. `.data` which contains the
+uninitialized variables and `.fastrun` which can contain any code that we want
+copied to `RAM` so it can be loaded faster when executed.
+
+The uninitialized variables are easier to deal with as we don't need to worry
+about copying them from `FLASH`. C stores them in a section called `.bss`. So we
+create that next, again storing the start and end in `_sbss` and `_ebss`.
+
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/layout.ld#L57-L64">layout.ld</a></div>
 
 ~~~
     ...
@@ -82,15 +90,16 @@ variables which C store in a section called `.bss`. So we create that next, agai
     ...
 ~~~
 
-# The C code: `crt0.c`
+# The C Code: [`blink.c`](https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c)
 
-We start with some definitions, some macros, the values from our linker script
-and the forward decelerations of the functions we are going to write.
+The C code is a port of the assembly code and contains all the major parts
+including, the exception vectors, flash configuration, start up code, the main
+loop and functions for turning the led on/off and a simple delay.
 
-The macros are simply to put a name to the various memory location we are going
-to be using and are the same ones we played with in the assembly example.
+We start with some macros definitions that will allow us to write to various
+memory locations by name rather then their actual address.
 
-<div class="code-header">layout.ld</div>
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L30-L35">blink.c</a></div>
 
 ~~~
 #define WDOG_UNLOCK  (*(volatile unsigned short *)0x4005200E) // Watchdog Unlock register
@@ -99,8 +108,18 @@ to be using and are the same ones we played with in the assembly example.
 #define PORTC_PCR5   (*(volatile unsigned short *)0x4004B014) // PORTC_PCR5 - page 223/227
 #define GPIOC_PDDR   (*(volatile unsigned short *)0x400FF094) // GPIOC_PDDR - page 1334,1337
 #define GPIOC_PDOR   (*(volatile unsigned short *)0x400FF080) // GPIOC_PDOR - page 1334,1335
+~~~
 
-extern unsigned long _etext;
+You should recognize these values from the assembly example and can all be found
+in the programmers manual. They have all been brought to the top so their
+definitions can be reused and to make the code easier to read.
+
+Then we declare the linker script variables and the functions we will use later.
+
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L37-L53">blink.c</a></div>
+
+~~~
+extern unsigned long _sflashdata;
 extern unsigned long _sdata;
 extern unsigned long _edata;
 extern unsigned long _sbss;
@@ -120,14 +139,13 @@ void delay(int ms);
 ...
 ~~~
 
-Like in the assembly example we need to define the exception vectors. We define
-them as an array of const function pointers and assign the function we want to
-handle each interrupt. Like in the assembly example we need to tell gcc that
-this code should be placed in the `.vectors` section which is done with the
-attribute flag. The `used` attribute flag is also used to tell gcc not to remove
-the code as it normally would unused code.
+We define the exception vectors as an array of const function pointers and
+assign the function we want to handle each interrupt. Like in the assembly
+example we need to tell gcc that this code should be placed in the `.vectors`
+section which is done with the attribute flag. The `used` attribute flag tells
+gcc the the code is used and to not remove it during the optimization process.
 
-<div class="code-header">layout.ld</div>
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L55-L64">blink.c</a></div>
 
 ~~~
 __attribute__ ((section(".vectors"), used))
@@ -142,10 +160,10 @@ void (* const _vectors[7])(void) = {
 };
 ~~~
 
-We then do something similar for the `.flashconfig` section but with an array on
+We then do something similar for the `.flashconfig` section using an array of
 unsigned chars.
 
-<div class="code-header">layout.ld</div>
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L66-L70">blink.c</a></div>
 
 ~~~
 __attribute__ ((section(".flashconfig"), used))
@@ -155,12 +173,15 @@ const unsigned char flashconfigbytes[16] = {
 };
 ~~~
 
-The startup code should also look similar to the assembly example, we define a
-function then unlock and disable the watchdog. Todo this we make use of the
-macros we defined at the start but is functionally equivalent to the assembly
-example.
+The startup code is also similar to the assembly example but now also
+initializes the global variables in ram. But first we unlock and
+disable the watchdog.
 
-<div class="code-header">layout.ld</div>
+The startup code expands upon the assembly example, it now also initializes the
+global variables in ram for the rest of the program to use. But like in the
+assembly we first need to unlock and disable the watchdog.
+
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L72-L76">blink.c</a></div>
 
 ~~~
 __attribute__ ((section(".startup")))
@@ -171,15 +192,15 @@ void startup() {
   ...
 ~~~
 
-This next section is new, this is where we copy the initialized variables from
-the `FLASH` section to `.data` in `RAM` and then initialize the `.bss` section
-to all `0`.
+Then we immediately setup the global variables before anything else attempts to
+use them. This is simply done by copying the `.data` location in `FLASH` to its
+location in `RAM`, then zeroing the `.bss` section in `RAM`.
 
-<div class="code-header">layout.ld</div>
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L78-L83">blink.c</a></div>
 
 ~~~
   ...
-	unsigned long *src = &_etext;
+	unsigned long *src = &_sflashdata;
 	unsigned long *dest = &_sdata;
 
 	while (dest < &_edata) *dest++ = *src++;
@@ -188,10 +209,10 @@ to all `0`.
   ...
 ~~~
 
-And the rest of startup is from the assembly example and simply configures the
-gpio pins so that we can blink the led before jumping into our infinite loop.
+And the rest of startup simply configures the gpio pins as we did in the
+assembly example before jumping into the loop.
 
-<div class="code-header">layout.ld</div>
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L44-L45">blink.c</a></div>
 
 ~~~
   // Enable system clock on all GPIO ports - page 254
@@ -209,7 +230,7 @@ Our loop is also very similar to the assembly example, the major difference is
 we initialize a variable to pass to delay. This is done simply to verify that
 the `.data` section is initialize correctly by our startup code.
 
-<div class="code-header">layout.ld</div>
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L44-L45">blink.c</a></div>
 
 ~~~
 int n = 1000; // Used to test if the data section is copied correctly
@@ -223,10 +244,9 @@ void loop() {
 }
 ~~~
 
-We turn the led on and off in the same way as the assembly code and the delay was
-changed to accept an argument but is otherwise the same.
+The rest of the functions do the same thing as they did in the assembly example.
 
-<div class="code-header">layout.ld</div>
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L44-L45">blink.c</a></div>
 
 ~~~
 void led_on() {
@@ -242,8 +262,10 @@ void delay(int ms) {
 }
 ~~~
 
-Finally all of the exception handlers are defined to simply lockup the cpu by busy looping.
-<div class="code-header">layout.ld</div>
+Finally all of the exception handlers are defined to simply lockup the cpu by
+busy looping.
+
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L44-L45">blink.c</a></div>
 
 ~~~
 void nim_handler() { while (1); }
@@ -255,7 +277,7 @@ void usage_fault_handler() { while (1); }
 
 # Compile and upload
 
-To compile and upload we only change the assembler to the c compiler and add the `-nostdlib` and `-c` flags to stop gcc including the std libraries and to tell it to compile without linking.
+To compile and upload we swap out the assembler for the c compiler and add the `-nostdlib` and `-c` flags to stop gcc including the std libraries and to tell it to compile without linking.
 
 ~~~bash
 arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -nostdlib -c -o crt0.o crt0.c
@@ -269,8 +291,8 @@ teensy-loader-cli -w --mcu=mk20dx256 crt0.hex
 
 Although more complete then the assembly example there are still some missing
 bits. Most notably we have not setup the heap or malloc so cannot dynamically
-allocate space. I would still recommend using a more complete base for any real
-work such as form the teensy project
+allocate memory. I would still recommend using a more complete base for any real
+project such as form the teensy project
 ([mk29dx128.c](https://github.com/PaulStoffregen/cores/blob/master/teensy3/mk20dx128.c),
 [mk20dx256.ld](https://github.com/PaulStoffregen/cores/blob/master/teensy3/mk20dx256.ld))
 which you will see share many similar parts as explained in this post.
