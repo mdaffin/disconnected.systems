@@ -214,7 +214,7 @@ location in `RAM`, then zeroing the `.bss` section in `RAM`.
 And the rest of startup simply configures the gpio pins as we did in the
 assembly example before jumping into the loop.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L44-L45">blink.c</a></div>
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L85-L93">blink.c</a></div>
 
 ~~~
   // Enable system clock on all GPIO ports - page 254
@@ -232,7 +232,7 @@ Our loop is also very similar to the assembly example, the major difference is
 we initialize a variable to pass to delay. This is done simply to verify that
 the `.data` section is initialize correctly by our startup code.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L44-L45">blink.c</a></div>
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L95-L103">blink.c</a></div>
 
 ~~~
 int n = 1000; // Used to test if the data section is copied correctly
@@ -248,7 +248,7 @@ void loop() {
 
 The rest of the functions do the same thing as they did in the assembly example.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L44-L45">blink.c</a></div>
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L105-L116">blink.c</a></div>
 
 ~~~
 void led_on() {
@@ -267,7 +267,7 @@ void delay(int ms) {
 Finally all of the exception handlers are defined to simply lockup the cpu by
 busy looping.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L44-L45">blink.c</a></div>
+<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L118-L122">blink.c</a></div>
 
 ~~~
 void nim_handler() { while (1); }
