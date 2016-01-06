@@ -1,18 +1,21 @@
 ---
 layout: post
 title: Bare Metal Rust on the Teensy 3.1
+published: false
 ---
 
-Now that we have a good understanding of bare metal programming using the
-triditional languages I wanted to look at rust. In this post I will port the
+
+Now that we have a good understanding of basic bare metal programming using the
+triditional languages I wanted to look at [rust](https://www.rust-lang.org/). In this post I will port the
 [bare metal c](bare-metal-c-on-the-teensy-3.1/) example to rust with cargo,
 rusts dependency manager and build manager.
+
 
 
 <!--more-->
 
 The final source can be found in [this github
-repository](https://github.com/james147/embedded-examples/tree/master/teensy-3-rust) with the following contents:
+repository](https://github.com/james147/embedded-examples/tree/master/teensy-3-rust) with the following structure:
 
 ```
 ├── build.rs
@@ -25,7 +28,7 @@ repository](https://github.com/james147/embedded-examples/tree/master/teensy-3-r
 └── thumbv7em-none-eabi.json
 ```
 
-Now, this is a few more files needed then the c example, however most of them are for cargo and just make our life abit easier.
+Now, this is a few more files needed then the c example, however most of them are for cargo and just make our life abit easier in the long run.
 
 The linker script
 [`layout.ld`](https://github.com/james147/embedded-examples/blob/master/teensy-3-rust/layout.ld)
