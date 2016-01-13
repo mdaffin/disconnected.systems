@@ -47,6 +47,8 @@ located. The flash is located at the start of the chip `0x00000000` and on the
 MK20DX256VLH7 it is 256K long. Where as on the MK20DX256VLH7 the ram starts at
 0x1FFF8000 and is 64K long:
 
+<code data-gist-id="d6fb7e91aa21d6943ef4" data-gist-file="file-layout.ld" data-gist-line="29-32"></code>
+
 <div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/layout.ld#L29-L32">layout.ld</a></div>
 
 ~~~
