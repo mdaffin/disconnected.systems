@@ -49,16 +49,6 @@ MK20DX256VLH7 it is 256K long. Where as on the MK20DX256VLH7 the ram starts at
 
 <code data-gist-id="d6fb7e91aa21d6943ef4" data-gist-file="layout.ld" data-gist-line="29-32"></code>
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/layout.ld#L29-L32">layout.ld</a></div>
-
-~~~
-MEMORY {
-    FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 256K
-    RAM  (rwx) : ORIGIN = 0x1FFF8000, LENGTH = 64K
-}
-...
-~~~
-
 The values for these location can be found in the programmers manual on pages 63
 and 90. Note that you can split up the flash and ram even more to give greater
 control over the layout of code and give each section different permissions. For
@@ -76,23 +66,7 @@ MEMORY {
 The SECTIONS block tells the linker where to place the various parts of
 the program:
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/layout.ld#L34-L45">layout.ld</a></div>
-
-~~~
-...
-SECTIONS {
-    . = 0x00000000;
-    .text : {
-        KEEP(*(.vectors)) /* vectors must be placed first - page 63*/
-        . = 0x400;
-        KEEP(*(.flashconfig*)) /* flash configuration starts at 0x400 - page 569 */
-        *(.startup)
-        *(.text)
-    } > FLASH
-
-    _estack = ORIGIN(RAM) + LENGTH(RAM); /* stack pointer start */
-}
-~~~
+<code data-gist-id="d6fb7e91aa21d6943ef4" data-gist-file="layout.ld" data-gist-line="34-45"></code>
 
 `. = 0x000000000;` sets the current location to the start of the block.
 
@@ -132,20 +106,7 @@ we well the assembler we are using a mix of the instruction sets.
 
 As we discussed above, we need to define the exception vectors:
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/blink.s#L32-L40">blink.s</a></div>
-
-~~~ assembly
-...
-    .section ".vectors"
-    .long _estack  //  0 ARM: Initial Stack Pointer
-    .long _startup //  1 ARM: Initial Program Counter
-    .long _halt    //  2 ARM: Non-maskable Interrupt (NMI)
-    .long _halt    //  3 ARM: Hard Fault
-    .long _halt    //  4 ARM: MemManage Fault
-    .long _halt    //  5 ARM: Bus Fault
-    .long _halt    //  6 ARM: Usage Fault
-...
-~~~
+<code data-gist-id="d6fb7e91aa21d6943ef4" data-gist-file="blink.s" data-gist-line="32-40"></code>
 
 The `.section ".vectors"` tells the assembler to place this bit of code in the
 `.vectors` section described in the linker script above, which we placed at the
@@ -171,53 +132,18 @@ to our linker script described in the last section. This address and the values
 are described in the programmers manual on page 569 but we are not making any
 real use of these features in this example.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/blink.s#L42-L47">blink.s</a></div>
-
-~~~ assembly
-    .section ".flashconfig"
-    .long   0xFFFFFFFF
-    .long   0xFFFFFFFF
-    .long   0xFFFFFFFF
-    .long   0xFFFFFFFE
-~~~
+<code data-gist-id="d6fb7e91aa21d6943ef4" data-gist-file="blink.s" data-gist-line="42-47"></code>
 
 Now we move on to the setup code. This will be placed after the `.flashconfig`
 as we defined in the linker script. `_startup:` is the label that the arm chip
 will jump to when it resets as we defined in the exception vectors above.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/blink.s#L50-L53">blink.s</a></div>
-
-~~~ assembly
-    .section ".startup","x",%progbits
-    .thumb_func
-    .global _startup
-_startup:
-...
-~~~
+<code data-gist-id="d6fb7e91aa21d6943ef4" data-gist-file="blink.s" data-gist-line="50-53"></code>
 
 There are a few things we need to do to setup the arm chip, first we reset all
 the registers to 0.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/blink.s#L55-L67">blink.s</a></div>
-
-~~~ assembly
-...
-    // Zero all the registers
-    mov     r0,#0
-    mov     r1,#0
-    mov     r2,#0
-    mov     r3,#0
-    mov     r4,#0
-    mov     r5,#0
-    mov     r6,#0
-    mov     r7,#0
-    mov     r8,#0
-    mov     r9,#0
-    mov     r10,#0
-    mov     r11,#0
-    mov     r12,#0
-...
-~~~
+<code data-gist-id="d6fb7e91aa21d6943ef4" data-gist-file="blink.s" data-gist-line="55-67"></code>
 
 The Teensy 3 has a watchdog, which is enabled by default. This will cause the
 chip to reset if the watchdog is not reset frequently. We do not want to worry
@@ -226,51 +152,14 @@ disabling interrupts, unlocking the watchdog (so it can be configured) then
 disable it before enabling interrupts again. You can read more about how to
 configure the watchdog on page 463 of the programmers manual.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/blink.s#L69-L83">blink.s</a></div>
-
-~~~ assembly
-...
-    cpsid i // Disable interrupts
-
-    // Unlock watchdog - page 478
-    ldr r6, = 0x4005200E // address from page 473
-    ldr r0, = 0xC520
-    strh r0, [r6]
-    ldr r0, = 0xD928
-    strh r0, [r6]
-
-    // Disable watchdog - page 468
-    ldr r6, = 0x40052000 // address from page 473
-    ldr r0, = 0x01D2
-    strh r0, [r6]
-
-    cpsie i // Enable interrupts
-~~~
+<code data-gist-id="d6fb7e91aa21d6943ef4" data-gist-file="blink.s" data-gist-line="69-83"></code>
 
 With that the general configuration of the chip is done. We can now configure
 the parts of the chip we want to use and start running our application loop. In
 this example that means to enable and set as an `OUTPUT` the GPIO pin the led
 is connected to.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/blink.s#L85-L98">blink.s</a></div>
-
-~~~ assembly
-
-    // Enable system clock on all GPIO ports - page 254
-    ldr r6, = 0x40048038
-    ldr r0, = 0x00043F82 // 0b1000011111110000010
-    str r0, [r6]
-
-    // Configure the led pin
-    ldr r6, = 0x4004B014 // PORTC_PCR5 - page 223/227
-    ldr r0, = 0x00000143 // Enables GPIO | DSE | PULL_ENABLE | PULL_SELECT - page 227
-    str r0, [r6]
-
-    // Set the led pin to output
-    ldr r6, = 0x400FF094 // GPIOC_PDDR - page 1334,1337
-    ldr r0, = 0x20 // pin 5 on port c
-    str r0, [r6]
-~~~
+<code data-gist-id="d6fb7e91aa21d6943ef4" data-gist-file="blink.s" data-gist-line="85-98"></code>
 
 Our logic is very simple:
 
@@ -282,71 +171,23 @@ Our logic is very simple:
 
 Which is done by the following loop.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/blink.s#L100-L106">blink.s</a></div>
-
-~~~ assembly
-    // Main loop
-loop:
-    bl led_on
-    bl delay
-    bl led_off
-    bl delay
-    b loop
-~~~
+<code data-gist-id="d6fb7e91aa21d6943ef4" data-gist-file="blink.s" data-gist-line="100-106"></code>
 
 Rather then embedding logic in the loop above we have moved it into separate
 functions to mimic an actual application closer. The two functions to turn the
 led on and off are as follows.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/blink.s#L108-L124">blink.s</a></div>
-
-~~~ assembly
-    // Function to turn the led off
-    .thumb_func
-    .global led_off
-led_off:
-    ldr r6, = 0x400FF080 // GPIOC_PDOR - page 1334,1335
-    ldr r0, = 0x0
-    str r0, [r6]
-    mov pc, r14
-
-    // Function to turn the led on
-    .thumb_func
-    .global led_on
-led_on:
-    ldr r6, = 0x400FF080 // GPIOC_PDOR - page 1334,1335
-    ldr r0, = 0x20
-    str r0, [r6]
-    mov pc, r14
-~~~
+<code data-gist-id="d6fb7e91aa21d6943ef4" data-gist-file="blink.s" data-gist-line="108-124"></code>
 
 And the last function just causes the processor to busy wait for a reasonable
 amount of time by counting down from a fairly large number.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/blink.s#L126-L135">blink.s</a></div>
-
-~~~ assembly
-    // Uncalibrated busy wait
-    .thumb_func
-    .global delay
-delay:
-    ldr r1, = 0x2625A0
-delay_loop:
-    sub r1, r1, #1
-    cmp r1, #0
-    bne delay_loop
-    mov pc, r14
-~~~
+<code data-gist-id="d6fb7e91aa21d6943ef4" data-gist-file="blink.s" data-gist-line="126-135"></code>
 
 Finally we have the busy wait which will cause the chip to lockup in cause any
 of the interrupts we defined at the start trigger.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-assembly/blink.s#L137-L138">blink.s</a></div>
-
-~~~ assembly
-_halt: b _halt
-    .end
-~~~
+<code data-gist-id="d6fb7e91aa21d6943ef4" data-gist-file="blink.s" data-gist-line="137-138"></code>
 
 ## Compile and Upload
 
