@@ -4,13 +4,10 @@ title: Bare Metal Rust on the Teensy 3.1
 published: false
 ---
 
-
 Now that we have a good understanding of basic bare metal programming using the
-triditional languages I wanted to look at [rust](https://www.rust-lang.org/). In this post I will port the
+traditional languages I wanted to look at [rust](https://www.rust-lang.org/). In this post I will port the
 [bare metal c](bare-metal-c-on-the-teensy-3.1/) example to rust with cargo,
 rusts dependency manager and build manager.
-
-
 
 <!--more-->
 
@@ -41,7 +38,7 @@ This is a simple port of blink.c from the c example . We have moved it to src as
 this is where cargo looks for our code and have renamed it to main.rs to tell
 cargo we want to build a binary.
 
-Rust makes use of feature guards to stop accdental use of unsable/experimental features. Unfortinutly bare metal programming still requires a few of these features so we must state which ones we want to use.
+Rust makes use of feature guards to stop accidental use of unsable/experimental features. Unfortunately bare metal programming still requires a few of these features so we must state which ones we want to use.
 
 * [lang_items](https://doc.rust-lang.org/book/lang-items.html): so we can define some functions that are needed by rust to work (these are normally defined in the standard libraries)
 * [no_std](https://doc.rust-lang.org/book/no-stdlib.html): to disable the standard libraries as they require an operating system to work
@@ -49,7 +46,7 @@ Rust makes use of feature guards to stop accdental use of unsable/experimental f
 * [asm](https://doc.rust-lang.org/book/inline-assembly.html): to allow us to call inline assembly directly
 * [start](https://gist.github.com/luqmana/fa40eb63ff653fdfb3cf): to allow us to override the entry point to our program
 
-We then disable the standard library with `#![no_std]`, tell rust we want a staticly linked executable `#![crate_type="staticlib"]` and decalre we want to use `volatile_store` from `core::intrinsics`.
+We then disable the standard library with `#![no_std]`, tell rust we want a statically linked executable `#![crate_type="staticlib"]` and declare we want to use `volatile_store` from `core::intrinsics`.
 
 <div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-rust/src/main.rs#L1-L5">src/main.rs</a></div>
 
@@ -61,7 +58,7 @@ We then disable the standard library with `#![no_std]`, tell rust we want a stat
 use core::intrinsics::{volatile_store};
 ~~~
 
-And now some required language functions which just cause the code to halt if we enconter an error.
+And now some required language functions which just cause the code to halt if we encounter an error.
 
 <div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-rust/src/main.rs#L7-L26">src/main.rs</a></div>
 
@@ -132,7 +129,7 @@ but you only need to edit it if you want to target a different platform.
 
 At this point we are able to build a rust program by downloading the rust core,
 compiling it then compiling `src/main.rs` against the new rust core. If you want
-to take this approch I recommend reading [this blog
+to take this approach I recommend reading [this blog
 post](http://www.hashmismatch.net/2015/05/18/pragmatic-bare-metal-rust.html) but
 in this post we are going to look at compiling our program with cargo.
 
@@ -191,7 +188,7 @@ compiler refuses to compile when you get it wrong.
 
 This use case for rust is still highly experimental, hence the need for
 rust-nightly and prone to randomly breaking in newer version. This can be seen
-in allot of the examples out there (and likey this one in a while) where they no
+in allot of the examples out there (and likely this one in a while) where they no
 longer compile against the latest version of rust-nightly. This makes the whole
 process more tedious then it should be as allot of the information out there is
 out of date.
