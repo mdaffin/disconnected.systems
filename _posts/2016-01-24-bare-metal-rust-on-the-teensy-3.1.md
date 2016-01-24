@@ -1,7 +1,8 @@
-<!-- --- -->
+---
 layout: post
 title: Bare Metal Rust on the Teensy 3.1
-published: false
+description: A bare metal example of blink written in rust for the teensy 3.1
+excerpt_separator: <!--more-->
 ---
 
 Now that we have a good understanding of basic bare metal programming using the
