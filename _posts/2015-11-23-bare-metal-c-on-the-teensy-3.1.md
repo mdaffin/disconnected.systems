@@ -24,32 +24,12 @@ C places all `const` variables inside a section called `.rodata`, which we place
 after the code section with by adding the following to the end of the `.text`
 section in the `SECTIONS` block.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/layout.ld#L44-L45">layout.ld</a></div>
-
-~~~
-        ...
-        *(.rodata*)
-        . = ALIGN(4);
-        ...
-~~~
+<code data-gist-id="f9132c388fae9ef5f5fe" data-gist-file="layout.ld" data-gist-line="44-45"></code>
 
 Next we define the `.data` section. This is where C will place all initialized
 global variables, which can be modified so should be placed in `RAM`.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/layout.ld#L48-L55">layout.ld</a></div>
-
-~~~
-    ...
-    .data : {
-        . = ALIGN(4);
-        _sdata = .;
-        *(.fastrun*)
-        *(.data*)
-        . = ALIGN(4);
-        _edata = .;
-    } > RAM AT > FLASH
-    ...
-~~~
+<code data-gist-id="f9132c388fae9ef5f5fe" data-gist-file="layout.ld" data-gist-line="48-55"></code>
 
 `RAM` is volatile so we cannot store the initial values of variables there
 directly. Instead we want to reserve space in `RAM` for them, but actually store
@@ -63,11 +43,7 @@ need to know where the data starts in `FLASH`, which we obtain using `LOADADDR`
 and store in `_sflashdata`. This references the whole data block so much be
 located outside of it, we just place it at the top for convenience.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/layout.ld#L29">layout.ld</a></div>
-
-~~~
-_sflashdata = LOADADDR(.data);
-~~~
+<code data-gist-id="f9132c388fae9ef5f5fe" data-gist-file="layout.ld" data-gist-line="29"></code>
 
 Note that we place two bits in the `.data` section. `.data` which contains the
 uninitialized variables and `.fastrun` which can contain any code that we want
@@ -77,20 +53,7 @@ The uninitialized variables are easier to deal with as we don't need to worry
 about copying them from `FLASH`. C stores them in a section called `.bss`. So we
 create that next, again storing the start and end in `_sbss` and `_ebss`.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/layout.ld#L57-L64">layout.ld</a></div>
-
-~~~
-    ...
-    .bss : {
-        . = ALIGN(4);
-        _sbss = .;
-        *(.bss*)
-        *(COMMON)
-        . = ALIGN(4);
-        _ebss = .;
-    } > RAM
-    ...
-~~~
+<code data-gist-id="f9132c388fae9ef5f5fe" data-gist-file="layout.ld" data-gist-line="57-64"></code>
 
 # The C Code: [`blink.c`](https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c)
 
@@ -101,16 +64,7 @@ loop and functions for turning the led on/off and a simple delay.
 We start with some macros definitions that will allow us to write to various
 memory locations by name rather then their actual address.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L30-L35">blink.c</a></div>
-
-~~~
-#define WDOG_UNLOCK  (*(volatile unsigned short *)0x4005200E) // Watchdog Unlock register
-#define WDOG_STCTRLH (*(volatile unsigned short *)0x40052000) // Watchdog Status and Control Register High
-#define GPIO_CONFIG  (*(volatile unsigned short *)0x40048038)
-#define PORTC_PCR5   (*(volatile unsigned short *)0x4004B014) // PORTC_PCR5 - page 223/227
-#define GPIOC_PDDR   (*(volatile unsigned short *)0x400FF094) // GPIOC_PDDR - page 1334,1337
-#define GPIOC_PDOR   (*(volatile unsigned short *)0x400FF080) // GPIOC_PDOR - page 1334,1335
-~~~
+<code data-gist-id="f9132c388fae9ef5f5fe" data-gist-file="blink.c" data-gist-line="30-35"></code>
 
 You should recognize these values from the assembly example and can all be found
 in the programmers manual. They have all been brought to the top so their
@@ -118,28 +72,7 @@ definitions can be reused and to make the code easier to read.
 
 Then we declare the linker script variables and the functions we will use later.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L37-L53">blink.c</a></div>
-
-~~~
-extern unsigned long _sflashdata;
-extern unsigned long _sdata;
-extern unsigned long _edata;
-extern unsigned long _sbss;
-extern unsigned long _ebss;
-extern unsigned long _estack;
-
-void startup();
-void nim_handler();
-void hard_fault_handler();
-void mem_fault_handler();
-void bus_fault_handler();
-void usage_fault_handler();
-void loop();
-void led_on();
-void led_off();
-void delay(int ms);
-...
-~~~
+<code data-gist-id="f9132c388fae9ef5f5fe" data-gist-file="blink.c" data-gist-line="37-53"></code>
 
 We define the exception vectors as an array of const function pointers and
 assign the function we want to handle each interrupt. Like in the assembly
@@ -147,33 +80,12 @@ example we need to tell gcc that this code should be placed in the `.vectors`
 section which is done with the attribute flag. The `used` attribute flag tells
 gcc the the code is used and to not remove it during the optimization process.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L55-L64">blink.c</a></div>
-
-~~~
-__attribute__ ((section(".vectors"), used))
-void (* const _vectors[7])(void) = {
-  (void (*)(void))((unsigned long)&_estack),
-  startup,
-  nim_handler,
-  hard_fault_handler,
-  mem_fault_handler,
-  bus_fault_handler,
-  usage_fault_handler
-};
-~~~
+<code data-gist-id="f9132c388fae9ef5f5fe" data-gist-file="blink.c" data-gist-line="55-64"></code>
 
 We then do something similar for the `.flashconfig` section using an array of
 unsigned chars.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L66-L70">blink.c</a></div>
-
-~~~
-__attribute__ ((section(".flashconfig"), used))
-const unsigned char flashconfigbytes[16] = {
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFE, 0xFF, 0xFF, 0xFF
-};
-~~~
+<code data-gist-id="f9132c388fae9ef5f5fe" data-gist-file="blink.c" data-gist-line="66-70"></code>
 
 The startup code is also similar to the assembly example but now also
 initializes the global variables in ram. But first we unlock and
@@ -183,99 +95,33 @@ The startup code expands upon the assembly example, it now also initializes the
 global variables in ram for the rest of the program to use. But like in the
 assembly we first need to unlock and disable the watchdog.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L72-L76">blink.c</a></div>
-
-~~~
-__attribute__ ((section(".startup")))
-void startup() {
-  WDOG_UNLOCK  = ((unsigned short)0xC520);
-  WDOG_UNLOCK  = ((unsigned short)0xD928);
-  WDOG_STCTRLH = ((unsigned short)0x01D2);
-  ...
-~~~
+<code data-gist-id="f9132c388fae9ef5f5fe" data-gist-file="blink.c" data-gist-line="72-76"></code>
 
 Then we immediately setup the global variables before anything else attempts to
 use them. This is simply done by copying the `.data` location in `FLASH` to its
 location in `RAM`, then zeroing the `.bss` section in `RAM`.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L78-L83">blink.c</a></div>
-
-~~~
-  ...
-	unsigned long *src = &_sflashdata;
-	unsigned long *dest = &_sdata;
-
-	while (dest < &_edata) *dest++ = *src++;
-	dest = &_sbss;
-	while (dest < &_ebss) *dest++ = 0;
-  ...
-~~~
+<code data-gist-id="f9132c388fae9ef5f5fe" data-gist-file="blink.c" data-gist-line="78-83"></code>
 
 And the rest of startup simply configures the gpio pins as we did in the
 assembly example before jumping into the loop.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L85-L93">blink.c</a></div>
-
-~~~
-  // Enable system clock on all GPIO ports - page 254
-  GPIO_CONFIG = ((unsigned short)0x00043F82); // 0b1000011111110000010
-  // Configure the led pin
-  PORTC_PCR5 = ((unsigned short)0x00000143); // Enables GPIO | DSE | PULL_ENABLE | PULL_SELECT - page 227
-  // Set the led pin to output
-  GPIOC_PDDR = ((unsigned short)0x20); // pin 5 on port c
-
-  loop();
-}
-~~~
+<code data-gist-id="f9132c388fae9ef5f5fe" data-gist-file="blink.c" data-gist-line="85-93"></code>
 
 Our loop is also very similar to the assembly example, the major difference is
 we initialize a variable to pass to delay. This is done simply to verify that
 the `.data` section is initialize correctly by our startup code.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L95-L103">blink.c</a></div>
-
-~~~
-int n = 1000; // Used to test if the data section is copied correctly
-void loop() {
-  while (1) {
-    led_on();
-    delay(n);
-    led_off();
-    delay(n);
-  }
-}
-~~~
+<code data-gist-id="f9132c388fae9ef5f5fe" data-gist-file="blink.c" data-gist-line="95-103"></code>
 
 The rest of the functions do the same thing as they did in the assembly example.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L105-L116">blink.c</a></div>
-
-~~~
-void led_on() {
-  GPIOC_PDOR = ((unsigned short)0x20);
-}
-
-void led_off() {
-  GPIOC_PDOR = ((unsigned short)0x0);
-}
-
-void delay(int ms) {
-  for (unsigned int i = 0; i <= ms * 2500; i++) {;}
-}
-~~~
+<code data-gist-id="f9132c388fae9ef5f5fe" data-gist-file="blink.c" data-gist-line="105-116"></code>
 
 Finally all of the exception handlers are defined to simply lockup the cpu by
 busy looping.
 
-<div class="code-header"><a href="https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c#L118-L122">blink.c</a></div>
-
-~~~
-void nim_handler() { while (1); }
-void hard_fault_handler() { while (1); }
-void mem_fault_handler() { while (1); }
-void bus_fault_handler() { while (1); }
-void usage_fault_handler() { while (1); }
-~~~
+<code data-gist-id="f9132c388fae9ef5f5fe" data-gist-file="blink.c" data-gist-line="118-122"></code>
 
 # Compile and upload
 
