@@ -18,7 +18,7 @@ more files and cargo enforces a stricter layout (ie the source must be in the
 `src/` directory. Most of the addition files are for rust and are meant to make
 life simpler in the long run. The final project structure is as follows:
 
-```
+~~~
 ├── build.rs
 ├── .cargo
 │   └── config
@@ -27,7 +27,7 @@ life simpler in the long run. The final project structure is as follows:
 ├── src
 │   └── main.rs
 └── thumbv7em-none-eabi.json
-```
+~~~
 
 The linker script
 [`layout.ld`](https://github.com/james147/teensy-3-rust/blob/master/layout.ld)
