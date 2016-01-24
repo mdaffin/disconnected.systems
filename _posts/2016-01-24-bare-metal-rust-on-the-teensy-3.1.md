@@ -7,7 +7,7 @@ excerpt_separator: <!--more-->
 
 Now that we have a good understanding of basic bare metal programming using the
 traditional languages I wanted to look at [rust](https://www.rust-lang.org/). In
-this post I will port the [bare metal c](bare-metal-c-on-the-teensy-3.1/)
+this post I will port the [bare metal c](/bare-metal-c-on-the-teensy-3.1/)
 example to rust with cargo, rusts dependency manager and build manager.
 
 <!--more-->
@@ -32,7 +32,7 @@ life simpler in the long run. The final project structure is as follows:
 The linker script
 [`layout.ld`](https://github.com/james147/teensy-3-rust/blob/master/layout.ld)
 is identical to the c version so we will skip over it, I recommend reading my
-[previous post](bare-metal-c-on-the-teensy-3.1/) for more details about it.
+[previous post](/bare-metal-c-on-the-teensy-3.1/) for more details about it.
 
 ## The Rust Code: [`src/main.rs`](https://github.com/james147/teensy-3-rust/blob/master/src/main.rs)
 
@@ -119,7 +119,7 @@ fn lang_start(_: isize, _: *const *const u8) -> isize {
 The rest of the code is a direct port from the [C
 example](https://gist.github.com/james147/f9132c388fae9ef5f5fe#file-blink-c).
 The only real difference is the syntax, its function is identical the the C
-version and is described in my [previous post](bare-metal-c-on-the-teensy-3.1/).
+version and is described in my [previous post](/bare-metal-c-on-the-teensy-3.1/).
 
 One thing to note however is there is no volatile keyword in rust. Instead we
 define the macros without it and use `volatile_store` to write the value and
