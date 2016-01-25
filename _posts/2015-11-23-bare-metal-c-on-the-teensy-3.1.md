@@ -4,7 +4,7 @@ title: Bare Metal C on the Teensy 3.1
 ---
 
 As a follow on from my previous post about writing [bare metal assembly on the
-teensy 3.1](bare-metal-assembly-on-the-teensy-3.1/) I wanted to see what it
+teensy 3.1](/bare-metal-assembly-on-the-teensy-3.1/) I wanted to see what it
 would take to port it to C. There where a few bits missing from the assembly
 example that are more important in the C port, which I will cover in this post.
 
