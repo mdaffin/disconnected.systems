@@ -12,14 +12,14 @@ Over the past couple of weeks I have been developing an arduino powered autonomo
 
 The rover consists of the following hardware all fairly cheap and readily available;
 
-*   [Arduino uno](http://proto-pic.co.uk/arduino-uno/) or [Arduino pro mini 5v](http://proto-pic.co.uk/arduino-pro-mini-328-5v-16mhz/)&#42;
+*   [Arduino uno](http://proto-pic.co.uk/arduino-uno/) or [Arduino pro mini 5v](https://proto-pic.co.uk/arduino-pro-mini-328-5v-16mhz-new/)&#42;
 *   [Potentiometer](http://proto-pic.co.uk/trimpot-10k-with-knob/)
 *   [2 bumper/latch switches](http://proto-pic.co.uk/omron-snap-action-switch/)
 *   1 [Momentary switch](http://proto-pic.co.uk/momentary-push-button-switch-12mm-square/)
 *   2 [Continuous Rotation Servo](http://www.hobbytronics.co.uk/springrc-sm-s4303r?keyword=servo)&#42;&#42;
 *   [2 GP2Y0D805Z0F Digital Distance Sensor](http://www.hobbytronics.co.uk/sensors/sensors-proximity/sharp-distance-sensor-5cm)
-*   4 AA batteries and [holder](http://proto-pic.co.uk/battery-holder-4xaa-square-terminated/)&#42;&#42;&#42;
-*   3 [1k resistor](http://proto-pic.co.uk/1k-ohm-1-4-watt-resistor-pack-of-20/)
+*   4 AA batteries and [holder](https://proto-pic.co.uk/battery-holder-4xaa-square/)&#42;&#42;&#42;
+*   3 [1k resistor](https://proto-pic.co.uk/0-25w-carbon-film-resistor-pack-of-20/)
 *   A proto board or bread board
 *   Some wires and connectors
 *   Something to mount everything on&#42;&#42;&#42;&#42;
