@@ -2,7 +2,7 @@
 published: false
 ---
 
-The archlinuxarm install instructions are only designed for linux, they likley also work on mac but windows users are out of luck. However it is quite simple to use a linux vm to create an `.img` from the root filesystem tar archlinuxarm supplies. 
+The archlinuxarm install instructions are only designed for linux, they likley also work on mac but windows users are out of luck. However it is quite simple to use a linux vm to create an `.img` from the root filesystem tar archlinuxarm supplies. This guide is primarly aimed at windows users, but will work just as well in linux or mac. 
 
 ## Install Vagrant and VirtualBox
 
