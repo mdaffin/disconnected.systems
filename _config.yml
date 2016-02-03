@@ -14,7 +14,7 @@ paginate:            5
 
 version:             1.0.0
 markdown: kramdown
-highlighter: pygments
+highlighter: rouge
 permalink: /:title/
 excerpt_separator: <!--more-->
 
