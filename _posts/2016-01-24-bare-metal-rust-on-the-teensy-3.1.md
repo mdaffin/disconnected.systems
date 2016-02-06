@@ -190,7 +190,7 @@ but I wanted to see if it was possible to avoid. I believe the
 unable to get their example to compile correctly and I cannot see from their
 source how/if they achieved it.
 
-# Conclusion
+## Conclusion
 
 Overall this project took quite a bit longer then I expected. Rust has a higher
 learning curve then I thought it had and it takes a while to get use to its

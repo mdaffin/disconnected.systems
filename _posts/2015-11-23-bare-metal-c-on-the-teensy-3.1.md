@@ -14,7 +14,7 @@ and only contains two files: the c source and the linker script.
 
 <!--more-->
 
-# The Linker Script: [`layout.ld`](https://github.com/james147/embedded-examples/blob/master/teensy-3-c/layout.ld)
+## The Linker Script: [`layout.ld`](https://github.com/james147/embedded-examples/blob/master/teensy-3-c/layout.ld)
 
 The linker script is very similar to the assembly example, just with a couple of
 additions. The `MEMORY` block is identical to the assembly example so we will
@@ -55,7 +55,7 @@ create that next, again storing the start and end in `_sbss` and `_ebss`.
 
 <code data-gist-id="f9132c388fae9ef5f5fe" data-gist-file="layout.ld" data-gist-line="57-64"></code>
 
-# The C Code: [`blink.c`](https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c)
+## The C Code: [`blink.c`](https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c)
 
 The C code is a port of the assembly code and contains all the major parts
 including, the exception vectors, flash configuration, start up code, the main
@@ -123,7 +123,7 @@ busy looping.
 
 <code data-gist-id="f9132c388fae9ef5f5fe" data-gist-file="blink.c" data-gist-line="118-122"></code>
 
-# Compile and upload
+## Compile and upload
 
 To compile and upload we swap out the assembler for the c compiler and add the `-nostdlib` and `-c` flags to stop gcc including the std libraries and to tell it to compile without linking.
 
@@ -135,7 +135,7 @@ echo "Reset teensy now"
 teensy-loader-cli -w --mcu=mk20dx256 crt0.hex
 ~~~
 
-# Conclusion
+## Conclusion
 
 Although more complete then the assembly example there are still some missing
 bits. Most notably we have not setup the heap or malloc so cannot dynamically
