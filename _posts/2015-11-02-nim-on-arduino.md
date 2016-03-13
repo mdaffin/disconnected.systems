@@ -2,6 +2,7 @@
 layout: post
 title: Nim on Arduino
 description: A minimal example of programming an arduino uno in the nim language
+tags: [nim, arduino, atmega328p]
 excerpt_separator: <!--more-->
 ---
 

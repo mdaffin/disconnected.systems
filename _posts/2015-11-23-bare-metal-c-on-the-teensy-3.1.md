@@ -1,6 +1,8 @@
 ---
 layout: post
 title: Bare Metal C on the Teensy 3.1
+description: A look at bare metal programming in c on the teensy 3.1 with out external dependencies.
+tags: [c, teensy, arm]
 ---
 
 As a follow on from my previous post about writing [bare metal assembly on the

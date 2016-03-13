@@ -2,6 +2,7 @@
 layout: post
 title: Shrimping it
 description: A quick tutorial on assembling a minimal DIY arduino known as the shrimp.
+tags: [shrimp, arduino, atmega328p]
 ---
 
 The arduino platform is a great platform to work with, it is easy to code for and has a nice

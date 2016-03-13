@@ -1,7 +1,7 @@
 ---
 layout: post
 title: QuasselCore on Archlinux
-description: A guide to setting up a quassel server on Arch Linux server.
+description: A guide to setting up a quassel server on an Arch Linux server.
 tags: [archlinux, linux]
 ---
 

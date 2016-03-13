@@ -2,6 +2,7 @@
 layout: post
 title: Bare Metal Rust on the Teensy 3.1
 description: A bare metal example of blink written in rust for the teensy 3.1
+tags: [rust, teensy, arm]
 excerpt_separator: <!--more-->
 ---
 
