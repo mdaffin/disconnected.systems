@@ -1,7 +1,7 @@
 ---
 layout: post
-title: Create Custom Raspberry Pi Images and SD Cards
-description: Set up a raspberry pi img or sd card without booting a pi.
+title: Create Custom Raspberry Pi ArchlinuxArm Images
+description: Setup a raspberry pi archlinuxarm image or sd card without booting a pi.
 tags: [raspberry pi, archlinuxarm, arm, automated]
 ---
 
