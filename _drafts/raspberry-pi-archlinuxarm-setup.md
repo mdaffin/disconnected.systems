@@ -6,17 +6,18 @@ tags: [raspberry pi, archlinuxarm, arm, automated]
 ---
 
 I generally work with headless Raspberry Pis either by running them as
-lightweight servers or embedding them into projects. But having to plug them
-into a monitor keyboard and mouse to set them up is annoying and often
-impossible if I am not at home.
+lightweight servers or embedding them into projects. It is very anoying having
+to plug them into a monitor keyboard and mouse to set them up and quite often
+impossible if not at home.
 
 I use to get around this by using a serial cable to configure them after
-flashing the image to the sd-card. Recently I discovered [how to chroot into a
-Raspberry
+flashing the image to the sd-card but that has its own disadvantages. Recently
+I discovered [how to chroot into a Raspberry
 Pi](http://raspberrypi.stackexchange.com/questions/855/is-it-possible-to-update-upgrade-and-install-software-before-flashing-an-image)
-image using `qemu` and `binfmt-support`. In this post I will take this one step
-further and looking at setting up a Raspberry Pi sdcard/image before you boot
-the Pi.
+image using `qemu` and `binfmt-support` making it possible to setup a pi before
+you boot it. In this post I will take this one step further and look at what it
+takes to setup a raspberry pi image/sd-card and customise it before you even
+have to plug it into a pi.
 
 <!--more-->
 
