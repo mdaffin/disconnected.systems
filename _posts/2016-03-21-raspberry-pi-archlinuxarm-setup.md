@@ -2,7 +2,7 @@
 layout: post
 title: Create Custom Raspberry Pi ArchlinuxArm Images
 description: Setup a raspberry pi archlinuxarm image or sd-card without booting a pi.
-tags: [raspberry pi, archlinuxarm, arm, automated]
+tags: [raspberry pi, archlinuxarm, arm, chroot]
 ---
 
 I generally work with headless Raspberry Pis either by running them as
