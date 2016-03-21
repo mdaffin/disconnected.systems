@@ -277,7 +277,7 @@ sudo losetup --detach "/dev/loop0"
 ## Flash the Image to an SD-Card
 
 We are now ready to flash the image, which can be done with `dd`. Remember to
-replace /dev/mmblk0 with the device for your sd-card.
+replace `/dev/mmblk0` with the device for your sd-card.
 
 {% highlight shell %}
 sudo dd if=custom-pi.img of=/dev/mmblk0 bs=1M
