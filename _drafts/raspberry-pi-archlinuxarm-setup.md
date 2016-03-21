@@ -28,9 +28,13 @@ You will require a Linux box with the following packages need to be installed
 * `qemu-user-static`
 * `binfmt-support`
 
+[Arch Linux](https://wiki.archlinux.org/index.php/Raspberry_Pi#QEMU_chroot)
+
 You can alternatively use [Vagrant](https://www.vagrantup.com/) with the
 following `Vagrantfile` to give you a Linux virtual machine with all the
-prerequisites preinstalled.
+prerequisites preinstalled. There are some caveats with using Vagrant for this
+process which are out of scope of this post. If there is enough interest I may
+cover Vagrant in a future post.
 
 {% highlight ruby %}
 # -*- mode: ruby -*-
@@ -256,9 +260,9 @@ sudo rm /mnt/etc/resolv.conf
 sudo mv /mnt/etc/resolv.conf.bak /mnt/etc/resolv.conf
 sudo rm /mnt/usr/bin/qemu-arm-static
 
-sudo umount ${root_dir}/dev
-sudo umount ${root_dir}/proc
-sudo umount ${root_dir}/sys
+sudo umount /mnt/dev
+sudo umount /mnt/proc
+sudo umount /mnt/sys
 {% endhighlight %}
 
 Now we can unmount the partitions and detach the loopback device.
@@ -275,7 +279,7 @@ We are now ready to flash the image, which can be done with `dd`. Remember to
 replace /dev/mmblk0 with the device for your sd-card.
 
 {% highlight shell %}
-dd if=custom-pi.img of=/dev/mmblk0 bs=1M
+sudo dd if=custom-pi.img of=/dev/mmblk0 bs=1M
 {% endhighlight %}
 
 ## Conclusion
@@ -286,4 +290,8 @@ However if you encounter problems with connecting you may need to dig out your
 serial cable or attach your pi to a keyboard and monitor after all to debug it.
 
 You may have noticed that the procedure lends itself well to being scripted
-making the process repeatable.
+making the creating an custom image repeatable. That way you can commit the
+scripts to your projects repository and regenerate an image when you want,
+rather then having to keep around a bunch of 2G+ backup images that you have
+manually setup. I hope to look at scripting this process in a future post to
+make creating repeatable images even easier.
