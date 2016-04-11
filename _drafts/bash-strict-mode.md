@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Unoficial Bash Strict Mode Take 2
+title: Unofficial Bash Strict Mode
 description: Cause bash scripts to fail fast and fail loudly to aid debugging.
 tags: [linux, bash, shell]
 ---
@@ -9,6 +9,9 @@ I have been using [Aaron Maxwell's Unofficial Bash Strict Mode](http://redsymbol
 
 {highlight bash}
 #!/bin/bash
+set -uo pipefail
+trap 's=$?; echo "${0}: Error on line "${LINENO}": $BASH_COMMAND"; exit $s' ERR
+IFS=$'\n\t'
 {endhighlight}
 
 The major improvement over Aaron Maxwell's version is that script now fail loudly. The problem with `set -e` is it produces no output but relies on the failing command to print what went wrong. This has two problems, first not all commands are nice enough to print why they failed and second they won't tell you where your script failed. This means when a command fails you have to figure ypou where in your script it was and quite often which command actually caused the problem.
