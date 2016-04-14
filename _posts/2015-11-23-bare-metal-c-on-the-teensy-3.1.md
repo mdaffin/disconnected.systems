@@ -11,12 +11,12 @@ would take to port it to C. There where a few bits missing from the assembly
 example that are more important in the C port, which I will cover in this post.
 
 The final source can be found in [this github
-repository](https://github.com/james147/embedded-examples/tree/master/teensy-3-c)
+repository](https://github.com/mdaffin/embedded-examples/tree/master/teensy-3-c)
 and only contains two files: the c source and the linker script.
 
 <!--more-->
 
-## The Linker Script: [`layout.ld`](https://github.com/james147/embedded-examples/blob/master/teensy-3-c/layout.ld)
+## The Linker Script: [`layout.ld`](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/layout.ld)
 
 The linker script is very similar to the assembly example, just with a couple of
 additions. The `MEMORY` block is identical to the assembly example so we will
@@ -57,7 +57,7 @@ create that next, again storing the start and end in `_sbss` and `_ebss`.
 
 <code data-gist-id="f9132c388fae9ef5f5fe" data-gist-file="layout.ld" data-gist-line="57-64"></code>
 
-## The C Code: [`blink.c`](https://github.com/james147/embedded-examples/blob/master/teensy-3-c/blink.c)
+## The C Code: [`blink.c`](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/blink.c)
 
 The C code is a port of the assembly code and contains all the major parts
 including, the exception vectors, flash configuration, start up code, the main

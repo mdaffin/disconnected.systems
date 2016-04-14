@@ -21,7 +21,7 @@ very useful.
 I took the minimal assembly example above with what I learned from other
 articles around the topic to give a more complete, but still minimal, example.
 The final source can be found in [this github
-repository](https://gist.github.com/james147/d6fb7e91aa21d6943ef4)
+repository](https://gist.github.com/mdaffin/d6fb7e91aa21d6943ef4)
 and only contains two files: the assembly source and the linker script, which I
 will explain in this post.
 
@@ -37,7 +37,7 @@ assembler `arm-none-eabi-as`, linker `arm-none-eabi-ld` and objcopy
 distribution's package managers or from inside a Arduino SDK's tools directory:
 `$ARDUINO_SDK/hardware/tools/arm/bin`.
 
-## The Linker script: [`layout.ld`](https://gist.github.com/james147/d6fb7e91aa21d6943ef4#file-layout-ld)
+## The Linker script: [`layout.ld`](https://gist.github.com/mdaffin/d6fb7e91aa21d6943ef4#file-layout-ld)
 
 This file tells linker where the various bits of memory are located and tells it
 where to put different bits of the code. There are two main blocks to the linker
@@ -99,7 +99,7 @@ rest of the code with `*(.text)`.
 Finally we set a variable `_estack` to point to the end of the ram which will be
 used to set the stack pointer.
 
-## The assembly code: [`blink.s`](https://gist.github.com/james147/d6fb7e91aa21d6943ef4#file-blink-s)
+## The assembly code: [`blink.s`](https://gist.github.com/mdaffin/d6fb7e91aa21d6943ef4#file-blink-s)
 
 Arm assembly comes in two flavors, the 16bit thumb instruction set and the
 full 32bit arm instruction set. With the first line of code `.syntax unified`

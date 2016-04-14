@@ -14,7 +14,7 @@ example to rust with cargo, rusts dependency manager and build manager.
 <!--more-->
 
 The final source can be found in [this github
-repository](https://github.com/james147/teensy-3-rust). It contains a fair few
+repository](https://github.com/mdaffin/teensy-3-rust). It contains a fair few
 more files and cargo enforces a stricter layout (ie the source must be in the
 `src/` directory. Most of the addition files are for rust and are meant to make
 life simpler in the long run. The final project structure is as follows:
@@ -31,11 +31,11 @@ life simpler in the long run. The final project structure is as follows:
 ~~~
 
 The linker script
-[`layout.ld`](https://github.com/james147/teensy-3-rust/blob/master/layout.ld)
+[`layout.ld`](https://github.com/mdaffin/teensy-3-rust/blob/master/layout.ld)
 is identical to the c version so we will skip over it, I recommend reading my
 [previous post](/bare-metal-c-on-the-teensy-3.1/) for more details about it.
 
-## The Rust Code: [`src/main.rs`](https://github.com/james147/teensy-3-rust/blob/master/src/main.rs)
+## The Rust Code: [`src/main.rs`](https://github.com/mdaffin/teensy-3-rust/blob/master/src/main.rs)
 
 This is a simple port of blink.c from the c example. We have moved it to src as
 this is where cargo looks for our code and have renamed it to main.rs to tell
@@ -62,7 +62,7 @@ We then disable the standard library with `#![no_std]`. Then tell rust we want a
 statically linked executable `#![crate_type="staticlib"]` and declare we want to
 use `volatile_store` from `core::intrinsics`.
 
-<div class="code-header"><a href="https://github.com/james147/teensy-3-rust/blob/master/src/main.rs#L1-L5">src/main.rs</a></div>
+<div class="code-header"><a href="https://github.com/mdaffin/teensy-3-rust/blob/master/src/main.rs#L1-L5">src/main.rs</a></div>
 
 ~~~
 #![feature(lang_items,no_std,core_intrinsics,asm,start)]
@@ -74,7 +74,7 @@ use core::intrinsics::{volatile_store};
 
 And now some required language functions which just cause the code to halt if we encounter an error.
 
-<div class="code-header"><a href="https://github.com/james147/teensy-3-rust/blob/master/src/main.rs#L7-L26">src/main.rs</a></div>
+<div class="code-header"><a href="https://github.com/mdaffin/teensy-3-rust/blob/master/src/main.rs#L7-L26">src/main.rs</a></div>
 
 ~~~
 #[lang="stack_exhausted"] extern fn stack_exhausted() {}
@@ -105,7 +105,7 @@ the teensy 3. In this example it is the `startup` function, which unfortunately
 needs a different signature then the one rust expects. Instead we create a
 simple wrapper to satisfy the compiler.
 
-<div class="code-header"><a href="https://github.com/james147/teensy-3-rust/blob/master/src/main.rs#L137-L143">src/main.rs</a></div>
+<div class="code-header"><a href="https://github.com/mdaffin/teensy-3-rust/blob/master/src/main.rs#L137-L143">src/main.rs</a></div>
 
 ~~~
 #[start]
@@ -118,7 +118,7 @@ fn lang_start(_: isize, _: *const *const u8) -> isize {
 ~~~
 
 The rest of the code is a direct port from the [C
-example](https://gist.github.com/james147/f9132c388fae9ef5f5fe#file-blink-c).
+example](https://gist.github.com/mdaffin/f9132c388fae9ef5f5fe#file-blink-c).
 The only real difference is the syntax, its function is identical the the C
 version and is described in my [previous post](/bare-metal-c-on-the-teensy-3.1/).
 
@@ -126,7 +126,7 @@ One thing to note however is there is no volatile keyword in rust. Instead we
 define the macros without it and use `volatile_store` to write the value and
 stop the compiler optimizing out the code.
 
-## Target Specification: [`thumbv7em-none-eabi.json`](https://github.com/james147/teensy-3-rust/blob/master/thumbv7em-none-eabi.json)
+## Target Specification: [`thumbv7em-none-eabi.json`](https://github.com/mdaffin/teensy-3-rust/blob/master/thumbv7em-none-eabi.json)
 
 The rust compiler needs some information to tell it how to compile for the arm
 architecture, the `thumbv7em-none-eabi.json` file is what does this. This file
@@ -148,21 +148,21 @@ Cargo is the dependency manager/rust build tool. It will help automate some of
 the steps required to build the application including downloading and building
 our dependencies (currently only `rust-core`).
 
-### Cargo Configuration: [`Cargo.toml`](https://github.com/james147/teensy-3-rust/blob/master/Cargo.toml)
+### Cargo Configuration: [`Cargo.toml`](https://github.com/mdaffin/teensy-3-rust/blob/master/Cargo.toml)
 
 This file tells cargo some basic details about our project, such as its name,
 version, authors as well as the dependencies required to build the project
 (`rust-libcore` in our case). It also tells cargo to use `build.rs` as our build
 script.
 
-### Build Script: [`build.rs`](https://github.com/james147/teensy-3-rust/blob/master/build.rs)
+### Build Script: [`build.rs`](https://github.com/mdaffin/teensy-3-rust/blob/master/build.rs)
 
 This file allows us to preform any custom build steps before cargo tried to
 build our application. This is useful for building c components or running other
 tools that generate files required to build our program. In this case we simply
 tell rust to use the `OUT_DIR` as part of the linker search path.
 
-### Cargo Options: [`.cargo/config`](https://github.com/james147/teensy-3-rust/blob/master/.cargo/config)
+### Cargo Options: [`.cargo/config`](https://github.com/mdaffin/teensy-3-rust/blob/master/.cargo/config)
 
 This file contains options used to customize cargo's behavior. It is used here
 to specify the linker and archive tool for the arm processor. We could specify

@@ -112,7 +112,7 @@ not. The 12th pin is mostly used for debugging so is not needed.
 ## The Software
 
 The code for this project is available on [my github
-account](https://github.com/james147/ArduinoRover). And can easily be built with
+account](https://github.com/mdaffin/ArduinoRover). And can easily be built with
 
     mkdir build
     cd build
