@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Another Unofficial Bash Strict Mode
+title: Another Bash Strict Mode
 description: Cause bash scripts to fail fast and loud to aid debugging.
 tags: [linux, bash, shell]
 ---
