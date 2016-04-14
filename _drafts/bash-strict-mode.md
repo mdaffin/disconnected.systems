@@ -1,7 +1,7 @@
 ---
 layout: post
-title: Unofficial Bash Strict Mode
-description: Cause bash scripts to fail fast and fail loudly to aid debugging.
+title: Another Unofficial Bash Strict Mode
+description: Cause bash scripts to fail fast and loud to aid debugging.
 tags: [linux, bash, shell]
 ---
 
@@ -24,9 +24,8 @@ IFS=$'\n\t'
 The major problem with `set -e` and `set -o pipefail` is that they are silent so
 you have to rely the output of the failed command to debug your script. But not
 all commands fail loudly and when they do they don't tell you where in your
-script they failed. The most common situation I have come across is when `grep`
-fails to match anything in the middle of a pipe.
+script they failed.
 
 Error traps can give you more information, anything that is available to the
-bash shell at the time they where triggered. But most usefully the command that
+bash shell at the time they where triggered. Most usefully the command that
 failed `$BASH_COMMAND` and the line number `$LINENO` that command was on.
