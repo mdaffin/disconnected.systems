@@ -1,0 +1,8 @@
+name: disconnected systems
+source: "."
+dest: "build"
+ignore:
+  - CNAME
+  - .nojekyll
+  - .git/*
+  - build/*

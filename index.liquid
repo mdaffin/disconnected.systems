@@ -1,0 +1,10 @@
+extends: default.liquid
+---
+<h1>Disconnected Systems</h1>
+<div>
+  {% for post in posts %}
+    <div>
+	    {{ post.date }} <a href="{{post.path}}">{{ post.title }}</a> - {{ post.description }}
+    </div>
+  {% endfor %}
+</div>

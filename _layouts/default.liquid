@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="/images/favicon.png">
+  <link href="//fonts.googleapis.com/css?family=Open+Sans|Vollkorn" rel="stylesheet">
+  <link rel="stylesheet" href="/css/normalize.css">
+  <link rel="stylesheet" href="/css/skeleton.css">
+  <link rel="stylesheet" href="/css/custom.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/styles/atom-one-dark.min.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  {% if is_post %}
+    <title>{{ title }}</title>
+  {% else %}
+    <title>Disconnected Systems</title>
+  {% endif %}
+</head>
+<body>
+<div class="container">
+  {% if is_post %}
+    {% include '_layouts/post.liquid' %}
+  {% else %}
+    {{ content }}
+  {% endif %}
+</div>
+</body>
+</html>
