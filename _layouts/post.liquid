@@ -1,5 +1,11 @@
-<h2>{{ title }}</h2>
-<time class="date">{{ date }}</time>
-<p>
-  {{ content }}
-</p>
+<div class="container">
+  <section class="header">
+    <div class="container">
+      <h1>{{ title }}</h1>
+      <h6><time class="date">{{ date | date: "%d %B %Y" }}</time></h6>
+    </div>
+  </section>
+  <p>
+    {{ content }}
+  </p>
+</div>

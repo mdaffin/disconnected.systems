@@ -1,10 +1,48 @@
 body {
-  font-family: "Open Sans", sans-serif;
-  color: #515151; }
+  font-family: 'Open sans', sans-serif;
+  color: #111111;
+  background-color: #FFFFFF;
+}
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: "Vollkkorn", serif;
-  color: #313131; }
+  font-family: 'Montserrat', cursive;
+  color: #001F3F;
+}
 
 li {
-  margin-bottom: 0; }
+  margin-bottom: 0;
+}
+
+time {
+  font-style: italic;
+}
+
+.panel:hover {
+  color: #FFFFFF;
+  background-color: #001f3f;
+}
+
+.panel:hover h5 {
+  color: #FFFFFF;
+}
+
+.panel {
+  padding-top: 10px;
+  display: block;
+  color: #312c32;
+  text-decoration: none;
+}
+
+.header {
+  margin-top: 18rem;
+  margin-bottom: 10rem;
+  text-align: center;
+}
+
+.header h1 {
+  margin-bottom: 0rem;
+}
+
+.header h6 {
+  font-style: italic;
+}
