@@ -6,9 +6,10 @@
   <meta name="author" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/images/favicon.png">
-  <link href="//fonts.googleapis.com/css?family=Open+Sans|Montserrat" rel="stylesheet">
+  <link href="//fonts.googleapis.com/css?family=Open+Sans|Montserrat|Rubik+One|Raleway" rel="stylesheet">
   <link rel="stylesheet" href="/css/normalize.css">
   <link rel="stylesheet" href="/css/skeleton.css">
+  <link rel="stylesheet" href="/css/font-awesome.min.css">
   <link rel="stylesheet" href="/css/custom.css">
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/styles/atom-one-dark.min.css">
   <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/highlight.min.js"></script>
@@ -18,12 +19,39 @@
   {% else %}
     <title>Disconnected Systems</title>
   {% endif %}
+  <script src="/js/app.js"></script>
 </head>
 <body>
-{% if is_post %}
-  {% include '_layouts/post.liquid' %}
-{% else %}
-  {{ content }}
-{% endif %}
+  <section class="header">
+    <div class="container">
+      <h1>{{ title }}</h1>
+      {% if is_post %}
+        {% if date %}
+      <h6><time class="date">{{ date | date: "%d %B %Y" }}</time></h6>
+        {% endif %}
+      {% else %}
+      <h6>Programming, Linux and all things Open Source</h6>
+      {% endif %}
+    </div>
+  <div class="navbar-spacer"></div>
+  <nav class="navbar">
+    <div class="container">
+      <ul class="navbar-list">
+        <li class="navbar-item"><a class="navbar-link" href="/">Home</a></li>
+        <li class="navbar-item"><a class="navbar-link" href="/">About</a></li>
+        <li class="navbar-item"><a class="navbar-link" href="/">Projects</a></li>
+      </ul>
+    </div>
+  </nav>
+  </section>
+  <section class="content">
+    {% if is_post %}
+    <div class="container">
+      {{ content }}
+    </div>
+    {% else %}
+    {{ content }}
+    {% endif %}
+  </section>
 </body>
 </html>
