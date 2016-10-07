@@ -5,8 +5,8 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Montserrat', cursive;
-  color: #001F3F;
+  font-family: 'Concert One', cursive;
+  color: #333333;
 }
 
 li {
@@ -19,7 +19,7 @@ time {
 
 .panel:hover {
   color: #FFFFFF;
-  background-color: #001f3f;
+  background-color: #333333;
 }
 
 .panel:hover h5 {
@@ -40,12 +40,18 @@ time {
 }
 
 .header h1 {
-  font-family: 'Rubik One';
+  font-family: 'Concert One';
   margin-bottom: 0rem;
 }
 
 .header h6 {
   font-style: italic;
+}
+
+.container img {
+    margin: auto;
+    display: block;
+    text-align: center;
 }
 
 .navbar, .navbar-spacer {
@@ -84,7 +90,7 @@ time {
 }
 .navbar-link:hover {
   display: block;
-  background-color: #001F3F;
+  background-color: #333333;
   color: #FFFFFF;
 }
 .navbar-link.active {
