@@ -1,21 +1,20 @@
----
-layout: post
-title: XBee Configuration
-description: A beginners guide on configuring and communicating over two xbees.
-tags: [xbee]
----
++++
+title = "XBee Configuration"
+description = "A beginners guide on configuring and communicating over two xbees."
+slug = "xbee-configuration"
+date = "2012-11-17"
+tags = [ "xbee" ]
++++
 
 For my third year project I will be using a bunch of XBee connected to various
 devices, this post will talk about how to set up the XBee and what the various
 config options do. To follow this post you will need the following equipment:
 
-* [XBee](https://www.sparkfun.com/products/8665)&#42;
-* [XBee Explorer USB]( https://www.sparkfun.com/products/8687)&#42;&#42;
+* [XBee](https://www.sparkfun.com/products/8665)\*
+* [XBee Explorer USB]( https://www.sparkfun.com/products/8687)\*\*
 
-&#42; I have tested this with the series 1 modules, but it should mostly work for the series 2 modules although some steps might be different.  
-&#42;&#42; Or any equivalent way of connecting the XBee to a computer.
-
-<!--more-->
+\* I have tested this with the series 1 modules, but it should mostly work for the series 2 modules although some steps might be different.  
+\*\* Or any equivalent way of connecting the XBee to a computer.
 
 ---
 
@@ -27,7 +26,7 @@ data.
 
 ## Notes
 
-**&lt;CR&gt;** in this article (as well as other places on the internet) means 
+**\<CR\>** in this article (as well as other places on the internet) means 
 _Carriage Return_, and you should hit the _Enter_ or _Return_ key in place of
 it.
 
@@ -40,7 +39,9 @@ minicom or screen are just as good (Windows users can use putty) and connect to
 the XBee serial port (/dev/ttyUSB0 or what ever it shows up as) at the default
 baud rate of 9200:
 
-    picocom -lc /dev/ttyUSB0
+```shell
+picocom -lc /dev/ttyUSB0
+```
 
 Now anything you type should be transmitted by the radio and anything received
 on the radio should be printed on the terminal. At the moment there wont be much
@@ -58,15 +59,19 @@ either don't type anything for a few seconds or type "ATCN&lt;CR&gt;". While in
 command mode you can read the current settings by typing the associated command
 such as:
 
-    ATMY<CR>
-    0
+```shell
+ATMY<CR>
+0
+```
 
 or set it by adding a value before you hit return
 
-    ATMY1<CR>
-    OK
-    ATMY<CR>
-    1
+```shell
+ATMY1<CR>
+OK
+ATMY<CR>
+1
+```
 
 if you miss type a command you get the ERROR message and can retype it again. If
 you don't get a response then it likely means the command session has timed out
@@ -75,7 +80,9 @@ backspace to correct typos and have to instead start the command again. You can
 also chain together commands by dropping the AT after the first command and
 separating them by commas like this,
 
-    ATMY1,WR,CN<CR>
+```shell
+ATMY1,WR,CN<CR>
+```
 
 However I find this less useful when in a terminal program that sends the
 characters as you type them as you will get a response after ever comma or
@@ -92,7 +99,9 @@ The first thing you should do when configuring a new XBee module is reset the
 device to its factory defaults. This will help prevent any configurations made
 previously from silently messing up your project. Enter command mode and type
 
-    ATRE<CR>
+```shell
+ATRE<CR>
+```
 
 Your devices settings should now have reset to their defaults.
 
@@ -103,7 +112,9 @@ the XBee memory which can be done with the **WR** command. You should issue this
 command when ever you have finished editing the commands to ensure that the
 changes you made will be preserved after a reboot or power up.
 
-    ATWR<CR>
+```shell
+ATWR<CR>
+```
 
 ### Restarting the XBee
 
@@ -112,7 +123,9 @@ it) you can issue the FR command to tell the device to do a software reset. This
 is useful to do after you have configured your device (and saved the settings!)
 to ensure the XBee is using the correct settings.
 
-    ATFR<CR>
+```shell
+ATFR<CR>
+```
 
 ### Useful Commands
 
@@ -151,21 +164,25 @@ one another, so plug-in the first XBee and open up picocom and send the
 following (remember to not press enter (or any other key) after the +++ until
 you receive the OK response);
 
-    +++
-    OK
-    ATRE<CR>
-    OK
-    ATMY0,DH0,DL1,WR,CN
-    OKOKOKOKOK
+```shell
++++
+OK
+ATRE<CR>
+OK
+ATMY0,DH0,DL1,WR,CN
+OKOKOKOKOK
+```
 
 Then connect the second  XBee and send the following;
 
-    +++
-    OK
-    ATRE<CR>
-    OK
-    ATMY1,DH0,DL0,WR,CN
-    OKOKOKOKOK
+```shell
++++
+OK
+ATRE<CR>
+OK
+ATMY1,DH0,DL0,WR,CN
+OKOKOKOKOK
+```
 
 These will give the first XBee an address of 0 and tell it to send to 1 and the
 second XBee an address of 1 and tell it to send to 0. If you now connect up both

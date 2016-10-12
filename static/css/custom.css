@@ -95,3 +95,8 @@ time {
 .navbar-link.active {
   color: #33C3F0;
 }
+
+.highlight > pre > code {
+  color: #FFFFFF;
+  background-color: #272822;
+}

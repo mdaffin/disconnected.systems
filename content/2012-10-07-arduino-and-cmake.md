@@ -1,11 +1,10 @@
-extends: default.liquid
-
-title: Arduino and CMake
-description: A guide to building and uploading an arduino sketch with out the Arduino IDE using CMake.
-path: /arduino-and-cmake
-date: 7 October 2012 21:00:00 +0000
-tags: [arduino, cmake]
----
++++
+title = "Arduino and CMake"
+description = "A guide to building and uploading an arduino sketch with out the Arduino IDE using CMake."
+slug = "arduino-and-cmake"
+date = "2012-10-07"
+tags = [ "arduino", "cmake" ]
++++
 
 The arduino is a great platform for embedded development and the ide it comes
 with is a good starting point. However, it lacks many features that make it a
@@ -33,31 +32,36 @@ as according to the standard c/c++ rules.
 
 Then create a CMakeLists.txt file with the following contents:
 
-    set(CMAKE_TOOLCHAIN_FILE cmake/ArduinoToolchain.cmake)
+```cmake
+set(CMAKE_TOOLCHAIN_FILE cmake/ArduinoToolchain.cmake)
 
-    cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8)
 
-    project(Project_Name C CXX)
+project(Project_Name C CXX)
 
-    set(ARDUINO_DEFAULT_BOARD uno) # Default Board ID
-    set(ARDUINO_DEFAULT_PORT /dev/ttyACM0) # Default Port
+set(ARDUINO_DEFAULT_BOARD uno) # Default Board ID
+set(ARDUINO_DEFAULT_PORT /dev/ttyACM0) # Default Port
 
-    generate_arduino_firmware(exe_name SRCS script.cpp)
+generate_arduino_firmware(exe_name SRCS script.cpp)
+```
 
-changing the Project_Name, board type, port and  exe_name and scrip.cpp to the
+changing the `Project_Name`, board type, port, `exe_name` and `script.cpp` to the
 appropriate values for your project.
 
-Then it is as simple as running
+Then to build the program simply run
 
-    mkdir build
-    cd build
-    cmake ..
-    make
+```shell
+mkdir build
+cd build
+cmake ..
+make
+```
 
-to build the program and
+and to upload exe_name to the arduino run
 
-    make exe_name-upload
-to upload exe_name to the arduino.
+```shell
+make exe_name-upload
+```
 
 ## Libraries
 
@@ -66,12 +70,14 @@ simple libraries that are in the libraries directory of your project so most of
 the time you don't need to worry about them. But it also support more complex
 situation via the generate_arduino_library command:
 
-    generate_arduino_library(name
-        [BOARD board_id]
-        [SRCS  src1 src2 ... srcN]
-        [HDRS  hdr1 hdr2 ... hdrN]
-        [LIBS  lib1 lib2 ... libN]
-        [NO_AUTOLIBS])
+```cmake
+generate_arduino_library(name
+    [BOARD board_id]
+    [SRCS  src1 src2 ... srcN]
+    [HDRS  hdr1 hdr2 ... hdrN]
+    [LIBS  lib1 lib2 ... libN]
+    [NO_AUTOLIBS])
+```
 
 Which you can find out more about by reading the documentation included with the
 cmake module

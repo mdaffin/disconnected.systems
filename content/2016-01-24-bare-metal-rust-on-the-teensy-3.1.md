@@ -1,10 +1,10 @@
----
-layout: post
-title: Bare Metal Rust on the Teensy 3.1
-description: A bare metal example of blink written in rust for the teensy 3.1
-tags: [rust, teensy, arm]
-excerpt_separator: <!--more-->
----
++++
+title = "Bare Metal Rust on the Teensy 3.1"
+description = "A bare metal example of blink written in rust for the teensy 3.1"
+slug = "bare-metal-rust-on-the-teensy-3.1"
+date = "2016-01-24"
+tags = ["rust", "teensy", "arm"]
++++
 
 Now that we have a good understanding of basic bare metal programming using the
 traditional languages I wanted to look at [rust](https://www.rust-lang.org/). In

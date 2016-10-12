@@ -1,11 +1,10 @@
-extends: default.liquid
-
-title: Raspberry Powered Wallboard
-description: A guide on how to setup a raspberry pi to use as a wallboard that once booted automatically loads a webpage.
-path: /raspberry-powered-wallboard
-date: 19 October 2012 21:00:00 +0000
-tags: [raspberry-pi, archlinuxarm, archlinux, linux]
----
++++
+title = "Raspberry Powered Wallboard"
+description = "A guide on how to setup a raspberry pi to use as a wallboard that once booted automatically loads a webpage."
+slug = "raspberry-powered-wallboard"
+date = "2012-10-19"
+tags = [ "raspberry-pi", "archlinuxarm", "archlinux", "linux" ]
++++
 
 Having information displayed on a wall or monitor in an office or other public
 space can be very useful to the people in that area. This post talks about how
@@ -19,7 +18,7 @@ don't know how to install ArchLinux to an sd card. Boot the image from the
 Raspberry Pi and login as root (the password is root as well). As with any
 install the very first thing you should do is update the system:
 
-```bash
+```shell
 pacman -Syu
 ```
 
@@ -28,7 +27,7 @@ pacman -Syu
 In keeping with best security practices its best to run things that don't need
 to run as root as a normal user. Create a new user called "wb" with:
 
-```bash
+```shell
 useradd -m wb
 passwd wb
 > Enter new UNIX password: <type password here>
@@ -40,7 +39,7 @@ Now logout of root and login as the new user. When you need to run a command as
 root now you can login as root from another tty or you can run a single command
 as root with:
 
-```bash
+```shell
 su root command
 ```
 
@@ -52,7 +51,7 @@ and any command that start with a $ should be run as the normal user.
 We are going to need xorg in order to run graphical programs so now is a good
 time to install it along with a window manager of your choice:
 
-```bash
+```shell
 pacman -S xorg-server xorg-xinit xorg-xset xterm ratpoison
 ```
 
@@ -66,7 +65,7 @@ To tell xinit what to do when a user tried to start a xorg session you need to
 edit ~/.xinitrc of that user, so edit /home/wb/.xinitrc with the following
 contents:
 
-```
+```shell
 setterm -blank 0 -powersave off -powerdown 0
 xset -dpms
 xset s off
@@ -86,7 +85,7 @@ we don't want on a wallboard.
 
 To test if this works run:
 
-```bash
+```shell
 startx
 ```
 
@@ -103,7 +102,7 @@ doesn't have lots of menus so makes it ideal for a wall board.
 
 To install it run:
 
-```bash
+```shell
 pacman -S uzbl-browser
 ```
 
@@ -112,13 +111,13 @@ shouldn't be needed for a wallboard.
 
 Once installed you can replace the
 
-```
+```shell
 exec xterm
 ```
 
 line in /home/wb/.xinitrc with
 
-```
+```shell
 exec uzbl-browser http://www.example.com
 ```
 
@@ -140,13 +139,13 @@ ArchLinux now uses systemd by default so we need to create a new service file to
 auto login to the wb user. Create a copy the getty@.service and place it in
 /etc/systemd/system:
 
-```bash
+```shell
 cp /usr/lib/systemd/system/getty@.service /etc/systemd/system/autologin@.service
 ```
 
 now edit the following parts to make it auto login to the wb user:
 
-```
+```ini
 [Service]
 Type=simple
 [...]
@@ -161,7 +160,7 @@ Change tty1 if you want to login to another tty. See
 for more info about editing the service file to your needs. Now set this service
 to run at boot by running:
 
-```bash
+```shell
 systemctl daemon-reload
 systemctl disable getty@tty1.service
 systemctl enable autologin@tty1.service
@@ -169,7 +168,7 @@ systemctl enable autologin@tty1.service
 
 you can start it now to test it by running:
 
-```bash
+```shell
 systemctl stop getty@tty1.service
 systemctl start autologin@tty1.service
 ```
@@ -180,7 +179,7 @@ another tty.
 Lastly we need to start x when the wb user logs in. This can be done by editing
 their .bash_profile file and add the following to the end:
 
-```bash
+```shell
 startx
 logout
 ```
@@ -195,7 +194,7 @@ the wb user manually.
 
 You can now reboot the raspberry pi
 
-```bash
+```shell
 reboot
 ```
 

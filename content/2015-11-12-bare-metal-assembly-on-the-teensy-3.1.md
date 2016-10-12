@@ -1,11 +1,10 @@
-extends: default.liquid
-
-title: Bare Metal Assembly on the Teensy 3.1
-description: A look at bare metal programming in assembly on the teensy 3.1 with out external dependencies.
-path: /bare-metal-assembly-on-the-teensy-3.1
-date: 12 November 2015 21:00:00 +0000
-tags: [assembly, teensy, arm]
----
++++
+title = "Bare Metal Assembly on the Teensy 3.1"
+description = "A look at bare metal programming in assembly on the teensy 3.1 with out external dependencies."
+slug = "bare-metal-assembly-on-the-teensy-3.1"
+date = "2015-11-12"
+tags = [ "assembly", "teensy", "arm" ]
++++
 
 I started to look at bare metal programming on the Teensy 3.1 and found quite a
 few examples mainly based off the work of [Karl
@@ -37,28 +36,22 @@ assembler `arm-none-eabi-as`, linker `arm-none-eabi-ld` and objcopy
 distribution's package managers or from inside a Arduino SDK's tools directory:
 `$ARDUINO_SDK/hardware/tools/arm/bin`.
 
-## The Linker script: [ `layout.ld` ](https://gist.github.com/mdaffin/d6fb7e91aa21d6943ef4#file-layout-ld)
+## The Linker script: 
 
-<div class="fileblock"><span class="filename">layout.ld</span>
+###### [layout.ld](https://gist.github.com/mdaffin/d6fb7e91aa21d6943ef4#file-layout-ld)
 
-```
-/*
-A very basic linker script for the teensy 3.1. Page references refer to the
-programmers manual for the MK20DX256VLH7 which can be found at:
-https://www.pjrc.com/teensy/K20P64M72SF1RM.pdf
-*/
-
+```text
 MEMORY {
     FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 256K
-    RAM  (rwx) : ORIGIN = 0x1FFF8000, LENGTH = 64K /* page 90 */
+    RAM  (rwx) : ORIGIN = 0x1FFF8000, LENGTH = 64K
 }
 
 SECTIONS {
     . = 0x00000000;
     .text : {
-        KEEP(*(.vectors)) /* vectors must be placed first - page 63*/
+        KEEP(*(.vectors))
         . = 0x400;
-        KEEP(*(.flashconfig*)) /* flash configuration starts at 0x400 - page 569 */
+        KEEP(*(.flashconfig*))
         *(.startup)
         *(.text)
     } > FLASH
@@ -67,19 +60,20 @@ SECTIONS {
 }
 ```
 
-</div>
-
 There are two main blocks to the linker script called `MEMORY` and `SECTIONS`.
-The `MEMORY` block tells the linker how the storage address space should be broken up.
-At a minimum you should define where the non-volitile (flash) and volitile
-(ram) storage blocks, which is what we do above.
+The `MEMORY` block tells the linker how the storage address space should be
+broken up. Typical microncontrollers have two main type os storage, flash
+(slower but non-volatile) and ram (faster but volatile).
+
+At a minimum you should define where the non-volitile (flash) and
+volitile (ram) storage blocks, which is what we do above. These values are
+defined in the datasheet of the chip, for the teensy 3.1 it is [this
+one](https://www.pjrc.com/teensy/K20P64M72SF1RM.pdf).
 
 For example, in our linker scripts we have split the storage address space into
-two parts, one for non-volitile `FLASH` storage and the other for volitile
+two parts, one for non-volatile `FLASH` storage and the other for volatile
 `RAM` storage. We tell the linker where these regions start, the `ORIGIN` and
-how long they are, the `LENGTH`. These values are defined in the datasheet of
-the chip, for the teensy 3.1 it is [this
-one](https://www.pjrc.com/teensy/K20P64M72SF1RM.pdf).
+how long they are, the `LENGTH`. 
 
 This file tells linker where the various bits of memory are located and tells it
 where to put different bits of the code. There are two main blocks to the linker
@@ -98,7 +92,7 @@ control over the layout of code and give each section different permissions. For
 example, you could make the second part of the flash read only to store data
 without the worry about it being executed:
 
-```
+```text
 MEMORY {
     FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 128K
     RODATA (ro) : ORIGIN = 0x00020000, LENGTH = 128K

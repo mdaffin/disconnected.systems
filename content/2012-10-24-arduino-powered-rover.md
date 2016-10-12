@@ -1,14 +1,13 @@
----
-layout: post
-title: Arduino Powered Rover
-description: A simple arduino powered robot
-tags: [arduino, robotics]
----
++++
+title = "Arduino Powered Rover"
+description = "A simple arduino powered robot"
+slug = "arduino-powered-rover"
+date = "2012-10-24"
+tags = [ "arduino", "robotics" ]
++++
 
 Over the past couple of weeks I have been developing an arduino powered
 autonomous rover.
-
-<!--more-->
 
 ## The Hardware
 
@@ -60,8 +59,8 @@ pins should be connected to the power source as well as the Arduinos ground
 pins. The left servo to pin 5 on the Arduinos digital pins and the right servo
 to pin 6.
 
-[![Rover Servo layout]({{site.url}}/images/arduino-powered-rover/Rover-servos-288x300.png
-"Rover Servos")]({{site.url}}/images/arduino-powered-rover/Rover-servos.png)
+[![Rover Servo layout](/images/arduino-powered-rover/Rover-servos-288x300.png
+"Rover Servos")](/images/arduino-powered-rover/Rover-servos.png)
 
 ### The Bumpers and Switch
 
@@ -71,8 +70,8 @@ ardunio's +5v pin and the other end to the Arduinos digital pins 2 (switch), 3
 (left bumper) or 4 (right bumper) as well as through a 1k resistor to ground.
 
 [![The bumpers and switch
-circuits]({{site.url}}/images/arduino-powered-rover/Rover-bumpers-198x300.png
-"Rover-Bumpers")]({{site.url}}/images/arduino-powered-rover/Rover-bumpers.png)
+circuits](/images/arduino-powered-rover/Rover-bumpers-198x300.png
+"Rover-Bumpers")](/images/arduino-powered-rover/Rover-bumpers.png)
 
 ### The Range Finders
 
@@ -90,8 +89,8 @@ The power pins should be connected to the Arduinos +5v pins and the ground to
 the ground pins. The left range finder to the digital pin 7 and the right one to
 digital pin 8.
 
-[![Range finders]({{site.url}}/images/arduino-powered-rover/Rover-Range-300x295.png
-"Rover-Range")]({{site.url}}/images/arduino-powered-rover/Rover-Range.png)
+[![Range finders](/images/arduino-powered-rover/Rover-Range-300x295.png
+"Rover-Range")](/images/arduino-powered-rover/Rover-Range.png)
 
 ### The Potentiometer
 
@@ -100,8 +99,8 @@ be directly connected to the arduinos ground and +5v power supply and the
 central pin to the Arduinos analog pin 0.
 
 [![Potentiometer
-circuit]({{site.url}}/images/arduino-powered-rover/Rover-Potentiometer-296x300.png
-"Rover-Potentiometer")]({{site.url}}/images/arduino-powered-rover/Rover-Potentiometer.png)
+circuit](/images/arduino-powered-rover/Rover-Potentiometer-296x300.png
+"Rover-Potentiometer")](/images/arduino-powered-rover/Rover-Potentiometer.png)
 
 ### The LEDs
 
@@ -114,11 +113,13 @@ not. The 12th pin is mostly used for debugging so is not needed.
 The code for this project is available on [my github
 account](https://github.com/mdaffin/ArduinoRover). And can easily be built with
 
-    mkdir build
-    cd build
-    cmake ..
-    make
-    make rover-upload # This step requires the arduino to be plugged into the computer
+```shell
+mkdir build
+cd build
+cmake ..
+make
+make rover-upload # This step requires the arduino to be plugged into the computer
+```
 
 The code should be built then uploaded to the arduino and the rover should start
 moving when you hit the switch (and the LED on pin 13 should light up when it is

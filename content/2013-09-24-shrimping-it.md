@@ -1,9 +1,10 @@
----
-layout: post
-title: Shrimping it
-description: A quick tutorial on assembling a minimal DIY arduino known as the shrimp.
-tags: [shrimp, arduino, atmega328p]
----
++++
+title = "Shrimping it"
+description = "A quick tutorial on assembling a minimal DIY arduino known as the shrimp."
+slug = "shrimping-it"
+date = "2013-09-24"
+tags = [ "shrimp", "arduino", "atmega328p" ]
++++
 
 The arduino platform is a great platform to work with, it is easy to code for and has a nice
 learning curve. However, after you have finished playing with and tweaking your circuit you are left
@@ -13,25 +14,23 @@ can you do about it? Well, this is where a [shrimp](http://shrimping.it/) comes 
 is basically a bare bones arduino, normally constructed on a breadboard or strip board, fully
 compatible with the arduino sdk, and only costs about a 10th of the price (&lt; £6).<!--more-->
 
-<!--more-->
-
 ## The Components
 
 The shrimp does not require many components, most of which can be bought very cheaply and are
 readily available.
 
-*   ATMEGA328P-PU&#42;
-*   Breadboard/Stripboard
-*   USB to Serial converter&#42;&#42;
-*   16MHz crystal oscillator
-*   2x 18-22pF ceramic capacitor
-*   4x ~100nF ceramic capacitor
-*   1x 10uF electrolitic capacitor
-*   1x 1k-10k resistor (exact value does not matter)
-*   1x LED
-*   1x resistor to match the LED&#42;&#42;&#42;
-*   1x Switch (Optional)
-*   Some wire
+* ATMEGA328P-PU&#42;
+* Breadboard/Stripboard
+* USB to Serial converter&#42;&#42;
+* 16MHz crystal oscillator
+* 2x 18-22pF ceramic capacitor
+* 4x ~100nF ceramic capacitor
+* 1x 10uF electrolitic capacitor
+* 1x 1k-10k resistor (exact value does not matter)
+* 1x LED
+* 1x resistor to match the LED&#42;&#42;&#42;
+* 1x Switch (Optional)
+* Some wire
 
 &#42; The ATMEGA328P is one of the most expensive part of the shrimp, typically you can get them for
 £2-£5 depending on the quantity you want and if they are preprogrammed with the Arduino bootloader.
@@ -79,7 +78,7 @@ crystal is connected to XTAL1 (pin 9) and XTAL2 (pin 10), it is not polarized so
 which way you connect it. Each of the crystal pins are connected to ground through a couple of 22pF
 capacitors and help to stabilize the crystals signal.
 
-[![shrimpingit-1]({{site.url}}/images/shrimping-it/shrimpingit-1-300x228.png)]({{site.url}}/images/shrimping-it/shrimpingit-1.png)
+[![shrimpingit-1](/images/shrimping-it/shrimpingit-1-300x228.png)](/images/shrimping-it/shrimpingit-1.png)
 
 The ATMEGA328 has two ground pins and two VCC pins. The ground pins (pins 8 and 22) are connected
 internally, so you only need to wire one up. The VCC pins however are not connected internally, pin
@@ -91,7 +90,7 @@ digital one so you can just short it to pin 7. Lastly, we should connect the res
 keeps the reset pin high and stops the chip from randomly resetting. If you wish to reset the chip,
 just short this pin to ground.
 
-[![shrimpingit-3]({{site.url}}/images/shrimping-it/shrimpingit-3-300x272.png)]({{site.url}}/images/shrimping-it/shrimpingit-3.png)
+[![shrimpingit-3](/images/shrimping-it/shrimpingit-3-300x272.png)](/images/shrimping-it/shrimpingit-3.png)
 
 And that is it! You have a fully functional shrimp, however it won't do much without some inputs or
 output so lets connect an LED to see it do something. There are many ways to do this, for example
@@ -105,7 +104,7 @@ you connect it to VCC then you have to reverse the logic in your program as sett
 to HIGH will turn _off_ the led and vice versa. We have chosen to connect it to ground so we don't
 have to worry about reversing the logic.
 
-[![shrimpingit-5]({{site.url}}/images/shrimping-it/shrimpingit-5-295x300.png)]({{site.url}}/images/shrimping-it/shrimpingit-5.png)
+[![shrimpingit-5](/images/shrimping-it/shrimpingit-5-295x300.png)](/images/shrimping-it/shrimpingit-5.png)
 
 If your ATMEGA328 has the blink sketch uploaded to it then you can power it up and the LED will
 start blinking at you.
@@ -118,7 +117,7 @@ capacitors, one across each VCC pin to ground. Ideally these should be close to 
 add a 10uF electrolytic capacitor across one of the VCC pins to ground (note that electrolytic
 capacitors are polar devices so make sure you connect the side with the strip to ground).
 
-[![shrimpingit-6]({{site.url}}/images/shrimping-it/shrimpingit-6-295x300.png)]({{site.url}}/images/shrimping-it/shrimpingit-6.png)
+[![shrimpingit-6](/images/shrimping-it/shrimpingit-6-295x300.png)](/images/shrimping-it/shrimpingit-6.png)
 
 Right, now our chip is more stable it is time to program it! For this we need one more 100nF
 capacitor to sit between the DTR pin on the UART chip and the reset pin on the ATMEGA328. This
@@ -134,7 +133,7 @@ There is no harm in connecting them in reverse, you just wont be able to upload 
 communicate over the serial port if you do, so if you are having trouble uploading sketches try
 reversing the RX and TX connections.
 
-[![shrimpingit-7]({{site.url}}/images/shrimping-it/shrimpingit-7-295x300.png)]({{site.url}}/images/shrimping-it/shrimpingit-7.png)
+[![shrimpingit-7](/images/shrimping-it/shrimpingit-7-295x300.png)](/images/shrimping-it/shrimpingit-7.png)
 
 Now you can try uploading sketches to the ATMEGA328.
 
@@ -143,7 +142,7 @@ out the analogue reference if you plan to use the analogue to digital converter 
 switch between the reset pin and ground to allow you to reset the ATMEGA328 whenever you want
 without having to manually short it to ground.
 
-[![shrimpingit-9]({{site.url}}/images/shrimping-it/shrimpingit-9-295x300.png)]({{site.url}}/images/shrimping-it/shrimpingit-9.png)
+[![shrimpingit-9](/images/shrimping-it/shrimpingit-9-295x300.png)](/images/shrimping-it/shrimpingit-9.png)
 
 That's it! You now have a fully functional shrimp equivalent to the Arduino Uno. You should now try
 experimenting with the sketches, see if you can make the LED blink faster or slower, or even in a

@@ -1,11 +1,10 @@
-extends: default.liquid
-
-title: Nim on Arduino
-description: A minimal example of programming an arduino uno in the nim language
-path: /nim-on-adruino
-date: 2 November 2015 21:00:00 +0000
-tags: [nim, arduino, atmega328p]
----
++++
+title = "Nim on Arduino"
+description = "A minimal example of programming an arduino uno in the nim language"
+slug = "nim-on-adruino"
+date = "2015-11-02"
+tags = [ "nim", "arduino", "atmega328p" ]
++++
 
 There has been a few interesting projects over the past few years that have tried to bring alternative languages to the embedded world. The [espruino](http://www.espruino.com/) and [micropython](https://micropython.org/) are two very interesting project that allow you to run programs written in javascript and python on a micro-controller. However they have one large drawback, they only support their own boards and therefore can only run them on a limited number of micro-controllers. These are two very interesting new programming languages designed for low level system programming making them ideally suited for micro-controllers - rust and nim.
 
@@ -15,7 +14,7 @@ This post I will look at nim in an attempt to get it running on an Arduino UNO.
 
 After installing the latest version of [nim](http://nim-lang.org/download.html) (0.12.0 at the time of writing) it was trivial to get an example program up and running:
 
-<div class="code-header">example.nim</div>
+###### example.nim
 
 ```nim
 # This is a comment
@@ -24,7 +23,7 @@ var name: string = readLine(stdin)
 echo("Hi, ", name, "!")
 ```
 
-```bash
+``` bash
 nim compile --run example.nim
 ```
 
@@ -34,7 +33,7 @@ There are quite a few tutorials on how to program in nim, so I will skip on to t
 
 Before we start to look at how to compile and upload a nim program to and avr chip we first need to see how this works without the Arduino SDK. Fortunately this process is quite easy and the example below where adapted from [Balau's blog](https://balau82.wordpress.com/2011/03/29/programming-arduino-uno-in-pure-c/) on the subject. I recommend reading his blog post for more details about the process.
 
-<div class="code-header">led.c</div>
+###### led.c
 
 ```c
 #include <avr/io.h>
@@ -77,13 +76,13 @@ The only working example I could find of how to compile a nim program for avr wa
 
 So let us try it out
 
-<div class="code-header">hello.nim</div>
+###### hello.nim
 
 ```nim
 echo "Hello, world!"
 ```
 
-<div class="code-header">panicoverride.nim</div>
+###### panicoverride.nim
 
 ```nim
 proc printf(frmt: cstring) {.varargs, importc, header: "<stdio.h>", cdecl.}
@@ -121,9 +120,9 @@ And the led stops blinking - progress, but nim is able to directly compile to av
 
 First I noticed it was using `gcc` not `gcc-avr`. This was fixed by adding the following
 
-<div class="code-header">nim.cfg</div>
+###### nim.cfg
 
-```
+```ini
 avr.standalone.gcc.path = "/usr/bin"
 avr.standalone.gcc.exe = "avr-gcc"
 avr.standalone.gcc.linkerexe = "avr-gcc"
@@ -131,9 +130,9 @@ avr.standalone.gcc.linkerexe = "avr-gcc"
 
 I then noticed some of the flags where missing from the compiler and linker. This was fixed by adding the following to the config
 
-<div class="code-header">nim.cfg</div>
+###### nim.cfg
 
-```
+```ini
 passC = "-Os"
 passC = "-DF_CPU=16000000UL"
 passC = "-mmcu=atmega328p"
@@ -142,9 +141,9 @@ passL = "-mmcu=atmega328p"
 
 Finally I added a couple more options for convenience
 
-<div class="code-header">nim.cfg</div>
+###### nim.cfg
 
-```
+```ini
 cpu = "avr"
 gc = "none"
 define = "release"
@@ -161,10 +160,9 @@ avrdude -F -V -c arduino -p ATMEGA328P -P /dev/ttyACM0 -b 115200 -U flash:w:hell
 
 ## Blink in nim
 
-
 Now its time to get nim to blink the led. We will only need the `nim.cfg` and `panicoverride.nim` files from the previous steps. Then we need to create a small c library to talk to the Arduino that we can wrap with nim. This is just the c example above split into separate functions.
 
-<div class="code-header">led.c</div>
+###### led.c
 
 ```c
 #include <avr/io.h>
@@ -192,7 +190,7 @@ void delay(int ms) {
 
 And now for the nim version of blink.
 
-<div class="code-header">blink.nim</div>
+###### blink.nim
 
 ```nim
 {.compile: "led.c".}

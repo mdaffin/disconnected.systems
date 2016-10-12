@@ -1,11 +1,10 @@
-extends: default.liquid
-
-title: Bare Metal C on the Teensy 3.1
-description: A look at bare metal programming in c on the teensy 3.1 with out external dependencies.
-path: /bare-metal-c-on-the-teensy-3.1
-date: 23 November 2015 21:00:00 +0000
-tags: [c, teensy, arm]
----
++++
+title = "Bare Metal C on the Teensy 3.1"
+description = "A look at bare metal programming in c on the teensy 3.1 with out external dependencies."
+slug = "bare-metal-c-on-the-teensy-3.1"
+date = "2015-11-23"
+tags = [ "c", "teensy", "arm" ]
++++
 
 As a follow on from my previous post about writing [bare metal assembly on the
 teensy 3.1](/bare-metal-assembly-on-the-teensy-3.1/) I wanted to see what it

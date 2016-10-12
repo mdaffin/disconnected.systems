@@ -1,9 +1,10 @@
----
-layout: post
-title: Create Custom ArchlinuxArm Images for the Raspberry Pi
-description: Setup a raspberry pi archlinuxarm image or sd-card before needing to boot the pi.
-tags: [raspberry pi, archlinuxarm, arm, chroot]
----
++++
+title = "Create Custom ArchlinuxArm Images for the Raspberry Pi"
+description = "Setup a raspberry pi archlinuxarm image or sd-card before needing to boot the pi."
+slug = "raspberry-pi-archlinuxarm-setup"
+date = "2016-03-21"
+tags = ["raspberry pi", "archlinuxarm", "arm", "chroot"]
++++
 
 I generally work with headless Raspberry Pis either by running them as
 lightweight servers or embedding them into projects. It is very anoying having
