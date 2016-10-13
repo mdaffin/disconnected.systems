@@ -100,3 +100,8 @@ time {
   color: #FFFFFF;
   background-color: #272822;
 }
+
+.footer > div {
+  margin: 50px;
+  text-align: center;
+}
