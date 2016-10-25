@@ -1,62 +1,38 @@
 body {
   font-family: 'Open sans', sans-serif;
-  color: #111111;
-  background-color: #FFFFFF;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Russo One', cursive;
-  color: #333333;
 }
 
-li {
-  margin-bottom: 0;
-}
-
-time {
-  font-style: italic;
-}
-
-.panel:hover {
-  color: #FFFFFF;
-  background-color: #333333;
-}
-
-.panel:hover h5 {
-  color: #FFFFFF;
-}
-
-.panel {
-  padding-top: 10px;
-  display: block;
-  color: #312c32;
-  text-decoration: none;
-}
-
-.header {
-  margin-top: 18rem;
-  margin-bottom: 10rem;
+header {
   text-align: center;
+  margin-top: 18rem;
+  margin-bottom: 5rem;
 }
 
-.header h1 {
-  margin-bottom: 0rem;
-}
-
-.header h6 {
+header h6 {
   font-style: italic;
 }
-
+.container {
+  width: 70%;
+  margin: 0 auto;
+}
 .container img {
     margin: auto;
     display: block;
     text-align: center;
 }
+footer > div {
+  margin: 50px;
+  text-align: center;
+}
 
 .navbar, .navbar-spacer {
   display: block;
   width: 100%;
-  height: 6.5rem;
+  height: 3.5rem;
   background: #fff;
   z-index: 99;
   border-top: 1px solid #eee;
@@ -65,12 +41,10 @@ time {
 .navbar-spacer {
   display: none;
 }
-.navbar > .container {
-  width: 100%;
-}
 .navbar-list {
   list-style: none;
   margin-bottom: 0;
+  padding-left: 0;
 }
 .navbar-item {
   position: relative;
@@ -84,11 +58,11 @@ time {
   padding-left: 15px;
   padding-right: 15px;
   text-decoration: none;
-  line-height: 6.5rem;
-  color: #222;
+  line-height: 3.5rem;
+  color: #222222;
+  display: block;
 }
 .navbar-link:hover {
-  display: block;
   background-color: #333333;
   color: #FFFFFF;
 }
@@ -96,12 +70,26 @@ time {
   color: #33C3F0;
 }
 
-.highlight > pre > code {
+.panel:hover {
   color: #FFFFFF;
-  background-color: #272822;
+  background-color: #333333;
+}
+.panel:hover h3 {
+  color: #FFFFFF;
+}
+.panel h3 {
+  margin-top: 0;
+}
+.panel {
+  padding-top: 10px;
+  padding-bottom: 20px;
+  display: block;
+  color: #312c32;
+  text-decoration: none;
 }
 
-.footer > div {
-  margin: 50px;
-  text-align: center;
+.highlight pre, .highlight code{
+  line-height: 1rem;
+  color: #FFFFFF;
+  background: #272822;
 }
