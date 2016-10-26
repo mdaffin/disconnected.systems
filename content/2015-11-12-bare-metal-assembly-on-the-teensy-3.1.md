@@ -36,9 +36,9 @@ assembler `arm-none-eabi-as`, linker `arm-none-eabi-ld` and objcopy
 distribution's package managers or from inside a Arduino SDK's tools directory:
 `$ARDUINO_SDK/hardware/tools/arm/bin`.
 
-## The Linker script: 
+## The Linker script
 
-###### [layout.ld](https://gist.github.com/mdaffin/d6fb7e91aa21d6943ef4#file-layout-ld)
+###### layout.ld
 
 ```text
 MEMORY {
@@ -63,34 +63,21 @@ SECTIONS {
 There are two main blocks to the linker script called `MEMORY` and `SECTIONS`.
 The `MEMORY` block tells the linker how the storage address space should be
 broken up. Typical microncontrollers have two main type os storage, flash
-(slower but non-volatile) and ram (faster but volatile).
+(slower but non-volatile) and ram (faster but volatile). 
 
-At a minimum you should define where the non-volitile (flash) and
-volitile (ram) storage blocks, which is what we do above. These values are
-defined in the datasheet of the chip, for the teensy 3.1 it is [this
-one](https://www.pjrc.com/teensy/K20P64M72SF1RM.pdf).
+At a minimum you should define where the non-volitile (flash) and volitile
+(ram) storage blocks, which is what we do above. These values are defined in
+the datasheet of the chip, for the teensy 3.1 it is [this
+one](https://www.pjrc.com/teensy/K20P64M72SF1RM.pdf).  For example, in our
+linker scripts we have split the storage address space into two parts, one for
+non-volatile `FLASH` storage and the other for volatile `RAM` storage. We tell
+the linker where these regions start, the `ORIGIN` and how long they are, the
+`LENGTH`. 
 
-For example, in our linker scripts we have split the storage address space into
-two parts, one for non-volatile `FLASH` storage and the other for volatile
-`RAM` storage. We tell the linker where these regions start, the `ORIGIN` and
-how long they are, the `LENGTH`. 
-
-This file tells linker where the various bits of memory are located and tells it
-where to put different bits of the code. There are two main blocks to the linker
-script, the `MEMORY` block and the `SECTIONS` bock.
-
-The `MEMORY` block tells the linker where sections of storage on chip are
-located. The flash is located at the start of the chip `0x00000000` and on the
-MK20DX256VLH7 it is 256K long. Where as on the MK20DX256VLH7 the ram starts at
-0x1FFF8000 and is 64K long:
-
-<code data-gist-id="d6fb7e91aa21d6943ef4" data-gist-file="layout.ld" data-gist-line="29-32"></code>
-
-The values for these location can be found in the programmers manual on pages 63
-and 90. Note that you can split up the flash and ram even more to give greater
-control over the layout of code and give each section different permissions. For
-example, you could make the second part of the flash read only to store data
-without the worry about it being executed:
+You can split these sections up as much as you like and in doing so can change
+the permissions for various different parts. For example, you can make a
+section for read only, non executable data to protect that section from being
+manuplated at runtime with the following.
 
 ```text
 MEMORY {
@@ -100,12 +87,12 @@ MEMORY {
 }
 ```
 
-The SECTIONS block tells the linker where to place the various parts of
-the program:
+The SECTIONS block tells the linker where and what order to place the various
+parts of the program. In our example we only have `.text` (aka the code) but
+typically you would also have a block for initialized and uninitialized data
+(`.data` and `.bss` respectively).
 
-<code data-gist-id="d6fb7e91aa21d6943ef4" data-gist-file="layout.ld" data-gist-line="34-45"></code>
-
-`. = 0x000000000;` sets the current location to the start of the block.
+`. = 0x000000000;` sets the current location to the start of the address space.
 
 `.text : {...} > FLASH` matches all the text (aka code) and tells it to place it
 in the FLASH section defined above.
@@ -135,15 +122,36 @@ rest of the code with `*(.text)`.
 Finally we set a variable `_estack` to point to the end of the ram which will be
 used to set the stack pointer.
 
-## The assembly code: [`blink.s`](https://gist.github.com/mdaffin/d6fb7e91aa21d6943ef4#file-blink-s)
+## The assembly code
 
 Arm assembly comes in two flavors, the 16bit thumb instruction set and the
 full 32bit arm instruction set. With the first line of code `.syntax unified`
 we well the assembler we are using a mix of the instruction sets.
 
-As we discussed above, we need to define the exception vectors:
+First thing to do is set the instruction set we wish to use, for modern `ARM
+THUMB` we use the `unified` syntax.
 
-<code data-gist-id="d6fb7e91aa21d6943ef4" data-gist-file="blink.s" data-gist-line="32-40"></code>
+###### blink.s
+
+```asm
+    .syntax unified
+```
+
+Then as we discussed above, we need to define the exception vectors:
+
+###### blink.s
+
+```asm
+    .section ".vectors"
+    // Interrupt vector definitions - page 63
+    .long _estack  //  0 ARM: Initial Stack Pointer
+    .long _startup //  1 ARM: Initial Program Counter
+    .long _halt    //  2 ARM: Non-maskable Interrupt (NMI)
+    .long _halt    //  3 ARM: Hard Fault
+    .long _halt    //  4 ARM: MemManage Fault
+    .long _halt    //  5 ARM: Bus Fault
+    .long _halt    //  6 ARM: Usage Fault
+```
 
 The `.section ".vectors"` tells the assembler to place this bit of code in the
 `.vectors` section described in the linker script above, which we placed at the
@@ -169,18 +177,49 @@ to our linker script described in the last section. This address and the values
 are described in the programmers manual on page 569 but we are not making any
 real use of these features in this example.
 
-<code data-gist-id="d6fb7e91aa21d6943ef4" data-gist-file="blink.s" data-gist-line="42-47"></code>
+###### blink.s
+
+```asm
+    .section ".flashconfig"
+    .long   0xFFFFFFFF
+    .long   0xFFFFFFFF
+    .long   0xFFFFFFFF
+    .long   0xFFFFFFFE
+```
 
 Now we move on to the setup code. This will be placed after the `.flashconfig`
 as we defined in the linker script. `_startup:` is the label that the arm chip
 will jump to when it resets as we defined in the exception vectors above.
 
-<code data-gist-id="d6fb7e91aa21d6943ef4" data-gist-file="blink.s" data-gist-line="50-53"></code>
+###### blink.s
+
+```asm
+    .section ".startup","x",%progbits
+    .thumb_func
+    .global _startup
+_startup:
+```
 
 There are a few things we need to do to setup the arm chip, first we reset all
 the registers to 0.
 
-<code data-gist-id="d6fb7e91aa21d6943ef4" data-gist-file="blink.s" data-gist-line="55-67"></code>
+###### blink.s
+
+```asm
+    mov     r0,#0
+    mov     r1,#0
+    mov     r2,#0
+    mov     r3,#0
+    mov     r4,#0
+    mov     r5,#0
+    mov     r6,#0
+    mov     r7,#0
+    mov     r8,#0
+    mov     r9,#0
+    mov     r10,#0
+    mov     r11,#0
+    mov     r12,#0
+```
 
 The Teensy 3 has a watchdog, which is enabled by default. This will cause the
 chip to reset if the watchdog is not reset frequently. We do not want to worry
@@ -189,14 +228,50 @@ disabling interrupts, unlocking the watchdog (so it can be configured) then
 disable it before enabling interrupts again. You can read more about how to
 configure the watchdog on page 463 of the programmers manual.
 
-<code data-gist-id="d6fb7e91aa21d6943ef4" data-gist-file="blink.s" data-gist-line="69-83"></code>
+###### blink.s
+
+```asm
+    cpsid i // Disable interrupts
+
+    // Unlock watchdog - page 478
+    ldr r6, = 0x4005200E // address from page 473
+    ldr r0, = 0xC520
+    strh r0, [r6]
+    ldr r0, = 0xD928
+    strh r0, [r6]
+
+    // Disable watchdog - page 468
+    ldr r6, = 0x40052000 // address from page 473
+    ldr r0, = 0x01D2
+    strh r0, [r6]
+
+    cpsie i // Enable interrupts
+
+```
 
 With that the general configuration of the chip is done. We can now configure
 the parts of the chip we want to use and start running our application loop. In
 this example that means to enable and set as an `OUTPUT` the GPIO pin the led
 is connected to.
 
-<code data-gist-id="d6fb7e91aa21d6943ef4" data-gist-file="blink.s" data-gist-line="85-98"></code>
+###### blink.s
+
+```asm
+    // Enable system clock on all GPIO ports - page 254
+    ldr r6, = 0x40048038 
+    ldr r0, = 0x00043F82 // 0b1000011111110000010
+    str r0, [r6]
+
+    // Configure the led pin
+    ldr r6, = 0x4004B014 // PORTC_PCR5 - page 223/227
+    ldr r0, = 0x00000143 // Enables GPIO | DSE | PULL_ENABLE | PULL_SELECT - page 227
+    str r0, [r6]
+
+    // Set the led pin to output
+    ldr r6, = 0x400FF094 // GPIOC_PDDR - page 1334,1337
+    ldr r0, = 0x20 // pin 5 on port c
+    str r0, [r6]
+```
 
 Our logic is very simple:
 
@@ -208,23 +283,70 @@ Our logic is very simple:
 
 Which is done by the following loop.
 
-<code data-gist-id="d6fb7e91aa21d6943ef4" data-gist-file="blink.s" data-gist-line="100-106"></code>
+###### blink.s
+
+```asm
+loop:
+    bl led_on
+    bl delay
+    bl led_off
+    bl delay
+    b loop
+```
 
 Rather then embedding logic in the loop above we have moved it into separate
 functions to mimic an actual application closer. The two functions to turn the
 led on and off are as follows.
 
-<code data-gist-id="d6fb7e91aa21d6943ef4" data-gist-file="blink.s" data-gist-line="108-124"></code>
+###### blink.s
+
+```asm
+    // Function to turn the led off
+    .thumb_func
+    .global led_off
+led_off:
+    ldr r6, = 0x400FF080 // GPIOC_PDOR - page 1334,1335
+    ldr r0, = 0x0
+    str r0, [r6]
+    mov pc, r14
+
+    // Function to turn the led on
+    .thumb_func
+    .global led_on
+led_on:
+    ldr r6, = 0x400FF080 // GPIOC_PDOR - page 1334,1335
+    ldr r0, = 0x20
+    str r0, [r6]
+    mov pc, r14
+```
 
 And the last function just causes the processor to busy wait for a reasonable
 amount of time by counting down from a fairly large number.
 
-<code data-gist-id="d6fb7e91aa21d6943ef4" data-gist-file="blink.s" data-gist-line="126-135"></code>
+###### blink.s
+
+```asm
+    // Uncalibrated busy wait
+    .thumb_func
+    .global delay
+delay:
+    ldr r1, = 0x2625A0
+delay_loop:
+    sub r1, r1, #1
+    cmp r1, #0
+    bne delay_loop
+    mov pc, r14
+```
 
 Finally we have the busy wait which will cause the chip to lockup in cause any
 of the interrupts we defined at the start trigger.
 
-<code data-gist-id="d6fb7e91aa21d6943ef4" data-gist-file="blink.s" data-gist-line="137-138"></code>
+###### blink.s
+
+```asm
+_halt: b _halt
+    .end
+```
 
 ## Compile and Upload
 
