@@ -11,8 +11,6 @@ traditional languages I wanted to look at [rust](https://www.rust-lang.org/). In
 this post I will port the [bare metal c](/bare-metal-c-on-the-teensy-3.1/)
 example to rust with cargo, rusts dependency manager and build manager.
 
-<!--more-->
-
 The final source can be found in [this github
 repository](https://github.com/mdaffin/teensy-3-rust). It contains a fair few
 more files and cargo enforces a stricter layout (ie the source must be in the

@@ -20,8 +20,6 @@ you boot it. In this post I will take this one step further and look at what it
 takes to setup a raspberry pi image/sd-card and customise it before you even
 have to plug it into a pi.
 
-<!--more-->
-
 ## Prerequisites
 
 You will require a Linux box with the following packages need to be installed
@@ -30,7 +28,8 @@ You will require a Linux box with the following packages need to be installed
 * `qemu-user-static`
 * `binfmt-support`
 
-[Arch Linux](https://wiki.archlinux.org/index.php/Raspberry_Pi#QEMU_chroot)
+See [this](https://wiki.archlinux.org/index.php/Raspberry_Pi#QEMU_chroot) for
+setting them up on Arch Linux.
 
 You can alternatively use [Vagrant](https://www.vagrantup.com/) with the
 following `Vagrantfile` to give you a Linux virtual machine with all the
@@ -38,7 +37,7 @@ prerequisites preinstalled. There are some caveats with using Vagrant for this
 process which are out of scope of this post. If there is enough interest I may
 cover Vagrant in a future post.
 
-{% highlight ruby %}
+```ruby
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
@@ -49,7 +48,7 @@ Vagrant.configure(2) do |config|
     apt-get install -y qemu qemu-user-static binfmt-support
   SHELL
 end
-{% endhighlight %}
+```
 
 ## Create an image file
 
@@ -62,9 +61,9 @@ Creating an image file is simple, just create an empty file large enough to
 store everything we want to install. A simple way to do this is with `fallocate`
 to create a 2 gigibyte file run the following.
 
-{% highlight shell %}
+```shell
 fallocate -l 2G "custom-pi.img"
-{% endhighlight %}
+```
 
 Feel free to play with the image size but 2G is a good starting point. Just
 remember that it needs to be smaller then the size of the sd-card you want to
@@ -76,62 +75,64 @@ Now setup the image as a loopback device so we can format and mount it as any
 physical disk. Note the device that this command returns, we will need it later -
 in the example below its `/dev/loop0`.
 
-{% highlight shell %}
+```shell
 sudo losetup --find --show "custom-pi.img"
 > /dev/loop0
-{% endhighlight %}
+```
 
 ## Format and mount the device
 
 Here we create the partitions the first one, 100M in size, for the boot files
 and the second one for the rest of the system.
 
-{% highlight shell %}
+```shell
 sudo parted --script /dev/loop0 mklabel msdos
 sudo parted --script /dev/loop0 mkpart primary fat32 0% 100M
 sudo parted --script /dev/loop0 mkpart primary ext4 100M 100%
-{% endhighlight %}
+```
 
 This will create two new devices `/dev/loop0p1` and `/dev/loop0p2` which you can
 see by running `ls /dev/loop0?*`. We can now format these partitions with vfat
 (required for the boot partition) and ext4 respectively.
 
-{% highlight shell %}
+```shell
 sudo mkfs.vfat -F32 /dev/loop0p1
 sudo mkfs.ext4 -F /dev/loop0p2
-{% endhighlight %}
+```
 
 Before we can install archlinuxarm we must mount the partition.
 
-{% highlight shell %}
+```shell
 sudo mount /dev/loop0p2 /mnt
 sudo mkdir /mnt/boot
 sudo mount /dev/loop0p1 /mnt/boot
-{% endhighlight %}
+```
 
 ## Install the base system
 
 Now download the archlinuxarm tar for your pi. For the raspberry pi 2/3
 
-{% highlight shell %}
+```shell
 wget http://archlinuxarm.org/os/ArchLinuxARM-rpi-2-latest.tar.gz
-{% endhighlight %}
+```
 
 Or for the raspberry pi 1.
 
-{% highlight shell %}
+```shell
 wget http://archlinuxarm.org/os/ArchLinuxARM-rpi-latest.tar.gz
-{% endhighlight %}
+```
 
 And extract it to the mounted image.
 
-{% highlight shell %}
+```shell
 sudo tar -xpf "ArchLinuxARM-rpi-2-latest.tar.gz" -C /mnt
-{% endhighlight %}
+```
 
 You may see a bunch of line like
 
-> `tar: Ignoring unknown extended header keyword 'SCHILY.fflags'`
+```bash
+tar: Ignoring unknown extended header keyword 'SCHILY.fflags'
+```
 
 These are safe to ignore.
 
@@ -144,32 +145,32 @@ to the image.
 There are a few system directories that need mounting to
 create a successful chroot environment.
 
-{% highlight shell %}
+```shell
 sudo mount -t proc none /mnt/proc
 sudo mount -t sysfs none /mnt/sys
 sudo mount -o bind /dev /mnt/dev
-{% endhighlight %}
+```
 
 Then to get a working network inside the chroot we need to fix the `resolv.conf`
 file.
 
-{% highlight shell %}
+```shell
 sudo mv /mnt/etc/resolv.conf /mnt/etc/resolv.conf.bak
 sudo cp /etc/resolv.conf /mnt/etc/resolv.conf
-{% endhighlight %}
+```
 
 And now for the bit that allows us to execute arm executables on a x86 or x86_64
 system.
 
-{% highlight shell %}
+```shell
 sudo cp /usr/bin/qemu-arm-static /mnt/usr/bin/
-{% endhighlight %}
+```
 
 We should now be able to chroot into our raspberry pi image.
 
-{% highlight shell %}
+```shell
 sudo chroot /mnt /usr/bin/bash
-{% endhighlight %}
+```
 
 Any command you now run will affect the raspberry pi image rather then your
 computer.
@@ -190,34 +191,34 @@ your self `ln -sf /usr/lib/systemd/system/SOMESERVICE.service
 First thing we should do to our image is update it and install any extra
 packages we want.
 
-{% highlight shell %}
+```shell
 pacman -Syu vim bash-completion
-{% endhighlight %}
+```
 
 You can change the hostname and rename the default user with the following.
 
-{% highlight shell %}
+```shell
 echo custom-pi > /etc/hostname
 
 sed -i "s/alarm/pi/g" /etc/passwd /etc/group /etc/shadow
 mv /home/alarm "/home/pi"
 echo -e "secret\nsecret" | passwd "pi"
-{% endhighlight %}
+```
 
 Install and enable sudo for our new user with.
 
-{% highlight shell %}
+```shell
 pacman -S --noconfirm sudo
 echo '%wheel ALL=(ALL) ALL' >> /etc/sudoers.d/wheel
-{% endhighlight %}
+```
 
 To enable the raspberry pi camera do.
 
-{% highlight shell %}
+```shell
 sed -i 's/gpu_mem=.*/gpu_mem=128/' /boot/config.txt
 grep 'start_file=start_x.elf' /boot/config.txt >/dev/null || echo 'start_file=start_x.elf' >> /boot/config.txt
 grep 'fixup_file=fixup_x.dat' /boot/config.txt >/dev/null || echo 'fixup_file=fixup_x.dat' >> /boot/config.txt
-{% endhighlight %}
+```
 
 Setup wired and wireless networking to auto connect when the pi boots (or just
 roams within range of the network). Remember to replace the `SSID` and
@@ -225,7 +226,7 @@ roams within range of the network). Remember to replace the `SSID` and
 wireless networks and the pi will connect to any that it can see allowing you to
 move your pi between locations.
 
-{% highlight shell %}
+```shell
 pacman -S --noconfirm wpa_supplicant wpa_actiond ifplugd crda dialog
 ln -sf /usr/lib/systemd/system/netctl-auto@.service /etc/systemd/system/multi-user.target.wants/netctl-auto@wlan0.service
 ln -sf /usr/lib/systemd/system/netctl-ifplugd@.service /etc/systemd/system/multi-user.target.wants/netctl-ifplugd@eth0.service
@@ -239,16 +240,16 @@ ESSID="SSID"
 IP=dhcp
 Key="PASSWORD"
 EOF
-{% endhighlight %}
+```
 
 Enable zero-conf networking (aka avahi or Bonjour) to make discovering your pi
 on the network easier, if your system supports it.
 
-{% highlight shell %}
+```shell
 pacman -S --noconfirm avahi nss-mdns
 sed -i '/^hosts: /s/files dns/files mdns dns/' /etc/nsswitch.conf
 ln -sf /usr/lib/systemd/system/avahi-daemon.service /etc/systemd/system/multi-user.target.wants/avahi-daemon.service
-{% endhighlight %}
+```
 
 ## Cleaning Up
 
@@ -257,7 +258,7 @@ some stuff. First exit the chroot by running `exit` or pressing `ctrl+d`. Then
 we start to unwind some of the setup steps, starting with restoring the
 resolve.conf, and unmounting the system folders needed by the chroot.
 
-{% highlight shell %}
+```shell
 sudo rm /mnt/etc/resolv.conf
 sudo mv /mnt/etc/resolv.conf.bak /mnt/etc/resolv.conf
 sudo rm /mnt/usr/bin/qemu-arm-static
@@ -265,24 +266,24 @@ sudo rm /mnt/usr/bin/qemu-arm-static
 sudo umount /mnt/dev
 sudo umount /mnt/proc
 sudo umount /mnt/sys
-{% endhighlight %}
+```
 
 Now we can unmount the partitions and detach the loopback device.
 
-{% highlight shell %}
+```shell
 sudo umount /mnt/boot
 sudo umount /mnt
 sudo losetup --detach "/dev/loop0"
-{% endhighlight %}
+```
 
 ## Flash the Image to an SD-Card
 
 We are now ready to flash the image, which can be done with `dd`. Remember to
 replace `/dev/mmblk0` with the device for your sd-card.
 
-{% highlight shell %}
+```shell
 sudo dd if=custom-pi.img of=/dev/mmblk0 bs=1M
-{% endhighlight %}
+```
 
 ## Conclusion
 
