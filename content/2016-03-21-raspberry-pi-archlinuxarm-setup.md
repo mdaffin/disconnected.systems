@@ -53,7 +53,7 @@ end
 ## Create an image file
 
 If you want to write directly to an sd-card skip this step and head to [Format
-and Mount the Device](#format-and-mount-the-device). Remember to substitute
+and Mount the Device](/raspberry-pi-archlinuxarm-setup/#format-and-mount-the-device). Remember to substitute
 `/dev/loop0` with the device you want to write to, typically `/dev/mmblkX` or
 `/dev/sdX` for sd-cards.
 
@@ -137,7 +137,7 @@ tar: Ignoring unknown extended header keyword 'SCHILY.fflags'
 These are safe to ignore.
 
 You should now have a fully working raspberry pi image and can skip to the
-[cleanup step](#cleaning-up) below if you do not want to make any customizations
+[cleanup step](raspberry-pi-archlinuxarm-setup/#cleaning-up) below if you do not want to make any customizations
 to the image.
 
 ## Chroot into the image

@@ -17,7 +17,7 @@ more files and cargo enforces a stricter layout (ie the source must be in the
 `src/` directory. Most of the addition files are for rust and are meant to make
 life simpler in the long run. The final project structure is as follows:
 
-~~~
+```text
 ├── build.rs
 ├── .cargo
 │   └── config
@@ -26,14 +26,14 @@ life simpler in the long run. The final project structure is as follows:
 ├── src
 │   └── main.rs
 └── thumbv7em-none-eabi.json
-~~~
+```
 
 The linker script
 [`layout.ld`](https://github.com/mdaffin/teensy-3-rust/blob/master/layout.ld)
 is identical to the c version so we will skip over it, I recommend reading my
 [previous post](/bare-metal-c-on-the-teensy-3.1/) for more details about it.
 
-## The Rust Code: [`src/main.rs`](https://github.com/mdaffin/teensy-3-rust/blob/master/src/main.rs)
+## The Rust Code
 
 This is a simple port of blink.c from the c example. We have moved it to src as
 this is where cargo looks for our code and have renamed it to main.rs to tell
@@ -60,21 +60,21 @@ We then disable the standard library with `#![no_std]`. Then tell rust we want a
 statically linked executable `#![crate_type="staticlib"]` and declare we want to
 use `volatile_store` from `core::intrinsics`.
 
-<div class="code-header"><a href="https://github.com/mdaffin/teensy-3-rust/blob/master/src/main.rs#L1-L5">src/main.rs</a></div>
+###### [src/main.rs](https://github.com/mdaffin/teensy-3-rust/blob/master/src/main.rs#L1-L5)
 
-~~~
+```rust
 #![feature(lang_items,no_std,core_intrinsics,asm,start)]
 #![no_std]
 #![crate_type="staticlib"]
 
 use core::intrinsics::{volatile_store};
-~~~
+```
 
 And now some required language functions which just cause the code to halt if we encounter an error.
 
-<div class="code-header"><a href="https://github.com/mdaffin/teensy-3-rust/blob/master/src/main.rs#L7-L26">src/main.rs</a></div>
+###### [src/main.rs](https://github.com/mdaffin/teensy-3-rust/blob/master/src/main.rs#L7-L26)
 
-~~~
+```rust
 #[lang="stack_exhausted"] extern fn stack_exhausted() {}
 #[lang="eh_personality"] extern fn eh_personality() {}
 #[lang="panic_fmt"]
@@ -95,7 +95,7 @@ pub extern fn __aeabi_unwind_cpp_pr1() -> ()
 {
     loop {}
 }
-~~~
+```
 
 The last bit of new code is the `lang_start` function. In truth the actual start
 point is the function that reset vector points to: the second `ISRVector` for
@@ -103,9 +103,9 @@ the teensy 3. In this example it is the `startup` function, which unfortunately
 needs a different signature then the one rust expects. Instead we create a
 simple wrapper to satisfy the compiler.
 
-<div class="code-header"><a href="https://github.com/mdaffin/teensy-3-rust/blob/master/src/main.rs#L137-L143">src/main.rs</a></div>
+###### [src/main.rs](https://github.com/mdaffin/teensy-3-rust/blob/master/src/main.rs#L137-L143)
 
-~~~
+```rust
 #[start]
 fn lang_start(_: isize, _: *const *const u8) -> isize {
     unsafe {
@@ -113,7 +113,7 @@ fn lang_start(_: isize, _: *const *const u8) -> isize {
     }
     0
 }
-~~~
+```
 
 The rest of the code is a direct port from the [C
 example](https://gist.github.com/mdaffin/f9132c388fae9ef5f5fe#file-blink-c).
@@ -172,12 +172,12 @@ a configuration file instead.
 Compiling is very simple and unlike the c and assembly examples it doesn't get
 more complex as the project grows as cargo handles this for us.
 
-~~~bash
+```bash
 cargo build --target thumbv7em-none-eabi
 arm-none-eabi-objcopy -O ihex -R .eeprom target/thumbv7em-none-eabi/debug/blink blink.hex
 echo "Reset teensy now"
 teensy-loader-cli -w --mcu=mk20dx256 blink.hex
-~~~
+```
 
 Note that this compiles a debug version of the application, to compile for
 release you simply pass the `--release` flag to cargo. However when I tried to
