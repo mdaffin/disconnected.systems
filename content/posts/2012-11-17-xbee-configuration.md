@@ -4,6 +4,7 @@ description = "A beginners guide on configuring and communicating over two xbees
 slug = "xbee-configuration"
 date = "2012-11-17"
 tags = [ "xbee" ]
+aliases = [ "/xbee-configuration/" ]
 +++
 
 For my third year project I will be using a bunch of XBee connected to various

@@ -4,6 +4,7 @@ description = "A guide on how to setup a raspberry pi to use as a wallboard that
 slug = "raspberry-powered-wallboard"
 date = "2012-10-19"
 tags = [ "raspberry-pi", "archlinuxarm", "archlinux", "linux" ]
+aliases = [ "/raspberry-powered-wallboard/" ]
 +++
 
 Having information displayed on a wall or monitor in an office or other public

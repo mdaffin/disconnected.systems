@@ -4,6 +4,7 @@ description = "Setup a raspberry pi archlinuxarm image or sd-card before needing
 slug = "raspberry-pi-archlinuxarm-setup"
 date = "2016-03-21"
 tags = ["raspberry pi", "archlinuxarm", "arm", "chroot"]
+aliases = [ "/raspberry-pi-archlinuxarm-setup/" ]
 +++
 
 I generally work with headless Raspberry Pis either by running them as

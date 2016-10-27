@@ -4,6 +4,7 @@ description = "A guide to setting up a quassel server on an Arch Linux server."
 slug = "quasselcore-on-archlinux"
 date = "2013-04-14"
 tags = [ "archlinux", "linux" ]
+aliases = [ "/quasselcore-on-archlinux/" ]
 +++
 
 I just set up a quassel server on an Arch Linux box. There is a serious lack of documentation around
