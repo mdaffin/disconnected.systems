@@ -1,0 +1,14 @@
+{{ partial "header.html" . }}
+<header>
+  <div container>
+    <h1>{{ .Title }}</h1>
+    <h6><time class="date">{{ dateFormat "2 Jan 2006" .Date }}</time></h6>
+  </div>
+{{ partial "navbar.html" . }}
+</header>
+<section>
+  <div container>
+    <p>{{ .Content }}</p>
+  </div>
+</section>
+{{ partial "footer.html" . }}
