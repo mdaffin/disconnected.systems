@@ -1,15 +1,15 @@
 {{ partial "header.html" . }}
 <header>
-  <div class="container">
+  <div container>
     <h1>{{ .Title }}</h1>
     <h6>Programming, Linux and all things Open Source</h6>
   </div>
 {{ partial "navbar.html" . }}
 </header>
-<section class="content">
-  {{ range first 50 .Data.Pages }}
+<section>
+  {{ range where .Data.Pages "Section" "posts"  }}
     <a class="panel" href="{{ .Permalink }}">
-      <div class="container">
+      <div container>
         <h3>{{ .Title }}</h3>
         <time class="date">{{ dateFormat "2 Jan 2006" .Date }}</time>
         <p>{{ .Description }}</p>

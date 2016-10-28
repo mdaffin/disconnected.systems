@@ -15,11 +15,8 @@ header {
 header h6 {
   font-style: italic;
 }
-.container {
-  width: 70%;
-  margin: 0 auto;
-}
-.container img {
+
+[container] img {
     margin: auto;
     display: block;
     text-align: center;
@@ -69,13 +66,14 @@ footer > div {
 .navbar-link.active {
   color: #33C3F0;
 }
-
+.panel time {
+  font-style: italic;
+}
 .panel:hover {
-  color: #FFFFFF;
-  background-color: #333333;
+  color: #555555;
 }
 .panel:hover h3 {
-  color: #FFFFFF;
+  text-decoration: underline;
 }
 .panel h3 {
   margin-top: 0;
@@ -84,7 +82,7 @@ footer > div {
   padding-top: 10px;
   padding-bottom: 20px;
   display: block;
-  color: #312c32;
+  color: #555555;
   text-decoration: none;
 }
 
