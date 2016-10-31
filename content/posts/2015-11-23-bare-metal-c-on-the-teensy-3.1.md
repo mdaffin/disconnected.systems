@@ -75,7 +75,6 @@ located outside of it, we just place it at the top for convenience.
 ```text
 _sflashdata = LOADADDR(.data);
 ```
-<code data-gist-id="f9132c388fae9ef5f5fe" data-gist-file="layout.ld" data-gist-line="29"></code>
 
 Note that we place two bits in the `.data` section. `.data` which contains the
 uninitialized variables and `.fastrun` which can contain any code that we want
