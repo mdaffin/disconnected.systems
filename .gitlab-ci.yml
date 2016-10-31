@@ -4,7 +4,7 @@ before_script:
   - apk update && apk add openssl py-pygments
   - wget https://github.com/spf13/hugo/releases/download/v0.17/hugo_0.17_Linux-64bit.tar.gz
   - echo "6a74626b64434a5ee9fc5ec4fbf22ce6  hugo_0.17_Linux-64bit.tar.gz" | md5sum -c
-  - tar xf hugo_0.17_Linux-64bit.tar.gz && cp ./hugo /usr/bin
+  - tar xf hugo_0.17_Linux-64bit.tar.gz && install -Dm0755 ./hugo_0.17_linux_amd64/hugo_0.17_linux_amd64 /usr/bin/hugo
   - hugo version
 
 test:
