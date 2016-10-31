@@ -21,6 +21,9 @@ header h6 {
     display: block;
     text-align: center;
 }
+footer {
+  margin-top: 5rem;
+}
 footer > div {
   margin: 50px;
   text-align: center;
