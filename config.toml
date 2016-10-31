@@ -5,3 +5,5 @@ languageCode = "en-gb"
 pygmentsStyle = "monokai"
 pygmentsUseClasses = true
 PygmentsCodeFences = true
+
+googleAnalytics = "UA-57006875-2"
