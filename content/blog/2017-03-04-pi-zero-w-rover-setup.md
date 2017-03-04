@@ -37,6 +37,11 @@ grep 'modules-load=dwc2,g_serial' /boot/config.txt >/dev/null || sed 's/.*/& mod
 grep 'dtoverlay=pwm-2chan,pin=12,func=4,pin2=13,func2=4' /boot/config.txt >/dev/null || echo 'dtoverlay=pwm-2chan,pin=12,func=4,pin2=13,func2=4' >> /boot/config.txt
 ```
 
+
+```
+wpa_passphrase "<SSID>" "<PASSPHRASE>" > /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
+```
+
 [rpi pinout](https://pinout.xyz/)
 [gpio18](https://pinout.xyz/pinout/pin12_gpio18)
 [gpio13](https://pinout.xyz/pinout/pin12_gpio13)
