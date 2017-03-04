@@ -4,7 +4,10 @@ description = "A bare metal example of blink written in rust for the teensy 3.1"
 slug = "bare-metal-rust-on-the-teensy-3.1"
 date = "2016-01-24"
 tags = ["rust", "teensy", "arm"]
-aliases = [ "/bare-metal-rust-on-the-teensy-3.1/" ]
+aliases = [
+    "/bare-metal-rust-on-the-teensy-3.1/",
+    "/posts/bare-metal-rust-on-the-teensy-3.1/",
+]
 +++
 
 Now that we have a good understanding of basic bare metal programming using the

@@ -4,7 +4,10 @@ description = "A guide to building and uploading an arduino sketch with out the 
 slug = "arduino-and-cmake"
 date = "2012-10-07"
 tags = [ "arduino", "cmake" ]
-aliases = [ "/arduino-and-cmake/" ]
+aliases = [
+    "/arduino-and-cmake/",
+    "/posts/arduino-and-cmake/",
+]
 +++
 
 The arduino is a great platform for embedded development and the ide it comes

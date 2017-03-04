@@ -4,7 +4,10 @@ description = "A quick tutorial on assembling a minimal DIY arduino known as the
 slug = "shrimping-it"
 date = "2013-09-24"
 tags = [ "shrimp", "arduino", "atmega328p" ]
-aliases = [ "/shrimping-it/" ]
+aliases = [
+    "/shrimping-it/",
+    "/posts/shrimping-it/",
+]
 +++
 
 The arduino platform is a great platform to work with, it is easy to code for and has a nice

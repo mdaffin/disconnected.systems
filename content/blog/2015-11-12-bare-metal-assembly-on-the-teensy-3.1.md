@@ -4,7 +4,10 @@ description = "A look at bare metal programming in assembly on the teensy 3.1 wi
 slug = "bare-metal-assembly-on-the-teensy-3.1"
 date = "2015-11-12"
 tags = [ "assembly", "teensy", "arm" ]
-aliases = [ "/bare-metal-assembly-on-the-teensy-3.1/" ]
+aliases = [
+    "/bare-metal-assembly-on-the-teensy-3.1/",
+    "/posts/bare-metal-assembly-on-the-teensy-3.1/",
+]
 +++
 
 I started to look at bare metal programming on the Teensy 3.1 and found quite a

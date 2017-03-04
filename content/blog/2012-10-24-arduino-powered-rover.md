@@ -4,7 +4,10 @@ description = "A simple arduino powered robot"
 slug = "arduino-powered-rover"
 date = "2012-10-24"
 tags = [ "arduino", "robotics" ]
-aliases = [ "/arduino-powered-rover/" ]
+aliases = [
+    "/arduino-powered-rover/",
+    "/posts/arduino-powered-rover/",
+]
 +++
 
 Over the past couple of weeks I have been developing an arduino powered
