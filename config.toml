@@ -7,3 +7,5 @@ pygmentsUseClasses = true
 PygmentsCodeFences = true
 
 googleAnalytics = "UA-57006875-2"
+
+disqusShortname = "disconsys"
