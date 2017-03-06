@@ -9,6 +9,8 @@ aliases = [
     "/pi-zero-w-rover-setup/",
     "/posts/pi-zero-w-rover-setup/",
 ]
+carousel = [
+]
 +++
 
 The raspberry pi zero w has just been released and I managed to get my hands on
@@ -49,7 +51,7 @@ As for the chassis I simple reused one from an old project, but it is little
 more then the servos bolted back to back with the pi and a caster wheel
 bluetacked on.
 
-{{< img src="/images/pi-zero-w-rover-setup/rpizw-rover-assembled.png" height="400" title="Assembled rover" >}}
+{{< carousel "/images/pi-zero-w-rover-setup/rover-01.jpg" "/images/pi-zero-w-rover-setup/rover-02.jpg" "/images/pi-zero-w-rover-setup/rover-03.jpg" "/images/pi-zero-w-rover-setup/rover-04.jpg" "/images/pi-zero-w-rover-setup/rover-05.jpg" "/images/pi-zero-w-rover-setup/rover-06.jpg" >}}
 
 ## Configuring the pi
 
