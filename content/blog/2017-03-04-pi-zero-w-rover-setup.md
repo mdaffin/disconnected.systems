@@ -20,26 +20,31 @@ will talk about how to setup the pi and hook it up to the servos, in particular
 how to configure the usb serial and enable and control the hardware pwm pins.
 
 This post will be based off [archlinux arm](https://archlinuxarm.org/) rather
-than raspbian as my distro of choice but it should work equally well on both
-distros but you will have to tweak some of the commands. For those that want to
-follow along with arch you should first follow my [archlinuxarm setup guide]
-({{< relref "blog/2016-03-21-raspberry-pi-archlinuxarm-setup.md" >}}) we will be
-adding a few steps to the end of the [customisation stage]({{< relref
+than raspbian as my distro of choice but with some tweaks should work equally
+well on both distros. For those that want to follow along with arch you should
+first follow my [archlinuxarm setup guide] ({{< relref
+"blog/2016-03-21-raspberry-pi-archlinuxarm-setup.md" >}}) we will be adding a
+few steps to the end of the [customisation stage]({{< relref
 "blog/2016-03-21-raspberry-pi-archlinuxarm-setup.md#install-and-configure-your-install"
->}}), but they can also be run on a running pi.
+>}}). You can also follow along from a running pi if you have raspian.
 
 ## The hardware
 
 The only required components are a couple of [continuous rotation
 servo](http://www.robotshop.com/uk/parallax-futaba-continuous-rotation-servo.html),
 ie servos that have been modified to run continuously rather then to a fixed
-angle, and some
-[wheels](http://www.robotshop.com/uk/solarbotics-diameter-servo-wheel-red.html?gclid=CjwKEAiAi-_FBRCZyPm_14CjoyASJAClUigOzLcyvxUhK-8n7cYZY5af1UTnJn6hiMfivWQDZemPDRoCjGLw_wcB).
-Connect both grounds of the servos to one of the [ground
-pins](https://pinout.xyz/pinout/ground) on the pi and both the power pins to one
-of the [5V pins](https://pinout.xyz/pinout/pin2_5v_power). Then connect one of
-the signal wires to [GPIO12](https://pinout.xyz/pinout/pin32_gpio12) and the
-other to [GPIO13](https://pinout.xyz/pinout/pin33_gpio13).
+angle, some
+[wheels](http://www.robotshop.com/uk/solarbotics-diameter-servo-wheel-red.html?gclid=CjwKEAiAi-_FBRCZyPm_14CjoyASJAClUigOzLcyvxUhK-8n7cYZY5af1UTnJn6hiMfivWQDZemPDRoCjGLw_wcB)
+, a [5v
+battery](https://www.amazon.co.uk/gp/product/B00X9VKZIO/ref=oh_aui_detailpage_o00_s00?ie=UTF8&psc=1)
+and something to hold it all togeather.
+
+The wiring is stright forward, connect both grounds of the servos to one of the
+[ground pins](https://pinout.xyz/pinout/ground) on the pi and both the power
+pins to one of the [5V pins](https://pinout.xyz/pinout/pin2_5v_power). Then
+connect one of the signal wires to
+[GPIO12](https://pinout.xyz/pinout/pin32_gpio12) and the other to
+[GPIO13](https://pinout.xyz/pinout/pin33_gpio13).
 
 {{< img src="/images/pi-zero-w-rover-setup/rpizw-rover-servos.png" height="400" title="Servos connected to the pi" >}}
 
@@ -49,27 +54,36 @@ enough power for both the pi and the servos, usually more then about 1.5A.
 
 As for the chassis I simple reused one from an old project, but it is little
 more then the servos bolted back to back with the pi and a caster wheel
-bluetacked on.
+bluetacked on. I plan to design and 3d print a better case at a later date.
 
-{{< carousel "/images/pi-zero-w-rover-setup/rover-01.jpg" "/images/pi-zero-w-rover-setup/rover-02.jpg" "/images/pi-zero-w-rover-setup/rover-03.jpg" "/images/pi-zero-w-rover-setup/rover-04.jpg" "/images/pi-zero-w-rover-setup/rover-05.jpg" "/images/pi-zero-w-rover-setup/rover-06.jpg" >}}
+{{< carousel "/images/pi-zero-w-rover-setup/rover-01.jpg"
+"/images/pi-zero-w-rover-setup/rover-02.jpg"
+"/images/pi-zero-w-rover-setup/rover-03.jpg"
+"/images/pi-zero-w-rover-setup/rover-04.jpg"
+"/images/pi-zero-w-rover-setup/rover-05.jpg"
+"/images/pi-zero-w-rover-setup/rover-06.jpg" >}}
 
 ## Configuring the pi
 
-Once you are in the chroot of the image, or at logged into a running pi then its
+Once you are in the chroot of the image or logged into a running pi then its
 time to configure our system. We need to enable two extra bits of functionally,
-namely the enable the usb serial interface and the hardware pwm.
+namely the enable the usb serial interface and the hardware pwm and set up the
+wireless network.
 
-The usb serial is optional, but makes connecting to and debugging the pi much
-easier. All you need is a usb cable connected to your computer to gain access to
-a full shell and it is simple to setup a wireless network or find out the ip of
-the pi. To enable the usb serial interface we need to add the `dwc2` overlay to
-the config.txt and ensure the `g_serial` module is loaded during boot then
-ensure a getty is listening to the serial port. This can be done by running the
+The usb serial is optional but makes connecting to and debugging the pi much
+easier. All you need is a usb cable connected to your computer to gain
+access to a full shell and it is simple to setup a wireless network or find out
+the ip that has been assigned to the pi.
+
+To enable the usb serial interface we need to add the `dwc2` overlay to the
+config.txt and ensure the `g_serial` module is loaded during boot. Then ensure a
+getty is listening to the serial port. All of which can be done by running the
 following commands.
 
 ```shell
 grep 'dtoverlay=dwc2' /boot/config.txt >/dev/null || echo 'dtoverlay=dwc2' >> /boot/config.txt
 grep 'modules-load=dwc2,g_serial' /boot/config.txt >/dev/null || sed 's/.*/& modules-load=dwc2,g_serial' >> /boot/config.txt
+
 ln -sf /usr/lib/systemd/system/getty@ttyGS0.service /etc/systemd/system/multi-user.target.wants/getty@ttyGS0.service
 ```
 
