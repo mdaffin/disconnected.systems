@@ -13,12 +13,11 @@
   };
 
   new Vue({
-  el: '#carousel',
-  components: {
+    el: '#carousel',
+    components: {
       'carousel': VueCarousel.Carousel,
       'slide': VueCarousel.Slide
-  },
-  template: '<div><carousel>' + buildSlideMarkup({{ .Params }}) + '</carousel></div>'
+    },
+    template: '<div><carousel>' + buildSlideMarkup({{ .Params }}) + '</carousel></div>'
   });
-
 </script>
