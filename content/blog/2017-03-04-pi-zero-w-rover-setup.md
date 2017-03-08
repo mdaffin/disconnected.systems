@@ -26,7 +26,7 @@ first follow my [archlinuxarm setup guide] ({{< relref
 "blog/2016-03-21-raspberry-pi-archlinuxarm-setup.md" >}}) we will be adding a
 few steps to the end of the [customisation stage]({{< relref
 "blog/2016-03-21-raspberry-pi-archlinuxarm-setup.md#install-and-configure-your-install"
->}}). You can also follow along from a running pi if you have raspian.
+>}}). You can also follow along from a running pi if you have raspbian.
 
 ## The hardware
 
@@ -37,9 +37,10 @@ angle, some
 [wheels](http://www.robotshop.com/uk/solarbotics-diameter-servo-wheel-red.html?gclid=CjwKEAiAi-_FBRCZyPm_14CjoyASJAClUigOzLcyvxUhK-8n7cYZY5af1UTnJn6hiMfivWQDZemPDRoCjGLw_wcB)
 , a [5v
 battery](https://www.amazon.co.uk/gp/product/B00X9VKZIO/ref=oh_aui_detailpage_o00_s00?ie=UTF8&psc=1)
-and something to hold it all togeather.
+and something to hold it all together. And of course the [raspberry pi zero
+w](https://thepihut.com/products/raspberry-pi-zero-w?variant=30333272081).
 
-The wiring is stright forward, connect both grounds of the servos to one of the
+The wiring is straight forward, connect both grounds of the servos to one of the
 [ground pins](https://pinout.xyz/pinout/ground) on the pi and both the power
 pins to one of the [5V pins](https://pinout.xyz/pinout/pin2_5v_power). Then
 connect one of the signal wires to
@@ -54,7 +55,8 @@ enough power for both the pi and the servos, usually more then about 1.5A.
 
 As for the chassis I simple reused one from an old project, but it is little
 more then the servos bolted back to back with the pi and a caster wheel
-bluetacked on. I plan to design and 3d print a better case at a later date.
+bluetacked on. I plan to design and 3d print a better case at a later date once
+I have a better idea of all the components/sensors I want to add to it.
 
 {{< carousel "/images/pi-zero-w-rover-setup/rover-01.jpg"
 "/images/pi-zero-w-rover-setup/rover-02.jpg"
@@ -65,12 +67,12 @@ bluetacked on. I plan to design and 3d print a better case at a later date.
 
 ## Configuring the pi
 
-Once you are in the chroot of the image or logged into a running pi then its
+Once you are in the `chroot` of the image or logged into a running pi then its
 time to configure our system. We need to enable two extra bits of functionally,
-namely the enable the usb serial interface and the hardware pwm and set up the
+specifically enabling the usb serial interface, the hardware pwm pins and set up the
 wireless network.
 
-The usb serial is optional but makes connecting to and debugging the pi much
+The usb serial is optional but makes connecting to and debugging the pi zero much
 easier. All you need is a usb cable connected to your computer to gain
 access to a full shell and it is simple to setup a wireless network or find out
 the ip that has been assigned to the pi.
@@ -87,7 +89,10 @@ grep 'modules-load=dwc2,g_serial' /boot/config.txt >/dev/null || sed 's/.*/& mod
 ln -sf /usr/lib/systemd/system/getty@ttyGS0.service /etc/systemd/system/multi-user.target.wants/getty@ttyGS0.service
 ```
 
-You can find out more about the otg functionality of the pi
+To connect to the pi zero over use serial you will need a program such as
+`picocom`, `minicom`, `screen`, `putty`, or even the Arduino IDE. There are many
+guides out there about how to do this so I will leave out the details in this
+post. You can find out more about the other otg functionality of the pi
 [here](https://learn.adafruit.com/turning-your-raspberry-pi-zero-into-a-usb-gadget/overview).
 
 We want to be able to control two servos from the pi, luckily the pi contains
@@ -99,9 +104,8 @@ grep 'dtoverlay=pwm-2chan,pin=12,func=4,pin2=13,func2=4' /boot/config.txt >/dev/
 ```
 Note that you can configure each pwm channel on one of 2 different pins. For
 pwm0 you can use `GPIO12` or `GPIO18` and for pwm1 you can use `GPIO13` or
-`GPIO19`. The command above configures our pi to use pins 12 and 13.
-
-You can read more about the hardware pwms
+`GPIO19`. The command above configures our pi to use pins 12 and 13. You can
+read more about the hardware pwms
 [here](http://librpip.frasersdev.net/peripheral-config/pwm0and1/).
 
 Lastly we want to configure the wireless so we dont need a cable attached in
@@ -124,9 +128,9 @@ ctrl_interface_group=wheel
 update_config=1
 fast_reauth=1
 ap_scan=1
+EOF
 
 wpa_passphrase "SSID" "PASSPHRASE" >> /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
-EOF
 ```
 
 You can install/configure anything else you might find useful at this point.
@@ -142,8 +146,8 @@ the image to an sd card]({{< relref
 After you have gotten the pi up and running and connected to a wifi network or
 otherwise have a shell running on it we can start to get it moving.
 
-The hardware pwm pins are controlled by the sys filesystem, specifically located
-at `/sys/class/pwm/pwmchip0`. Before we can do anything we must enable the pwm
+The hardware pwm pins are controlled by the sys filesystem located at
+`/sys/class/pwm/pwmchip0`. Before we can do anything we must enable the pwm
 channels, this can be done by writing the channel we want to enable to the
 `export` file. Enable both channels with
 
@@ -182,7 +186,7 @@ echo 1 > /sys/class/pwm/pwmchip0/pwm1/enable
 At this point the servos should be enable, and not moving. So lets make it drive
 forward by setting one servo to go full forward and the other to go full reverse.
 
-```
+```shell
 echo 1000000 > /sys/class/pwm/pwmchip0/pwm0/duty_cycle
 echo 2000000 > /sys/class/pwm/pwmchip0/pwm1/duty_cycle
 sleep 1
@@ -190,12 +194,12 @@ echo 1500000 > /sys/class/pwm/pwmchip0/pwm0/duty_cycle
 echo 1500000 > /sys/class/pwm/pwmchip0/pwm1/duty_cycle
 ```
 
-This will make the rover drive forward for 1 second then stop. However, if it
+This will make the rover drive forward for 1 second then stop. If it
 drives backwards then simply swap the servos around or reverse the numbers
-above.
+above. If one or both servos do not move double check your wiring.
 
-Try experimenting with different values, but values above 2000000 or below
-1000000 will just make the servo go in full forward or full reverse. Values
+Try experimenting with different values, but values above `2000000` or below
+`1000000` will just make the servo go in full forward or full reverse. Values
 between these will make the servo move at various speeds between full reverse
 and full forward.
 
@@ -283,6 +287,13 @@ Press `ctrl+c` to stop it.
 
 ## Conclusion
 
-This is not a very exiting post, but it lays the foundations for the next task I
-want to do: build a web controlled rover. In my next post I hope to look at
-writing a rust webserver to run on the pi that is able to control the rover.
+You now have the start of a robotics platform, you can download a reconfigured
+image
+[here](https://github.com/mdaffin/rpizw-rover/releases/download/0.0.1/rpizw-rover.img.xz)
+so that all you need to do is give it the wireless credentials for your network.
+This is only the foundation for a larger project: build a web controlled rover
+but is necessary to get out the way before solving more intreating problems. In
+my next few posts I hope to look at writing a rust webserver to run on the pi
+that is able to control the rover then getting it to interact with the
+environment in some way before looking into using the pi camera for vision
+recognition.
