@@ -1,7 +1,7 @@
 +++
-date = "2017-03-04T09:38:23Z"
+date = "2017-03-08T13:03:47Z"
 title = "Pi Zero W Rover Setup"
-draft = true
+draft = false
 description = "Configure the pi zeros usb serial, networking and hardware pwm pins to control a servo wirelessly"
 slug = "pi-zero-w-rover-setup"
 tags = ["linux", "robot", "serial", "raspberry-pi", "pwm"]
