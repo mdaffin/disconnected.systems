@@ -1,5 +1,5 @@
 +++
-date = "2017-03-09T13:00:55Z"
+date = "2017-03-10T13:00:55Z"
 title = "Customising raspberry pi images with github and travis"
 draft = true
 description = "Make use of github and travis to automate the customisation of raspberry pi images"
@@ -213,26 +213,86 @@ addons:
     - parted
     - wget
     - dosfstools
+    - zip
 script:
 - sudo ./create-image
 - xz -z rpizw-rover.img -c > rpizw-rover.img.xz
+- zip rpizw-rover.img.zip rpizw-rover.img
 ```
 
 Once you have saved, committed and push (if you have a local clone) travis will
 automatically start building your image. You can follow the build on the travis
 site including a full build log. If everything has gone write you should end up
 with a green passing build. If not you can inspect the logs to find out why it
-failed.
+failed. Note that we also compress the image here, this will reduce the size of
+the image we store and need to download at the cost of taking a bit longer to
+build. We also compress it to two different formats, `xz` which produces smaller
+images and `zip` which is more portable.
 
-```shell
-sudo docker run --privileged --rm -it -v $PWD:/code -w /code ubuntu bash -c "apt update -y && \
-apt install -y qemu qemu-user-static binfmt-support parted wget dosfstools && \
-./create-image" 
+Now that we are able to build an image we must tell travis to upload the it back
+to github as a release. To do this we need to create an api key and encrypt it
+and include it in the `.travis.yml` file. The simplest way to do this is to
+[install ruby](https://www.ruby-lang.org/en/documentation/installation/) then
+the travis cli tool.
+
+```
+gem install travis
 ```
 
-```shell
--rw-r--r-- 1 root    root    2.0G Mar  5 23:36 rpizw-rover.img
--rw-r--r-- 1 mdaffin mdaffin 303M Mar  5 23:38 rpizw-rover.img.bz2
--rw-r--r-- 1 mdaffin mdaffin 330M Mar  5 23:37 rpizw-rover.img.gz
--rw-r--r-- 1 mdaffin mdaffin  94M Mar  5 23:38 rpizw-rover.img.xz
+Then you can setup release with
+
 ```
+travis setup releases
+> Username: mdaffin
+> Password for mdaffin:
+> File to Upload: rpizw-rover.img.xz
+> Deploy only from mdaffin/rpizw-rover? |yes| yes
+> Encrypt API key? |yes| yes
+```
+
+If you have trouble with this consult the travis documentation on [setting up
+github releases](https://docs.travis-ci.com/user/deployment/releases/).
+
+This will add something like the following to your `.travis.yml` file locally.
+
+```
+deploy:
+  provider: releases
+  api_key:
+    secure: TzZpsusZ/P/adlSUL1wonxAF6LvQ4j+JcKLTmr9bz3t7KLc7dY3E248EjEqMkTbB8+1SPrwaLbIPlc7ammsu+vRKelVJLNjIQrs2gZ1ZTBPxF9kZxvorpbM/dYrend+7ffNcfdej1Ef+jGD9Wpd5DG2qwPoDniNDVTkCVISJTCGBob/z7DMM9nf7NkY9Z+OhLrrBFi96P18NX8jqFhvvAtdnVk5tr6j7MCspCcqN31cwEOUzFuRtTqGthwDwY8gSo9TejDCw6Cf47MGYA7hxHKO20W9aqHyczoTy2/t6uiIKkYH7MymoREi7O6rgTBaUAybLmiqJ+g+cE8dHjnPDdvse96Rv0PLMTy+7aZLVjV7NNGKVrgKOWrCDXqwlH321YQc9UYraOvk3aJU3Q9+FHf7QO3D9JPOkICo5Yl7svAX4XHw+vQPa2em/PObmbUGvw+WMjhoqfYTBjLS/LCYMFU/foxxec5cB37fHXfzXgtdEHzq/FJ/2zSj0uJLc2FBejL/ukEHHaNWGQJuvPTNL47iYmTj4I1G954o9ThT21RjjqeDmY1+dAz3ztVapgQIgSijJQfZ/Qc4rW1VbPMuKF09MmkGMnwaThmFStdeSX3PrtMdB6zs+8W74TPOw5l7urOZSpWSq/eg7vT2Sp4y8PupthJnEJTPnJrLD/0AphDc=
+  file: rpizw-rover.img.xz
+  on:
+    repo: mdaffin/rpizw-rover
+```
+
+Before committing and pushing this we need to make a couple of tweaks, first we
+need to add `skip_cleanup: true` to the `delpoy:` block to stop travis from
+deleting our built image before deploying it and then `tags: true` to the
+`deploy.on:` block to ensure we only push images back on a tagged build. We also
+need to add the second archive file in the list of files. After editing it
+should look like:
+
+```
+deploy:
+  provider: releases
+  api_key:
+    secure: TzZpsusZ/P/adlSUL1wonxAF6LvQ4j+JcKLTmr9bz3t7KLc7dY3E248EjEqMkTbB8+1SPrwaLbIPlc7ammsu+vRKelVJLNjIQrs2gZ1ZTBPxF9kZxvorpbM/dYrend+7ffNcfdej1Ef+jGD9Wpd5DG2qwPoDniNDVTkCVISJTCGBob/z7DMM9nf7NkY9Z+OhLrrBFi96P18NX8jqFhvvAtdnVk5tr6j7MCspCcqN31cwEOUzFuRtTqGthwDwY8gSo9TejDCw6Cf47MGYA7hxHKO20W9aqHyczoTy2/t6uiIKkYH7MymoREi7O6rgTBaUAybLmiqJ+g+cE8dHjnPDdvse96Rv0PLMTy+7aZLVjV7NNGKVrgKOWrCDXqwlH321YQc9UYraOvk3aJU3Q9+FHf7QO3D9JPOkICo5Yl7svAX4XHw+vQPa2em/PObmbUGvw+WMjhoqfYTBjLS/LCYMFU/foxxec5cB37fHXfzXgtdEHzq/FJ/2zSj0uJLc2FBejL/ukEHHaNWGQJuvPTNL47iYmTj4I1G954o9ThT21RjjqeDmY1+dAz3ztVapgQIgSijJQfZ/Qc4rW1VbPMuKF09MmkGMnwaThmFStdeSX3PrtMdB6zs+8W74TPOw5l7urOZSpWSq/eg7vT2Sp4y8PupthJnEJTPnJrLD/0AphDc=
+  file:
+  - rpizw-rover.img.xz
+  - rpizw-rover.img.zip
+  skip_cleanup: true
+  on:
+    repo: mdaffin/rpizw-rover
+    tags: true
+```
+
+Commit and push these changes and travis will start another build, but still
+wont upload our images. To do this final step simply create a release on github,
+give the relase a name (a version number is often a good idea). Once done travis
+will start another build aginst our tag/release, when done the images will be
+avaiable to download on the releases page in your github repo. This might take
+more then 10 mins to happen so be patient, you can follow its progess in the
+travis ui.
+
+All thats left to do now is download, extract and flash the image to an sd card,
+just like you would do with any other raspberry pi image.
