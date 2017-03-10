@@ -7,31 +7,48 @@ slug = "custom-rpi-image-with-github-travis"
 tags = ["linux", "automation", "raspberry-pi", "github", "travis"]
 +++
 
-Over the coming months I am goring to be building upon my raspberry pi rover.
-Over this time I will be needing to change the image quite often. I have always
-been in favour of making things builds reproducible rather then simply backing
-up an image after setting it up so I am going to be creating a lot of images for
-the pi. I figured I would take this time to automate this process so save on the
-repetitive task later and will give me an distributable image others can use.
+Over the coming months I am goring to be building upon my [raspberry pi
+rover]({{< relref "blog/2017-03-08-pi-zero-w-rover-setup.md" >}}) and over this
+time I will be needing to change and update the image quite often. I have always
+been in favour of automating setup rather then taking repeated backups/snapshots
+of raspberry pi images (as well as other things). So I figured I would start by
+fully automating the creation and publishing of the raspberry pi images and
+write up how I accomplished this.
 
 A large amount of this work has already been covered in my post on [setting up
 archlinuxarm on the raspberry pi]({{< relref
 "blog/2016-03-21-raspberry-pi-archlinuxarm-setup.md" >}}). This post will look
 at taking the commands covered in that post and getting them to run in travis
-via a github repo and publishing the image as to a release on github.
+via a github repo and publishing the image as to a release on github. Everything
+in this post can be done for free using public repos and you only require an
+account on github and travis (which you can login to through your github
+account).
 
 ## Github Repo
 
-Head over to [github.com](https://github.com), sign up or login and create a [new
-public repo](https://github.com/new). The repo needs to be public to take
+Head over to [github.com](https://github.com), sign up or login and create a
+[new public repo](https://github.com/new). The repo needs to be public to take
 advantage of the free build on travis for open source projects, other wise you
-need to pay for a private plan on both github and travis.
+need to pay for a private plan on both github and travis. If you wish to keep it
+private you might want to look at [gitlab](https://gitlab.com/users/sign_in)
+instead which offer free private repos and an integrated ci system (if there is
+interest I may do a blog post on doing this with gitlab). I recommend checking
+the "add a readme" checkbox to create a non empty repo, this will allow you to
+create/edit files directly on github. You can also optionally add a license and
+a gitignore file for the language you want might want to use.
 
-## create-image script
+{{< img src="/images/custom-rpi-image-with-github-travis/01-new-repo.png" title="Creating new github repo" >}}
 
-Create a new file called `create-image` (no extension) in the root of your git
-repo (either clone it locally or add it through the github interface) with the
-following contents.
+## First stage script: `create-image`
+
+This script is responsible for the first stage of creating the custom image and
+involves allocating a file, formatting it, installing the base system and
+prepping the `chroot` for the second stage. Create a new file called `create-image`
+(no extension) in the root of your git repo (either clone it locally or add it
+through the github interface)
+
+
+with the following contents.
 
 ```shell
 #!/bin/bash
@@ -115,12 +132,19 @@ cp /usr/bin/qemu-arm-static ${mount}/usr/bin/
 chroot ${mount}  "/tmp/${script}"
 ```
 
-You can also copy any other resources (such as additional binaries or configs)
-to the image in the same way we copied the script to the `chroot`.
+Then commit the new file.
 
-## setup script
+{{< img src="/images/custom-rpi-image-with-github-travis/02-create-image-top.png" >}}
+{{< img src="/images/custom-rpi-image-with-github-travis/03-create-image-commit.png"  title="Create and commit the create-image script" >}}
 
-This script is what is run inside the `chroot` environment and is where we can
+You can later modify the script to copy any other resources (such as additional
+binaries or configs) to the image in the same way we copied the script to the
+`chroot`.
+
+## Second stage script: `setup`
+
+This script is the second and final stage of creating the image. It is what runs
+inside the `chroot` environment setup in the first stage and is where we can
 truly customise the image. Create another file in the root of your git repo
 called `setup` (again, no extension) with the following contents.
 
@@ -185,10 +209,15 @@ chown alarm. /home/alarm/.zshrc
 
 This is the script used to setup my [pi rover]({{< relref
 "blog/2017-03-08-pi-zero-w-rover-setup.md" >}}) and you should customise it to suit 
-your application.
+your application. When you are done commit the new file.
+
+{{< img src="/images/custom-rpi-image-with-github-travis/04-setup-top.png" >}}
+{{< img src="/images/custom-rpi-image-with-github-travis/05-setup-commit.png"  title="Create and commit the setup script" >}}
 
 You can test run these scripts locally if you are running linux, or by using
-[Vagrant](https://www.vagrantup.com/) as mentioned in my previous post.
+[Vagrant](https://www.vagrantup.com/) as mentioned in my [previous post]({{<
+relref "blog/2016-03-21-raspberry-pi-archlinuxarm-setup.md#prerequisites" >}})
+or just wait to run it inside travis.
 
 ## Travis
 
@@ -198,8 +227,10 @@ github account then enable your repo in the account settings. You can read more
 about getting started with travis
 [here](https://docs.travis-ci.com/user/for-beginners).
 
-Create a travis yaml file in the root of your repo called `.travis.yml` (the
-leading dot `.` is important, do not miss it off).
+{{< img src="/images/custom-rpi-image-with-github-travis/06-travis-enable.png"  title="Enable travis for our repo" >}}
+
+Now head back to github and create a travis yaml file in the root of your repo
+called `.travis.yml` (the leading dot `.` is important, do not miss it off).
 
 ```yaml
 dist: trusty
@@ -215,25 +246,38 @@ addons:
     - dosfstools
     - zip
 script:
-- sudo ./create-image
+- sudo bash ./create-image
 - xz -z rpizw-rover.img -c > rpizw-rover.img.xz
 - zip rpizw-rover.img.zip rpizw-rover.img
 ```
 
+{{< img src="/images/custom-rpi-image-with-github-travis/07-travis-yml-top.png" >}}
+{{< img src="/images/custom-rpi-image-with-github-travis/08-travis-yml-commit.png"  title="Create .travis.yml to start the build" >}}
+
 Once you have saved, committed and push (if you have a local clone) travis will
 automatically start building your image. You can follow the build on the travis
-site including a full build log. If everything has gone write you should end up
-with a green passing build. If not you can inspect the logs to find out why it
-failed. Note that we also compress the image here, this will reduce the size of
-the image we store and need to download at the cost of taking a bit longer to
-build. We also compress it to two different formats, `xz` which produces smaller
-images and `zip` which is more portable.
+site including a full build log, note that it can take more then 10 minutes to
+complete (mostly due to the compression steps). If everything has gone write you
+should end up with a green build indicating everything has run successfully. If
+not you can inspect the build logs to find out why it failed. Note that we also
+compress the image here, this will reduce the size of the image we store and
+need to download at the cost of taking a bit longer to build. It is compress it
+to two different formats, `xz` which produces smaller images and `zip` which is
+more portable (ie for windows users).
+
+{{< img src="/images/custom-rpi-image-with-github-travis/09-travis-built.png"  title="Successful build on travis" >}}
 
 Now that we are able to build an image we must tell travis to upload the it back
 to github as a release. To do this we need to create an api key and encrypt it
 and include it in the `.travis.yml` file. The simplest way to do this is to
 [install ruby](https://www.ruby-lang.org/en/documentation/installation/) then
-the travis cli tool.
+the travis cli tool. Unfortinutlly you need to checkout your build locally to
+run these commands, but this is the only step your are required to do this, and
+you only need to do it once per repo. Windows (and mac) users can use the
+[github desktop app](https://desktop.github.com/) to do this.
+
+After you have ruby installed and a local clone run the following to install the
+travis cli tool.
 
 ```
 gem install travis
@@ -288,11 +332,30 @@ deploy:
 
 Commit and push these changes and travis will start another build, but still
 wont upload our images. To do this final step simply create a release on github,
-give the relase a name (a version number is often a good idea). Once done travis
-will start another build aginst our tag/release, when done the images will be
-avaiable to download on the releases page in your github repo. This might take
-more then 10 mins to happen so be patient, you can follow its progess in the
-travis ui.
+give the relase a name (a version number is often a good idea).
 
-All thats left to do now is download, extract and flash the image to an sd card,
-just like you would do with any other raspberry pi image.
+{{< img src="/images/custom-rpi-image-with-github-travis/10-tag-release.png"  title="Tag a release in github" >}}
+
+This will trigger another build on travis agiesnt the tag. Again, this build can take more then 10 minutes to complete.
+
+{{< img src="/images/custom-rpi-image-with-github-travis/11-travis-tag-build.png"  title="Successful build of the taged release" >}}
+
+When you have a successful build the images will be avaiable to download on the
+releases page in your github repo. Ready to download, extract and flash to an sd
+card.
+
+{{< img src="/images/custom-rpi-image-with-github-travis/12-github-release.png"  title="Github release" >}}
+
+## Conclusion
+
+Using this method you can create custom images for all of your pi based projects
+with relative ease. Or just be able to setup an image before you boot the pi,
+even from windows. Once you have an image created you can tweak and modify its
+creation over the course of your projects without having to keep taking backups
+of your running pi and easly share these images with others.
+
+This guide only touches on the creation of the image, but you can also combine
+it with a full power of travies ci suite to run automated tests, build your
+application and install it in the image ready for when you start the pi. Over
+the comming months you will be able to follow my [rpizw-rover
+project](https://github.com/mdaffin/rpizw-rover) for an example of this.
