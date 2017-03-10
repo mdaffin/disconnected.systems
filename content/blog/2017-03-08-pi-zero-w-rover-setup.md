@@ -47,7 +47,7 @@ connect one of the signal wires to
 [GPIO12](https://pinout.xyz/pinout/pin32_gpio12) and the other to
 [GPIO13](https://pinout.xyz/pinout/pin33_gpio13).
 
-{{< img src="/images/pi-zero-w-rover-setup/rpizw-rover-servos.png" title="Servos connected to the pi" >}}
+{{< img src="/images/pi-zero-w-rover-setup/rpizw-rover-servos.png" height="400px" title="Servos connected to the pi" >}}
 
 You should note that the servos can draw quite quite allot of power when
 running, the pi is fine with this as long as your power supply is able to supply

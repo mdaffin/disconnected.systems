@@ -134,8 +134,7 @@ chroot ${mount}  "/tmp/${script}"
 
 Then commit the new file.
 
-{{< img src="/images/custom-rpi-image-with-github-travis/02-create-image-top.png" >}}
-{{< img src="/images/custom-rpi-image-with-github-travis/03-create-image-commit.png"  title="Create and commit the create-image script" >}}
+{{< img src="/images/custom-rpi-image-with-github-travis/02-create-image.png"  title="Create and commit the create-image script" >}}
 
 You can later modify the script to copy any other resources (such as additional
 binaries or configs) to the image in the same way we copied the script to the
@@ -211,8 +210,7 @@ This is the script used to setup my [pi rover]({{< relref
 "blog/2017-03-08-pi-zero-w-rover-setup.md" >}}) and you should customise it to suit 
 your application. When you are done commit the new file.
 
-{{< img src="/images/custom-rpi-image-with-github-travis/04-setup-top.png" >}}
-{{< img src="/images/custom-rpi-image-with-github-travis/05-setup-commit.png"  title="Create and commit the setup script" >}}
+{{< img src="/images/custom-rpi-image-with-github-travis/03-setup.png"  title="Create and commit the setup script" >}}
 
 You can test run these scripts locally if you are running linux, or by using
 [Vagrant](https://www.vagrantup.com/) as mentioned in my [previous post]({{<
@@ -227,7 +225,7 @@ github account then enable your repo in the account settings. You can read more
 about getting started with travis
 [here](https://docs.travis-ci.com/user/for-beginners).
 
-{{< img src="/images/custom-rpi-image-with-github-travis/06-travis-enable.png"  title="Enable travis for our repo" >}}
+{{< img src="/images/custom-rpi-image-with-github-travis/04-travis-enable.png"  title="Enable travis for our repo" >}}
 
 Now head back to github and create a travis yaml file in the root of your repo
 called `.travis.yml` (the leading dot `.` is important, do not miss it off).
@@ -251,8 +249,7 @@ script:
 - zip rpizw-rover.img.zip rpizw-rover.img
 ```
 
-{{< img src="/images/custom-rpi-image-with-github-travis/07-travis-yml-top.png" >}}
-{{< img src="/images/custom-rpi-image-with-github-travis/08-travis-yml-commit.png"  title="Create .travis.yml to start the build" >}}
+{{< img src="/images/custom-rpi-image-with-github-travis/05-travis-yml.png"  title="Create .travis.yml to start the build" >}}
 
 Once you have saved, committed and push (if you have a local clone) travis will
 automatically start building your image. You can follow the build on the travis
@@ -265,7 +262,7 @@ need to download at the cost of taking a bit longer to build. It is compress it
 to two different formats, `xz` which produces smaller images and `zip` which is
 more portable (ie for windows users).
 
-{{< img src="/images/custom-rpi-image-with-github-travis/09-travis-built.png"  title="Successful build on travis" >}}
+{{< img src="/images/custom-rpi-image-with-github-travis/06-travis-built.png"  title="Successful build on travis" >}}
 
 Now that we are able to build an image we must tell travis to upload the it back
 to github as a release. To do this we need to create an api key and encrypt it
@@ -334,17 +331,17 @@ Commit and push these changes and travis will start another build, but still
 wont upload our images. To do this final step simply create a release on github,
 give the relase a name (a version number is often a good idea).
 
-{{< img src="/images/custom-rpi-image-with-github-travis/10-tag-release.png"  title="Tag a release in github" >}}
+{{< img src="/images/custom-rpi-image-with-github-travis/7-tag-release.png"  title="Tag a release in github" >}}
 
 This will trigger another build on travis agiesnt the tag. Again, this build can take more then 10 minutes to complete.
 
-{{< img src="/images/custom-rpi-image-with-github-travis/11-travis-tag-build.png"  title="Successful build of the taged release" >}}
+{{< img src="/images/custom-rpi-image-with-github-travis/08-travis-tag-build.png"  title="Successful build of the taged release" >}}
 
 When you have a successful build the images will be avaiable to download on the
 releases page in your github repo. Ready to download, extract and flash to an sd
 card.
 
-{{< img src="/images/custom-rpi-image-with-github-travis/12-github-release.png"  title="Github release" >}}
+{{< img src="/images/custom-rpi-image-with-github-travis/09-github-release.png"  title="Github release" >}}
 
 ## Conclusion
 
