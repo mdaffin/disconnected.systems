@@ -1,7 +1,7 @@
 +++
-date = "2017-03-10T13:00:55Z"
+date = "2017-03-10T23:21:07Z"
 title = "Customising raspberry pi images with github and travis"
-draft = true
+draft = false
 description = "Make use of github and travis to automate the customisation of raspberry pi images"
 slug = "custom-rpi-image-with-github-travis"
 tags = ["linux", "automation", "raspberry-pi", "github", "travis"]
@@ -331,7 +331,7 @@ Commit and push these changes and travis will start another build, but still
 wont upload our images. To do this final step simply create a release on github,
 give the relase a name (a version number is often a good idea).
 
-{{< img src="/images/custom-rpi-image-with-github-travis/7-tag-release.png"  title="Tag a release in github" >}}
+{{< img src="/images/custom-rpi-image-with-github-travis/07-tag-release.png"  title="Tag a release in github" >}}
 
 This will trigger another build on travis agiesnt the tag. Again, this build can take more then 10 minutes to complete.
 
