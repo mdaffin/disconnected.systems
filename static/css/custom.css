@@ -3,13 +3,24 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Russo One', cursive;
+  font-family: 'Open sans', sans-serif;
 }
 
 header {
   text-align: center;
-  margin-top: 18rem;
   margin-bottom: 5rem;
+}
+
+@media (min-height: 1000px) {
+  header{
+    margin-top: 18rem;
+  }
+}
+
+@media (min-height: 800px) and (max-height: 1280px){
+  header{
+    margin-top: 10rem;
+  }
 }
 
 header h6 {
@@ -75,9 +86,7 @@ footer > div {
 }
 .panel:hover {
   color: #555555;
-}
-.panel:hover h3 {
-  text-decoration: underline;
+  background-color: #eeeeee;
 }
 .panel h3 {
   margin-top: 0;
