@@ -28,6 +28,13 @@ few steps to the end of the [customisation stage]({{< relref
 "blog/2016-03-21-raspberry-pi-archlinuxarm-setup.md#install-and-configure-your-install"
 >}}). You can also follow along from a running pi if you have raspbian.
 
+{{< carousel "/images/pi-zero-w-rover-setup/rover-01.jpg"
+"/images/pi-zero-w-rover-setup/rover-02.jpg"
+"/images/pi-zero-w-rover-setup/rover-03.jpg"
+"/images/pi-zero-w-rover-setup/rover-04.jpg"
+"/images/pi-zero-w-rover-setup/rover-05.jpg"
+"/images/pi-zero-w-rover-setup/rover-06.jpg" >}}
+
 ## The hardware
 
 The only required components are a couple of [continuous rotation
@@ -57,13 +64,6 @@ As for the chassis I simple reused one from an old project, but it is little
 more then the servos bolted back to back with the pi and a caster wheel
 bluetacked on. I plan to design and 3d print a better case at a later date once
 I have a better idea of all the components/sensors I want to add to it.
-
-{{< carousel "/images/pi-zero-w-rover-setup/rover-01.jpg"
-"/images/pi-zero-w-rover-setup/rover-02.jpg"
-"/images/pi-zero-w-rover-setup/rover-03.jpg"
-"/images/pi-zero-w-rover-setup/rover-04.jpg"
-"/images/pi-zero-w-rover-setup/rover-05.jpg"
-"/images/pi-zero-w-rover-setup/rover-06.jpg" >}}
 
 ## Configuring the pi
 
