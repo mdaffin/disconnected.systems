@@ -1,6 +1,6 @@
 +++
 date = "2017-03-10T23:21:07Z"
-title = "Customising raspberry pi images with github and travis"
+title = "Customising Raspberry Pi Images with Github and Travis"
 draft = false
 description = "Make use of github and travis to automate the customisation of raspberry pi images"
 slug = "custom-rpi-image-with-github-travis"
