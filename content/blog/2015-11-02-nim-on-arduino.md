@@ -5,8 +5,8 @@ slug = "nim-on-adruino"
 date = "2015-11-02"
 tags = [ "nim", "arduino", "atmega328p" ]
 aliases = [
-    "/nim-on-adruino/",
-    "/posts/nim-on-adruino/",
+    "/nim-on-arduino/",
+    "/posts/nim-on-arduino/",
 ]
 +++
 
