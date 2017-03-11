@@ -35,6 +35,7 @@ header h6 {
 }
 footer {
   margin-top: 5rem;
+  margin-bottom: 1rem;
 }
 footer > div {
   margin: 50px;
