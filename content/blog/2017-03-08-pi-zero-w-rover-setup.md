@@ -289,7 +289,7 @@ Press `ctrl+c` to stop it.
 
 You now have the start of a robotics platform, you can download a reconfigured
 image
-[here](https://github.com/mdaffin/rpizw-rover/releases/download/0.0.1/rpizw-rover.img.xz)
+[here](https://github.com/mdaffin/rpizw-rover/releases/download/v0.1.0/rpizw-rover.img.xz)
 so that all you need to do is give it the wireless credentials for your network.
 This is only the foundation for a larger project: build a web controlled rover
 but is necessary to get out the way before solving more intreating problems. In

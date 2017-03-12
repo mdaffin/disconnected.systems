@@ -117,8 +117,7 @@ mount "${bootdev}" "${mount}/boot"
 tar -xpf "${rpi_tar}" -C ${mount} 2> >(grep -v "Ignoring unknown extended header keyword")
 
 # Copy our installation script to the mount so it can be run in the chroot
-cp "${script}" "${mount}/tmp/${script}"
-chmod +x "${mount}/tmp/${script}"
+install -Dm755 "${script}" "${mount}/tmp/${script}"
 
 # Prep the chroot
 mount -t proc none ${mount}/proc
