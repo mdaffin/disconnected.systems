@@ -26,7 +26,7 @@ I am going to continue with the repo we created in the last blog post, if you
 dont want to follow on from that, or if you want to start from the same base you
 can clone it by running 
 
-```
+```shell
 git clone git@github.com:mdaffin/rpizw-rover.git -b v0.1
 cd ripzw-rover
 ```
@@ -494,3 +494,11 @@ script:
 
 Once you commit and push these changes travis should start building. We can then
 tag our next version to cause travis to build and publish the ready to go images.
+
+## Conclusion
+
+We have introduced another building block to the rover platform, we can now
+cross compile rust programs and embed them in our raspberry pi images and have a
+basic module to control our rover. The next step is a to build basic web server
+that uses what we have done here to allow us to finally remotely control the
+rover through an web interface.
