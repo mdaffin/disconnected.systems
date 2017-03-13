@@ -27,7 +27,7 @@ dont want to follow on from that, or if you want to start from the same base you
 can clone it by running 
 
 ```shell
-git clone git@github.com:mdaffin/rpizw-rover.git -b v0.1
+git clone https://github.com/mdaffin/rpizw-rover.git -b v0.1
 cd ripzw-rover
 ```
 
