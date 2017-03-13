@@ -99,7 +99,7 @@ And cross compile and upload it to then run it on the pi with.
 
 ```shell
 cargo build --target=arm-unknown-linux-gnueabihf
-#    Compiling rpizw-rover v0.1.0 (file:///home/mdaffin/projects/test)
+#    Compiling rpizw-rover v0.2.0 (file:///home/mdaffin/projects/test)
 #     Finished debug [unoptimized + debuginfo] target(s) in 0.43 secs
 scp target/arm-unknown-linux-gnueabihf/debug/rpizw-rover alarm@rpizw-rover.local: # or the ip address of your pi
 ssh -t alarm@rpizw-rover.local ./rpizw-rover
@@ -325,7 +325,6 @@ arguments in a separate file keeping our `src/main.rs` cleaner. Create
 
 ```yaml
 name: rpizw-rover
-version: "0.2.0"
 about: Controls a raspberry pi zero powered rover
 subcommands:
     - stop:
@@ -372,7 +371,7 @@ fn run() -> Result<()> {
     use rover::Rover;
 
     let yaml = load_yaml!("cli.yml");
-    let matches = App::from_yaml(yaml).get_matches();
+    let matches = App::from_yaml(yaml).version(crate_version!()).get_matches();
 
     let rover = Rover::new(PWM_CHIP, LEFT_PWM, RIGHT_PWM)?;
 
