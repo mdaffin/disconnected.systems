@@ -66,8 +66,9 @@ linker = "arm-linux-gnueabihf-gcc"
 ## Cross Compile Hello World
 
 Now lets us setup a simple hello world application to see if we have our
-environment setup correctly. Inside the repo create a `Cargo.toml` file with the
-following contents.
+environment setup correctly. Inside the we created last time, or that you cloned
+at the start of this post, create a `Cargo.toml` file with the following
+contents.
 
 ```ini
 [package]
@@ -102,8 +103,8 @@ cargo build --target=arm-unknown-linux-gnueabihf
 #     Finished debug [unoptimized + debuginfo] target(s) in 0.43 secs
 scp target/arm-unknown-linux-gnueabihf/debug/rpizw-rover alarm@rpizw-rover.local: # or the ip address of your pi
 ssh -t alarm@rpizw-rover.local ./rpizw-rover
-#Hello World!
-#Connection to rpizw-rover.local closed.
+# Hello World!
+# Connection to rpizw-rover.local closed.
 ```
 If you are having trouble with these steps have a look at this more
 comprehensive guide on [cross compiling
@@ -121,7 +122,8 @@ The three dependencies we are going to use are
 * [error-chain](https://github.com/brson/error-chain): to avoid some boiler plate on error handling
 * [clap](https://clap.rs/): to parse the command line arguments
 
-Append the following to your `Cargo.toml`.
+Append the following to the `Cargo.toml` we created above to add these
+dependencies to our project.
 
 ```ini
 [dependencies]
@@ -132,7 +134,9 @@ clap = {version = "2.20.5", features = ["yaml"]}
 
 ## Handling Errors
 
-First thing to do is setup the error handling. Create the file `src/error.rs` with the following contents.
+Dealing with errors is important in any program, so lets setup some of out error
+handling code in preparation for later. Create the file `src/error.rs` with the
+following contents.
 
 ```rust
 use sysfs_pwm;
@@ -144,41 +148,51 @@ error_chain!{
 }
 ```
 
-This macro will create a `Result`, `Error` for use as well as some other useful
+This macro will create a `Result`, `Error` types as well as some other useful
 structs. It will also wrap the `sysfs_pwm::Error` in the `ErrorKind` enum
-allowing us to match on it later if required.
+allowing us to seemsly convert errors from it to our types and to match on it
+later if required.
 
 All errors are going to be propagated up to our main function, which will
 handle them by printing out a nice error message to the user explaining what
 failed and why. Replace `src/main.rs` with the following.
 
 ```rust
+// The dependencies we are going to use.
 extern crate sysfs_pwm;
 #[macro_use]
 extern crate error_chain;
 #[macro_use]
 extern crate clap;
 
+// Include our error module so we can use it.
 mod error;
 
+// Import everything from our error module.
 use error::*;
 
+// A stub function we will implement our application logic in later.
 fn run() -> Result<()> {
     bail!("Not yet implemented")
 }
 
 fn main() {
+    // Run the run function and print any errors that it returns.
     if let Err(ref e) = run() {
         use std::io::Write;
         let stderr = &mut ::std::io::stderr();
+        // Error message for when we cannot write to stderr
         let errmsg = "Error writing to stderr";
 
+        // Print out the error that occurred.
         writeln!(stderr, "error: {}", e).expect(errmsg);
 
+        // And what caused it.
         for e in e.iter().skip(1) {
             writeln!(stderr, "caused by: {}", e).expect(errmsg);
         }
 
+        // As well as any backtrace if they are enabled.
         if let Some(backtrace) = e.backtrace() {
             writeln!(stderr, "backtrace: {:?}", backtrace).expect(errmsg);
         }
@@ -195,7 +209,7 @@ post](http://brson.github.io/2016/11/30/starting-with-error-chain) or their on
 ## The Rover Module
 
 The rovers code can be encapsulated into a module that we will be able to easily
-reuse later when we build more existing applications around it. Create
+reuse later and allow more complex applications to be built around it. Create
 `src/rover.rs` with the following contents. Note that we make use of our error
 module and that any function that can return an error does so with the `Result`
 defined there. This gives us a consistent error type thought out our project.
@@ -208,43 +222,43 @@ const PERIOD: u32 = 20_000_000;
 const MAX_DUTY_CYCLE: u32 = 2_000_000;
 const MIN_DUTY_CYCLE: u32 = 1_000_000;
 
-/// Holds the left and right motor that the functions below will act upon.
+// Holds the left and right motor that the functions below will act upon.
 pub struct Rover {
     left: Pwm,
     right: Pwm,
 }
 
 impl Rover {
-    /// Creates a new rovers with both wheels enabled but stopped. The wheels
-    /// will be disabled and the underlying pwm drivers unexported when the
-    /// rover is dropped. `enable(true)` must be called before the wheel will
-    /// move.
+    // Creates a new rovers with both motors ready to be enabled. The motors
+    // will be disabled and the underlying pwm drivers unexported when the
+    // rover is dropped. `enable(true)` must be called before the motor will
+    // move.
     pub fn new(chip: u32, left_pin: u32, right_pin: u32) -> Result<Rover> {
-        let left = Pwm::new(chip, left_pin).chain_err(|| "failed to create left wheel")?;
-        let right = Pwm::new(chip, right_pin).chain_err(|| "failed to create right wheel")?;
-        left.export().chain_err(|| "failed to export the left wheel pwm channel")?;
-        right.export().chain_err(|| "failed to export the right wheel pwm channel")?;
-        left.set_period_ns(PERIOD).chain_err(|| "failed to set period on left wheel")?;
-        right.set_period_ns(PERIOD).chain_err(|| "failed to set period on right wheel")?;
+        let left = Pwm::new(chip, left_pin).chain_err(|| "failed to create left motor")?;
+        let right = Pwm::new(chip, right_pin).chain_err(|| "failed to create right motor")?;
+        left.export().chain_err(|| "failed to export the left motor pwm channel")?;
+        right.export().chain_err(|| "failed to export the right motor pwm channel")?;
+        left.set_period_ns(PERIOD).chain_err(|| "failed to set period on left motor")?;
+        right.set_period_ns(PERIOD).chain_err(|| "failed to set period on right motor")?;
         Ok(Rover {
             left: left,
             right: right,
         })
     }
 
-    /// Enables/disables the wheel. When disabled they keep their current
-    /// speed and their speed can still be set but they will not move until
-    /// enabled.
+    // Enables/disables the motor. When disabled they keep their current
+    // speed and their speed can still be set but they will not move until
+    // enabled.
     pub fn enable(&self, enabled: bool) -> Result<()> {
-        self.left.enable(enabled).chain_err(|| "failed to enable left wheel")?;
-        self.right.enable(enabled).chain_err(|| "failed to enable right wheel")
+        self.left.enable(enabled).chain_err(|| "failed to enable left motor")?;
+        self.right.enable(enabled).chain_err(|| "failed to enable right motor")
     }
 
-    /// Converts a speed between -100 (full reverse) and 100 (full forward)
-    /// to a duty cycle which we can pass to the Pwm struct from sysfs_pwm.
-    /// The idea is to map values from -100, 100 to 1_000_000, 2_000_000 where
-    /// 0 is 1500000 (the neutral point for servos). It also caps the return
-    /// value to be within this range.
+    // Converts a speed between -100 (full reverse) and 100 (full forward)
+    // to a duty cycle which we can pass to the Pwm struct from sysfs_pwm.
+    // The idea is to map values from -100, 100 to 1_000_000, 2_000_000 where
+    // 0 is 1500000 (the neutral point for servos). It also caps the return
+    // value to be within this range.
     fn speed_to_duty_cycle(speed: i8) -> u32 {
         let duty_cycle = (((speed as i32 * 10000) + MIN_DUTY_CYCLE as i32) as u32 / 2) +
                          MIN_DUTY_CYCLE;
@@ -257,56 +271,57 @@ impl Rover {
         duty_cycle
     }
 
-    /// Sets the speed of the left wheel. Can be any value between -100 (full
-    /// reverse) and 100 (full forward), values above or below these limits will
-    /// be to to the limit.
+    // Sets the speed of the left motor. Can be any value between -100 (full
+    // reverse) and 100 (full forward), values above or below these limits will
+    // be to to the limit.
     pub fn set_left_speed(&self, speed: i8) -> Result<()> {
         self.left
             .set_duty_cycle_ns(Rover::speed_to_duty_cycle(-speed))
-            .chain_err(|| "failed to set duty on left wheel")
+            .chain_err(|| "failed to set duty on left motor")
     }
 
-    /// Sets the speed of the right wheel. Can be any value between -100 (full
-    /// reverse) and 100 (full forward), values above or below these limits will
-    /// be to to the limit.
+    // Sets the speed of the right motor. Can be any value between -100 (full
+    // reverse) and 100 (full forward), values above or below these limits will
+    // be to to the limit.
     pub fn set_right_speed(&self, speed: i8) -> Result<()> {
         self.right
             .set_duty_cycle_ns(Rover::speed_to_duty_cycle(speed))
-            .chain_err(|| "failed to set duty on left wheel")
+            .chain_err(|| "failed to set duty on left motor")
     }
 
-    /// Stops both the wheels, equlivent to setting their speeds to 0.
+    // Stops both the motors, equlivent to setting their speeds to 0.
     pub fn stop(&self) -> Result<()> {
         self.set_left_speed(0)?;
         self.set_right_speed(0)
     }
 
-    /// Sets the speed of left and right wheel. Can be any value between -100 (full
-    /// reverse) and 100 (full forward), values above or below these limits will
-    /// be to to the limit.
+    // Sets the speed of left and right motor. Can be any value between -100 (full
+    // reverse) and 100 (full forward), values above or below these limits will
+    // be to to the limit.
     pub fn set_speed(&self, left: i8, right: i8) -> Result<()> {
         self.set_left_speed(left)?;
         self.set_right_speed(right)
     }
 
-    /// Unexports the wheels so they can no longer be used. Note that we use
-    /// `self` rather than `&self` as we want this function to consume the
-    /// rover stopping any future calls to it (which will cause a compile time
-    /// error)
+    // Unexports the motors so they can no longer be used. Note that we use
+    // `self` rather than `&self` as we want this function to consume the
+    // rover stopping any future calls to it (which will cause a compile time
+    // error)
     pub fn unexport(self) -> Result<()> {
-        self.left.enable(false).chain_err(|| "failed to disable left wheel")?;
-        self.right.enable(false).chain_err(|| "failed to disable right wheel")?;
-        self.left.unexport().chain_err(|| "failed to unexport left wheel")?;
-        self.right.unexport().chain_err(|| "failed to unexport right wheel")
+        self.left.enable(false).chain_err(|| "failed to disable left motor")?;
+        self.right.enable(false).chain_err(|| "failed to disable right motor")?;
+        self.left.unexport().chain_err(|| "failed to unexport left motor")?;
+        self.right.unexport().chain_err(|| "failed to unexport right motor")
     }
 }
 ```
 
 ## Handling Cli Arguments
 
-We are going to use [clap]() to handle our command line arguments. We are going
-to use its yaml feature to allow us to define the arguments in a separate yaml
-file keeping our main.rs cleaner. Create `src/cli.yml` with the following contents.
+We are going to use [clap](https://clap.rs) to handle our command line
+arguments. We are going to use its yaml feature to allow us to define the
+arguments in a separate file keeping our `src/main.rs` cleaner. Create
+`src/cli.yml` with the following contents.
 
 ```yaml
 name: rpizw-rover
@@ -318,9 +333,9 @@ subcommands:
     - unexport:
         about: unexports the underlying pwm hardware interface so it can be used by other programs
     - enable:
-        about: enables the wheels
+        about: enables the motors
     - disable:
-        about: disables the wheels
+        about: disables the motors
     - speed:
         about: sets the speed of the rover
         args:
@@ -346,6 +361,8 @@ both left and right speeds). These commands correspond to the functions on our
 making the following changes to the run function.
 
 ```rust
+mod rover;
+
 const PWM_CHIP: u32 = 0;
 const LEFT_PWM: u32 = 0;
 const RIGHT_PWM: u32 = 1;
@@ -413,9 +430,11 @@ sudo ./rpizw-rover speed -- 100 -100
 sleep 1
 sudo ./rpizw-rover speed -- -100 100
 sleep 1
-sudo ./rpizw-rover speed -- -25 75
+sudo ./rpizw-rover speed -- -15 85
 sleep 2
 sudo ./rpizw-rover stop
+sleep 1
+sudo ./rpizw-rover unexport
 ```
 
 ## Updating `create-image` and the Travis config
@@ -449,7 +468,7 @@ cleanup() {
 
 Then add the following install command just after we install the script
 
-```
+```shell
 ...
 
 # Copy our installation script and other artifacts
@@ -467,7 +486,7 @@ While we are at it we can remove our old `rover-test.sh` from the image and
 repo. Remove the following line from `create-image` then delete the
 `rover-test.sh` script from the repo.
 
-```
+```shell
 cp rover-test.sh ${mount}/home/alarm/rover-test.sh
 ```
 
