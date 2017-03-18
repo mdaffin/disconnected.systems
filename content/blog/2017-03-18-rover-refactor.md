@@ -218,6 +218,22 @@ index 5d8540c..9c350e8 100755
  mount -t proc none ${mount}/proc
 ```
 
+## Fix for the `ca-certificates-utils` Update
+
+There has been a recent change to the upstream package `ca-certificates-utils`
+which is detailed
+[here](https://www.archlinux.org/news/ca-certificates-utils-20170307-1-upgrade-requires-manual-intervention/).
+Until the upstream archlinuxarm update their rootfs we must make a small change
+to our `setup` script, add the following to the top of `setup` just before the first `pacman -Syu ...`
+
+```shell
+# Fix for a recent change in ca-certificates-utils this can be removed once upstream rootfs has been update.
+# https://www.archlinux.org/news/ca-certificates-utils-20170307-1-upgrade-requires-manual-intervention/
+pacman -Syuw
+rm /etc/ssl/certs/ca-certificates.crt
+pacman -Su
+```
+
 ## Conclusion
 
 We only did some minor tweaks in preparation for building the rovers webserver
