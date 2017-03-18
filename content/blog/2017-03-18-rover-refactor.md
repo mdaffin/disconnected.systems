@@ -1,7 +1,7 @@
 +++
-date = "2017-03-18T17:37:43Z"
+date = "2017-03-18T21:45:01Z"
 title = "Small Refactor To Prepare For Writing The Rest API"
-draft = true
+draft = false
 description = "Small tweaks to the rovers code and overall project layout in preparation for adding a webserver that can control the rover."
 slug = "rover-refactor"
 tags = ["rust", "raspberry-pi"]
