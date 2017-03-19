@@ -1,7 +1,7 @@
 +++
-date = "2017-03-19T17:37:43Z"
+date = "2017-03-19T17:20:50Z"
 title = "Writing A Rest API For The Pi Rover"
-draft = true
+draft = false
 description = "Using the iron web framework to build a simple rest api for the raspberry pi zero w rover"
 slug = "rover-rest-api"
 tags = ["rust", "raspberry-pi", "iron", "rest"]
