@@ -565,5 +565,10 @@ requires rust nightly to compile. Although there is nothing fundamentally wrong
 with the rust web ecosystem it is still quite immature and these issues will
 hopefully be solved over time.
 
+You can view the final source code on the
+[v0.4](https://github.com/mdaffin/rpizw-rover/tree/v0.4) branch or download the
+image created from this process
+[here](https://github.com/mdaffin/rpizw-rover/releases/tag/v0.4.0).
+
 Now we only have one core component left to write: the front end code that will run
 in the browser and communicate with the rest api we developed in this post.
