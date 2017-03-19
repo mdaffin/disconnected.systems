@@ -99,7 +99,6 @@ used in the `rover-cli` tool.
 
 ```rust
 extern crate rpizw_rover;
-#[macro_use]
 extern crate iron;
 extern crate router;
 extern crate logger;
