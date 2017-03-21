@@ -237,9 +237,9 @@ to the top of `setup` just before the first `pacman -Syu ...`.
 ```shell
 # Fix for a recent change in ca-certificates-utils this can be removed once upstream rootfs has been update.
 # https://www.archlinux.org/news/ca-certificates-utils-20170307-1-upgrade-requires-manual-intervention/
-pacman -Syuw
-rm /etc/ssl/certs/ca-certificates.crt
-pacman -Su
+pacman -Syuw --noconfirm
+rm -f /etc/ssl/certs/ca-certificates.crt
+pacman -Su --noconfirm
 ```
 
 Note that you may not require this fix for long, it is just needed until
