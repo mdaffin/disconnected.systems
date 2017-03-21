@@ -1,5 +1,5 @@
 +++
-date = "2017-03-21:20:50Z"
+date = "2017-03-21T20:20:50Z"
 title = "Web Interface To Control The Rover"
 draft = true
 description = "Looks at how to build a web interface using vue.js and webpack to control the raspberry pi rover"
