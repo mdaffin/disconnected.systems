@@ -1,10 +1,10 @@
 +++
 date = "2017-03-21:20:50Z"
-title = ""
+title = "Web Interface To Control The Rover"
 draft = true
-description = ""
-slug = "rover-rest-api"
-tags = ["rust", "raspberry-pi", "iron", "rest"]
+description = "Looks at how to build a web interface using vue.js and webpack to control the raspberry pi rover"
+slug = "rover-web-ui"
+tags = ["javascript", "raspberry-pi", "vue.js", "webpack"]
 +++
 
 Over the past few weeks I have been building a raspberry pi zero w based rover.
