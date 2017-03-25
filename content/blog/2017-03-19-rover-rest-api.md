@@ -26,6 +26,9 @@ Add the following to the `[dependencies]` section in `Cargo.toml`.
 iron = "0.5.0"
 router = "0.5.1"
 logger = "0.3.0"
+staticfile = "0.4.0"
+mount = "0.3"
+unicase = "1.4.0"
 log = "0.3.7"
 env_logger = "0.4.2"
 chan-signal = "0.2.0"
@@ -38,50 +41,61 @@ serde_derive = "0.9.11"
 For this we require a fair few dependencies, lets take a brief moment to talk
 about what each one brings us below.
 
-* [Iron](http://ironframework.io/) is the web framework that we are going to use,
-it is currently the most popular web framework for rust but unfortunately still
-lacks in overall documentation. This, however, also holds true for allot of the
-alternative frameworks. [Rocket](https://rocket.rs/) was a tempting alternative,
-its documentation seems more complete but still requires rust nightly which I
-want to avoid at the moment.
+* [Iron](http://ironframework.io/) is the web framework that we are going to
+  use, it is currently the most popular web framework for rust but unfortunately
+  still lacks in overall documentation. This, however, also holds true for allot
+  of the alternative frameworks. [Rocket](https://rocket.rs/) was a tempting
+  alternative, its documentation seems more complete but still requires rust
+  nightly which I want to avoid at the moment.
 
 * [Router](https://github.com/iron/router) is simply the router middleware for
-the iron web framework, it lets us handle multiple paths and bind them to
-different functions.
+  the iron web framework, it lets us handle multiple paths and bind them to
+  different functions.
 
-* [Logger](https://github.com/iron/logger) is the logging middleware for iron. It
-lets us log all of the requests that we receive with some useful information
-like the time it took to process.
+* [Logger](https://github.com/iron/logger) is the logging middleware for iron.
+  It lets us log all of the requests that we receive with some useful
+  information like the time it took to process.
 
-* [Log](https://github.com/rust-lang-nursery/log) gives us some handy macros like
-`info!` `warning!` and `error!` that act like the `println!` macro allowing us
-to print scoped messages to the logs.
+* [Staticfile](https://github.com/iron/staticfile) allows serving static files
+  from iron. This will be used to serve our user interface which we will develop
+  in the next post.
 
-* [Env_logger](https://github.com/rust-lang-nursery/log) is the implementation of
-logging, they two libraries above basically wrap this library.
+* [Mount](https://github.com/iron/mount) allows us up mount handlers on
+  different paths. This is similar to the router, but forwards all sub paths
+  that and methods match the prefix.
+
+* [Unicase](https://github.com/seanmonstar/unicase) handle case insensitive
+  strings. This is required for settings some of the headers.
+
+* [Log](https://github.com/rust-lang-nursery/log) gives us some handy macros
+  like `info!` `warning!` and `error!` that act like the `println!` macro
+  allowing us to print scoped messages to the logs.
+
+* [Env_logger](https://github.com/rust-lang-nursery/log) is the implementation
+  of logging, they two libraries above basically wrap this library.
 
 * [Chan](https://github.com/BurntSushi/chan) gives us access to channels which
-we use with chan-signal.
+  we use with chan-signal.
 
 * [chan-signal](https://github.com/BurntSushi/chan-signal) library allow us to
-capture and gracefully handle signals that might be sent to our program. In
-particular we want to be able to tear down our rover (aka stop it) when our
-webserver exits for any reason. `SIGTERM` and `SIGINT` are two signals that are
-commonly used to tell applications to stop. `SIGTERM` is sent by default when
-you run `kill` and `SIGINT` is sent when you press `ctrl+c`.
+  capture and gracefully handle signals that might be sent to our program. In
+  particular we want to be able to tear down our rover (aka stop it) when our
+  webserver exits for any reason. `SIGTERM` and `SIGINT` are two signals that
+  are commonly used to tell applications to stop. `SIGTERM` is sent by default
+  when you run `kill` and `SIGINT` is sent when you press `ctrl+c`.
 
-* [Serde](https://github.com/serde-rs/serde) is a serialisation library, it allows
-us to convert different encoded string into structs and vice versa. We will make
-use of it to convert message we send back to the client and messages we receive
-from the client to a form rust understands.
+* [Serde](https://github.com/serde-rs/serde) is a serialisation library, it
+  allows us to convert different encoded string into structs and vice versa. We
+  will make use of it to convert message we send back to the client and messages
+  we receive from the client to a form rust understands.
 
 * [Serde_json](https://github.com/serde-rs/json) is the json implementation of
-serde, we are only going to be converting to and from json.
+  serde, we are only going to be converting to and from json.
 
 * [Serde_derive](https://github.com/serde-rs/serde) allows us to use
-`#[derive(Serialize, Deserialize)]` save us from writing a bunch of boiler plate
-code to serialize and deserialize our types and overall makes the serde library
-very simple to use.
+  `#[derive(Serialize, Deserialize)]` save us from writing a bunch of boiler
+  plate code to serialize and deserialize our types and overall makes the serde
+  library very simple to use.
 
 ## The Rover Server
 
@@ -101,6 +115,9 @@ used in the `rover-cli` tool.
 extern crate rpizw_rover;
 extern crate iron;
 extern crate router;
+extern crate mount;
+extern crate staticfile;
+extern crate unicase;
 extern crate logger;
 #[macro_use]
 extern crate chan;
@@ -113,14 +130,19 @@ extern crate serde_derive;
 extern crate serde_json;
 
 use iron::prelude::*;
-use iron::status;
-use iron::headers::ContentType;
+use iron::{status, AfterMiddleware};
+use iron::method::Method;
+use iron::headers;
 use iron::mime::{Mime, TopLevel, SubLevel, Attr, Value};
 use logger::Logger;
 use router::Router;
+use mount::Mount;
+use staticfile::Static;
+use std::path::Path;
 use rpizw_rover::Rover;
 use chan_signal::Signal;
 use std::io::Read;
+use unicase::UniCase;
 
 const PWM_CHIP: u32 = 0;
 const LEFT_PWM: u32 = 0;
@@ -173,11 +195,11 @@ impl ResponsePayload {
 
     /// Converts the payload to a iron response with the ok status.
     pub fn to_response(self) -> Response {
-        let mut resp = Response::with((status::Ok, serde_json::to_string(&self).unwrap()));
-        resp.headers.set(ContentType(Mime(TopLevel::Application,
-                                          SubLevel::Json,
-                                          vec![(Attr::Charset, Value::Utf8)])));
-        resp
+        let mut res = Response::with((status::Ok, serde_json::to_string(&self).unwrap()));
+        res.headers.set(headers::ContentType(Mime(TopLevel::Application,
+                                                  SubLevel::Json,
+                                                  vec![(Attr::Charset, Value::Utf8)])));
+        res
     }
 }
 ```
@@ -251,33 +273,59 @@ will be defined in the next section. Note that all of the endpoints are put
 calls as they all set things on the rover.
 
 ```rust
-    let mut router = Router::new();
-    router.put("/api/reset", reset, "reset");
-    router.put("/api/stop", stop, "stop");
-    router.put("/api/enable", enable, "enable");
-    router.put("/api/disable", disable, "disable");
-    router.put("/api/speed", set_speed, "set_speed");
+    let mut api_router = Router::new();
+    api_router.put("/reset", reset, "reset");
+    api_router.put("/stop", stop, "stop");
+    api_router.put("/enable", enable, "enable");
+    api_router.put("/disable", disable, "disable");
+    api_router.put("/speed", set_speed, "set_speed");
 ```
 
 Iron has a very flexible middleware system, which is used by chaining middleware
-together with the `Chain` type. We add the `logger_before` to execute before our
-router, which sets up some timing variables that are used by `logger_after`.
-`logger_after` is setup to run after our router and outputs the request to the
-logs detailing what was called and how long it took, as well as any errors that
-were encountered.
+together with the `Chain` type. We want to create a very basic
+[CORS](https://spring.io/understanding/CORS) implementation to make development
+of our interface easier. We will talk more about this in a later section when we
+create the middleware.
 
 ```rust
-    let mut chain = Chain::new(router);
+    let mut api_chain = Chain::new(api_router);
+    let cors_middleware = CORS {};
+
+    api_chain.link_after(cors_middleware);
+```
+
+Our user interface will be served from a static location, we do this with the
+`Static` type from the `staticfile` crate. It simply takes a directory and will
+serve any files it finds there. We also mount the `api_chain` from above to
+`/api` so that any url prefixed by that will be handled by the api router,
+everything else will be served from the static path.
+
+```rust
+    let mut root_mount = Mount::new();
+    root_mount.mount("/api/", api_chain);
+    root_mount.mount("/", Static::new(Path::new("/srv/rover/ui")));
+```
+
+We want all requests to be logged by the server so we add the logger middleware
+to the `root_mount`. Where as the CORS middleware will only apply to the api
+routes. We add the `logger_before` to execute before our router, which sets up
+some timing variables that are used by `logger_after`. `logger_after` is setup
+to run after our router and outputs the request to the logs detailing what was
+called and how long it took, as well as any errors that were encountered.
+
+```rust
+    let mut root_chain = Chain::new(root_mount);
     let (logger_before, logger_after) = Logger::new(None);
-    chain.link_before(logger_before);
-    chain.link_after(logger_after);
-``
+    root_chain.link_before(logger_before);
+    root_chain.link_after(logger_after);
+```
 
 Now we are ready to get things running, we just need to start `chan_signal` to
 listen for `SIGTERM` and `SIGINT` then start they iron web server.
+
 ```rust
     let signal = chan_signal::notify(&[Signal::INT, Signal::TERM]);
-    let mut serv = Iron::new(chain).http("0.0.0.0:3000").unwrap();
+    let mut serv = Iron::new(root_chain).http("0.0.0.0:3000").unwrap();
     info!("listening on 0.0.0.0:3000");
 ```
 
@@ -378,6 +426,53 @@ fn set_speed(req: &mut Request) -> IronResult<Response> {
 }
 ```
 
+## CORS Middleware
+
+[Cross Origin Resource Sharing](https://spring.io/understanding/CORS) (aka CORS)
+is a standard introduced into browsers to relax their strict same origin
+policies. This basically stops websites from accessing resources of other
+websites surreptitiously via the users web browser. This does however make
+developing our user interface harder we would not be able to call the api on our
+rover from a web server running on our development machine. We have no user data
+or even authentication so this limitation does not protect our users/application
+from anything but makes development more tedious.
+
+To relax these constraints we must set a few headers, to do this for all
+responses from our api we create our own middleware to append them to the
+response.
+
+```rust
+struct CORS;
+
+impl CORS {
+    fn add_headers(res: &mut Response) {
+        res.headers.set(headers::AccessControlAllowOrigin::Any);
+        res.headers.set(headers::AccessControlAllowHeaders(
+            vec![
+                UniCase(String::from("accept")),
+                UniCase(String::from("content-type"))
+            ]
+        ));
+        res.headers.set(headers::AccessControlAllowMethods(vec![Method::Put]));
+    }
+}
+
+impl AfterMiddleware for CORS {
+    fn after(&self, req: &mut Request, mut res: Response) -> IronResult<Response> {
+        if req.method == Method::Options {
+            res = Response::with(status::Ok);
+        }
+        CORS::add_headers(&mut res);
+        Ok(res)
+    }
+
+    fn catch(&self, _: &mut Request, mut err: IronError) -> IronResult<Response> {
+        CORS::add_headers(&mut err.response);
+        Err(err)
+    }
+}
+```
+
 ## Compiling And Running
 
 Compile the code like we did for the `rover-cli` tool
@@ -422,6 +517,9 @@ curl -XPUT http://rpizw-rover.local:3000/api/stop
 curl -iXPUT http://rpizw-rover.local:3000/api/speed -d '{}'
 #HTTP/1.1 400 Bad Request
 #Content-Length: 81
+#Access-Control-Allow-Origin: *
+#Access-Control-Allow-Headers: accept, content-type
+#Access-Control-Allow-Methods: PUT
 #Content-Type: text/plain
 #Date: Sun, 19 Mar 2017 12:40:56 GMT
 #
