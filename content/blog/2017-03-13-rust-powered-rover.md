@@ -150,7 +150,7 @@ error_chain!{
 
 This macro will create a `Result`, `Error` types as well as some other useful
 structs. It will also wrap the `sysfs_pwm::Error` in the `ErrorKind` enum
-allowing us to seemsly convert errors from it to our types and to match on it
+allowing us to seamlessly convert errors from it to our types and to match on it
 later if required.
 
 All errors are going to be propagated up to our main function, which will

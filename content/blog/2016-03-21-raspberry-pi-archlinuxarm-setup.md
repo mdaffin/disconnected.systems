@@ -246,33 +246,6 @@ Key="PASSWORD"
 EOF
 ```
 
-*Update:*
-
-Alternatively you can do the same thing with systemd-networkd which is
-installed and enabled by default now. Note, only configure netctl OR networkd, not both.
-
-```shell
-pacman -S --noconfirm wpa_supplicant
-ln -sf /usr/lib/systemd/system/wpa_supplicant@.service /etc/systemd/system/multi-user.target.wants/wpa_supplicant@wlan0.service
-
-cat >/etc/systemd/network/wlan0.network <<EOF
-[Match]
-Name=wlan0
-[Network]
-DHCP=yes
-EOF
-
-cat <<EOF > /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
-ctrl_interface=/var/run/wpa_supplicant
-ctrl_interface_group=wheel
-update_config=1
-fast_reauth=1
-ap_scan=1
-
-wpa_passphrase "SSID" "PASSPHRASE" >> /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
-EOF
-```
-
 Enable zero-conf networking (aka avahi or Bonjour) to make discovering your pi
 on the network easier, if your system supports it.
 

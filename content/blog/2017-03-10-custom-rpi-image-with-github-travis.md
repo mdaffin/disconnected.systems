@@ -172,22 +172,9 @@ ln -sf /usr/lib/systemd/system/avahi-daemon.service /etc/systemd/system/multi-us
 
 # Enable wireless, actual connection details will be configured by the user, likely over usb-serial.
 # No not put any secrets like wifi passphrases in here as they will be publicly exposed in the repo and image.
-ln -sf /usr/lib/systemd/system/wpa_supplicant@.service /etc/systemd/system/multi-user.target.wants/wpa_supplicant@wlan0.service
-
-cat >/etc/systemd/network/wlan0.network <<EOF
-[Match]
-Name=wlan0
-[Network]
-DHCP=yes
-EOF
-
-cat <<EOF > /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
-ctrl_interface=/var/run/wpa_supplicant
-ctrl_interface_group=wheel
-update_config=1
-fast_reauth=1
-ap_scan=1
-EOF
+pacman -S --noconfirm wpa_supplicant wpa_actiond ifplugd crda dialog
+ln -sf /usr/lib/systemd/system/netctl-auto@.service /etc/systemd/system/multi-user.target.wants/netctl-auto@wlan0.service
+ln -sf /usr/lib/systemd/system/netctl-ifplugd@.service /etc/systemd/system/multi-user.target.wants/netctl-ifplugd@eth0.service
 
 # Enable the usb serial, this will make it easier to add any wifi credentials on the pi zero (will not work on other models).
 grep 'dtoverlay=dwc2' /boot/config.txt >/dev/null || echo 'dtoverlay=dwc2' >> /boot/config.txt
@@ -275,13 +262,13 @@ you only need to do it once per repo. Windows (and mac) users can use the
 After you have ruby installed and a local clone run the following to install the
 travis cli tool.
 
-```
+```shell
 gem install travis
 ```
 
 Then you can setup release with
 
-```
+```shell
 travis setup releases
 > Username: mdaffin
 > Password for mdaffin:
@@ -295,7 +282,7 @@ github releases](https://docs.travis-ci.com/user/deployment/releases/).
 
 This will add something like the following to your `.travis.yml` file locally.
 
-```
+```yaml
 deploy:
   provider: releases
   api_key:
@@ -312,7 +299,7 @@ deleting our built image before deploying it and then `tags: true` to the
 need to add the second archive file in the list of files. After editing it
 should look like:
 
-```
+```yaml
 deploy:
   provider: releases
   api_key:

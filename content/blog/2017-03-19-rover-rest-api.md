@@ -7,6 +7,8 @@ slug = "rover-rest-api"
 tags = ["rust", "raspberry-pi", "iron", "rest"]
 +++
 
+*Updated on 2017-03-25: added a static file server and set cors headers*
+
 Over the past few weeks I have been building a raspberry pi zero w based rover.
 This post follows on from the previous posts which you can checkout below.
 
@@ -77,7 +79,7 @@ about what each one brings us below.
 * [Chan](https://github.com/BurntSushi/chan) gives us access to channels which
   we use with chan-signal.
 
-* [chan-signal](https://github.com/BurntSushi/chan-signal) library allow us to
+* [Chan-signal](https://github.com/BurntSushi/chan-signal) library allow us to
   capture and gracefully handle signals that might be sent to our program. In
   particular we want to be able to tear down our rover (aka stop it) when our
   webserver exits for any reason. `SIGTERM` and `SIGINT` are two signals that
