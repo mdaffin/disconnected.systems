@@ -106,9 +106,16 @@ can leave this running in the background as we develop the site.
 
 ## Adding Concise CSS
 
+Concise css is a simple css framework that give us a nice looking base theme to
+start from. It is similar to bootstrap but light weight, simpler and pure css.
+Use npm to download and save `concise.css` to out `projects.json` file.
+
 ```shell
 npm install --save concise.css
 ```
+
+Since we are using webpack and `vue-cli` has configured it to handle css files
+we can simply import it in our `ui/src/main.js` file to make use of it.
 
 ```diff
 diff --git a/ui/src/main.js b/ui/src/main.js
