@@ -374,21 +374,21 @@ currently set values which we will see in the `start`/`stop` functions below.
 ```
 
 The rover will be controlled by periodically sending the currently set speeds to
-it every 50 milliseconds. We do this instead of simply sending one command every
-time something changes as there is potential for api calls to be lost over the
-network. By constantly sending the commands it wont matter if a few get lost as
-we only have to wait 50 milliseconds to correct it rather then sending another
-command. This also lets us build some fail safes into the rovers rest api, for
-example we could get it to auto stop if it does not receive a command within 200
-milliseconds such as if we lose connection completely but we will not be looking
-at that in this post.
+it every 50 milliseconds while it is not stopped. We do this instead of simply
+sending one command every time something changes as it gives a more predictable
+number of requests sent and conversely that the rover needs to processes,
+effectively stopping you from overwhelming the rover with a burst of requests if
+you change the speed slider too quickly. It will also lets us build some fail
+safes into the rovers rest api. For example we could get it to auto stop if no
+request has been received in 200 milliseconds due to a connection loss or a
+browser crash. We will however not be looking at that in this post.
 
 There is a trade off with how often we send the commands, slower and it is less
 responsive, faster and it requires more processing to handle all of the
 requests. 50-100 milliseconds gave a good balance between these values but it
-was noted that the rest api is heaver on the cpu then I would have really liked.
-We will looking at more efficient ways to do this in the future for now it is
-good enough for the current task.
+was noted that the rest api is heaver on the pis cpu then I would have really
+liked. We will looking at more efficient ways to do this in the future for now
+it is good enough for the current task.
 
 ```javascript
     toggleStopped() {
@@ -415,6 +415,10 @@ good enough for the current task.
     },
 ```
 
+The `toggleEnabled` function acts like the `toggleStopped` method above, except
+it simply disables/enables the servos while preserving their current speeds and
+does not stop the speed commands from being sent.
+
 ```javascript
     toggleEnabled() {
       this.$set(this, 'enabled', !this.enabled);
@@ -426,6 +430,12 @@ good enough for the current task.
     },
 ```
 
+The `setSpeed` function sends the currently set speeds to the rover, with a very
+short timeout as we expect to call this function many times a second and we do
+not want connections to build up if there are network issues. We multiply the
+values by 10 as the rovers speed has a greater precision then we really care
+about in this ui.
+
 ```javascript
     setSpeed() {
       this.$http.put(`${API_URL}/api/speed`, {
@@ -434,6 +444,10 @@ good enough for the current task.
       }, { timeout: 200 }).then(null, this.errorHandler);
     },
 ```
+
+The `reset` function resets the rovers state in both the ui and sends the
+request to the rover. This will help to fix any potential problems that might
+occur in the rover - at least from a software configuration point of view.
 
 ```javascript
     reset() {
@@ -447,6 +461,10 @@ good enough for the current task.
       this.$http.put(`${API_URL}/api/reset`).then(null, this.errorHandler);
     },
 ```
+
+Lastly we handle the key press and release events by setting the relevant
+variables to true or false, or calling one off functions and then call the
+`calculateSpeeds` function we described above to update the speed values.
 
 ```javascript
     keyPressed(event) {
@@ -488,4 +506,170 @@ good enough for the current task.
 </script>
 ```
 
-which contains all of the css our component requires.
+### Style
+
+The style sections allows us to define any extra css our component needs. We
+define it as `scoped` to limit the css to only the elements we define above
+rather then applying them globally. We only do some basic stuff to anchor the
+controls to the bottom of the page and center them, nothing very exiting.
+
+```html
+<style scoped>
+.controls {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  margin-bottom: 50px;
+}
+
+.controls form {
+  margin: auto;
+  width: 50%;
+}
+
+main {
+  height: 100vh;
+  width: 100vw;
+  background-color: #f5f5f5;
+}
+</style>
+```
+
+## The Root Component
+
+The applications root component is located at `ui/src/App.vue` and will hold
+anything we require on all pages of our application - which is currently none.
+So lets remove the logo and custom styling of the default boiler plate that was
+generated for us.
+
+```diff
+ <template>
+   <div id="app">
+-    <img src="./assets/logo.png">
+     <router-view></router-view>
+   </div>
+ </template>
+ ...
+ </script>
+ 
+ <style>
+-#app {
+-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+-  -webkit-font-smoothing: antialiased;
+-  -moz-osx-font-smoothing: grayscale;
+-  text-align: center;
+-  color: #2c3e50;
+-  margin-top: 60px;
+-}
++
+ </style>
+```
+
+Note that the `<router-view>` is where our component will be placed by the
+router depending on which page we load. We don't strictly need the router and
+could have just written our component as the root component but this will give
+us more flexibility later should we decide to add more pages or other components
+to the site.
+
+## The Router
+
+`vue-router` allows us to render different components based on the url of the
+page. We are not strictly taking advantage of this feature yet but will keep it
+in place to make expanding our site easier at a later date. All we require is to
+update the router to tell it about our new component and to use it inplace of
+the `Hello` component for the root path `/`. Edit `ui/src/router/index.js` with
+the following changes.
+
+```diff
+ import Vue from 'vue';
+ import Router from 'vue-router';
+-import Hello from '@/components/Hello';
++import Controls from '@/components/Controls';
+ 
+ Vue.use(Router);
+ 
+ ...
+   routes: [
+     {
+       path: '/',
+-      name: 'Hello',
+-      component: Hello,
++      name: 'Controls',
++      component: Controls,
+     },
+   ],
+ });
+```
+
+We can now delete `ui/src/components/Hello.vue` as we will no longer require it.
+
+## Building The UI Into The Image
+
+Finally we can build and package our ui into the image alongside the rest api.
+If you recall from our last post static files will be served from
+`/srv/rover/ui` so all we need to do is copy our built files to that location
+inside the image. This can be done in the `create-image` script where we copy
+the binaries across.
+
+```diff
+ install -Dm755 "target/arm-unknown-linux-gnueabihf/release/rover-cli" "${mount}/usr/local/bin/rover-cli"
+ install -Dm755 "target/arm-unknown-linux-gnueabihf/release/rover-server" "${mount}/usr/local/bin/rover-server"
+ install -Dm755 "src/bin/rover-server.service" "${mount}/etc/systemd/system/rover-server.service"
++mkdir -p  /srv/rover/ui
++cp -r ui/dist/* "/srv/rover/ui/"
+ 
+ # Prep the chroot
+ mount -t proc none ${mount}/proc
+```
+
+The ui can be built for production by running `npm run build` inside the ui
+directory. We do not include this command in the `create-image` script above for
+the same reason we excluded the `cargo build` command - we do not want it to run
+as root. Instead you must run these two commands before running the
+`create-image` script. This is automated in travis by editing `.travis.yml` with
+the following.
+
+```diff
+ - export PATH="$PATH:$HOME/.cargo/bin"
+ - curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain=stable
+ - rustup target add arm-unknown-linux-gnueabihf
++- nvm install 7.7.3
++- nvm use 7.7.3
+ script:
+ - cargo build --release --target arm-unknown-linux-gnueabihf
++- ( cd ui && npm install && npm run build )
+ - sudo ./create-image
+ - xz -z rpizw-rover.img -c > rpizw-rover.img.xz
+ - zip rpizw-rover.img.zip rpizw-rover.img
+```
+
+## Conclusion
+
+There is now allot of boilerplate in our project that we have not even begun to
+explain. But we now have a solid web application we can start building on top of
+that meets allot of modern web standards and is quite easy to work with.
+Considering this application was not very complex we could have this with a
+simple html page and some simple javascript using jquery but I wanted to take
+this chance to learn more about some of the emerging web technologies that are
+popping up all over the place.
+
+Overall I found vue very easy to work with, its simple and has some excellent
+documentation with plenty of examples about. Coupled with webpack makes the
+process very fluid and more familiar to the compiled work flows I am used to.
+Allowing you to have a highly organized source that compiles down to a small and
+clean set of deployable artifacts without a hugely complicated build pipeline -
+something I have always missed when working on browser side code in previous
+projects.
+
+Again I have skipped over the unit testing side of the project, not doing so
+would have distracted away from the core concepts of this post and made it far
+to long. I hope to look back at this in a future post, possibly once the
+application has evolved a bit more.
+
+We now have a solid base to start working from, we have a nice ui to manually
+control our rover allowing us to position/reset it with ease. I would like to
+expand upon this in the future to allow running and uploading of custom scripts
+and programs to preform different dedicated tasks - to give similar workflow, in
+a way, to uploading a sketches to an arduino. But in the next few posts I plan
+to start hooking the rover up to some sensors to get it to interact with the
+world.
