@@ -17,28 +17,26 @@ This post follows on from the previous posts which you can checkout below.
 * [Writing A Rest API For The Pi Rover]({{< relref "blog/2017-03-19-rover-rest-api.md" >}})
 
 In this post we will look at creating a web ui for the rover. It will make use
-of the rest api we developed in the last post to give us a nicer way to
-interactively control the rover. Rather then keeping this as a minimal example,
-I am going to make use of most of the front end stack to develop the ui rather
-then just creating a simple html page. For this we are going to look at a number
-of front end technologies such as vue.js, webpack and concise.css.
-
-Vue.js will be responsible for our ui, it is a rendering library similar to
-angular.js or react.js. Webpack is a build tool for browser javascript projects,
-it allows us to develop code to run on a browser like we develop for service
-side node.js applications.
+of the rest api we developed in the last post to give us a nice way to
+interactively control the rover. Rather then keeping this to a bare bones
+example we will be building the start of a modern frontend web application that
+will act as a base we can build upon later. For this we are going to look at and
+tie together a few different frontend technologies such as [vue.js](TODO),
+[webpack](TODO) and [concise.css](TODO) and others.
 
 ## Setting Up The Dev Environment And Project
 
-Most modern web development it based off node.js, in particular npm - this now
-include browser side code as well as server side. In our project the server side
-code is written in rust but we will still make use of npm for installing and
-managing our browser side dependencies.
+Modern web development makes heavy use of node.js, especially npm, nodes package
+manager. This now include browser side code/dependencies in addition to server
+side node was originally written for. In our project the server side code is
+written in rust but we will still make use of npm for installing and managing
+our browser side dependencies in addition to running some tools useful in
+development.
 
 Node.js is the first component we need to install as npm and many other tools
-are based off it. Head over to the [node.js install guide] and follow the
-instructions for your system. This should give you both `nodejs` and `npm`
-commands. Verify both of these are installed with the following.
+are based off it. Head over to the [node.js install guide](TODO) and follow the
+instructions for your system. Once done you should have both `nodejs` and `npm`
+installed, verify this with the following.
 
 ```shell
 node --version
@@ -54,13 +52,15 @@ The only other tool we will need is `vue-cli` which can be install globally with
 npm install -g vue-cli
 ```
 
+TODO
 https://medium.com/codingthesmartway-com-blog/vue-js-2-quickstart-tutorial-2017-246195cfbdd2#.8w94isatl
 https://vuejs-templates.github.io/webpack/
 https://vuejs.org/v2/guide/index.html
 
 Our front end code is going to live inside the `ui` subdirectory of the root of
 our project. `vue-cli` can be used to create this directory with all of the
-boiler plate code needed by vue.js and webpack as well as many other niceties.
+boiler plate code needed by vue.js and webpack as well as many other niceties we
+can make use of later.
 
 ```shell
 vue init webpack ui
@@ -70,7 +70,7 @@ vue init webpack ui
 #  For Vue 1.x use: vue init webpack#1.0 ui
 #
 #? Project name ui
-#? Project description User interface for a raspberry pi based rover
+#? Project description Web application for a raspberry pi based rover
 #? Author Michael Daffin <michael@daffin.io>
 #? Vue build standalone
 #? Install vue-router? Yes
@@ -101,8 +101,9 @@ npm run dev
 
 This will start a web server and launch a web browser to display our
 application. This is an incredibly useful tool during development as it will
-automatically build and reload the web browser whenever we change anything. You
-can leave this running in the background as we develop the site.
+automatically build run/reload a web browser whenever we change anything
+allowing you to instantly see the change you have made. You can leave this
+running in the background as we develop the site.
 
 ## Overview Of The Project
 
@@ -137,13 +138,14 @@ running.
 ```shell
 npm install --save concise.css
 npm install --save concise-ui
-npm install --save vue-resources
+npm install --save vue-resource
 ```
 
-Since we are using webpack and `vue-cli` has configured it to handle css files
-we can simply import it, along with `vue-resource` in our `ui/src/main.js` file
-to make use of them. For `vue-resource` we must also register it with vue and
-configure it.
+`vue-cli` has configured webpack to automatically handel and build css files for
+us so all we need to do to is to import them in `ui/src/main.js` and webpack
+will find and concatenate/minify them along with the css from the vue components
+into a single resource when we build the project. We must also register
+`vue-resource` with vue and set some configuration options.
 
 ```diff
  // The Vue build version to load with the `import` command
@@ -164,9 +166,42 @@ configure it.
  new Vue({
 ```
 
+## Configuration
+
+The `config` directory allows us to set different variables for different
+environments. We can make use of this to set different api urls for dev and
+production. 
+
+The development environment can be configured with `ui/config/dev.env.js`. We
+default it to the hostname but if zero-conf/avahi is not available in your
+environment replace this with the ip address of the rover.
+
+```diff
+ var merge = require('webpack-merge')
+ var prodEnv = require('./prod.env')
+ 
+ module.exports = merge(prodEnv, {
++  API_URL: '"http://rpizw-rover.local:3000"',
+   NODE_ENV: '"development"'
+ })
+```
+
+The production environment can be configured with `ui/config/prod.env.js`. We
+set it to an empty string to use a relative url as it will be served the same
+webserver as our api.
+
+```diff
+ module.exports = {
++  API_URL: '""',
+   NODE_ENV: '"production"'
+ }
+```
+
 ## The Controls Component
 
-This will be our main and for now only functional component. All of its logic and styles will live in `ui/src/components/Controls.vue`. Vue components have tree main sections.
+This will be our main and for now only functional component. All of its logic
+and styles will live in `ui/src/components/Controls.vue`. Vue components have
+tree main sections.
 
 ### Template
 
@@ -243,11 +278,13 @@ function when they are clicked, which we will look at in a bit.
 ### Script
 
 The script section contains all of the javascript code related to our component.
-Here we can place any custom logic our component requires. We start by creating a constant variable for the base url to the backend api.
+Here we can place any custom logic our component requires. We start by creating
+a constant variable for the base url to the backend api which we set in the
+configs above.
 
 ```html
 <script>
-const API_URL = 'http://rpizw-rover.local:3000';
+const API_URL = `${process.env.BASE_URL}/api`;
 ```
 
 Vue requires some functions to be exported that it will use to create the
@@ -407,7 +444,7 @@ it is good enough for the current task.
       this.aPressed = false;
       this.sPressed = false;
       this.dPressed = false;
-      this.$http.put(`${API_URL}/api/stop`).then(null, this.errorHandler);
+      this.$http.put(`${API_URL}/stop`).then(null, this.errorHandler);
     },
     start() {
       this.setSpeed();
@@ -423,9 +460,9 @@ does not stop the speed commands from being sent.
     toggleEnabled() {
       this.$set(this, 'enabled', !this.enabled);
       if (this.enabled) {
-        this.$http.put(`${API_URL}/api/enable`).then(null, this.errorHandler);
+        this.$http.put(`${API_URL}/enable`).then(null, this.errorHandler);
       } else {
-        this.$http.put(`${API_URL}/api/disable`).then(null, this.errorHandler);
+        this.$http.put(`${API_URL}/disable`).then(null, this.errorHandler);
       }
     },
 ```
@@ -438,7 +475,7 @@ about in this ui.
 
 ```javascript
     setSpeed() {
-      this.$http.put(`${API_URL}/api/speed`, {
+      this.$http.put(`${API_URL}/speed`, {
         left: this.left * 10,
         right: this.right * 10,
       }, { timeout: 200 }).then(null, this.errorHandler);
@@ -458,7 +495,7 @@ occur in the rover - at least from a software configuration point of view.
       this.aPressed = false;
       this.sPressed = false;
       this.dPressed = false;
-      this.$http.put(`${API_URL}/api/reset`).then(null, this.errorHandler);
+      this.$http.put(`${API_URL}/reset`).then(null, this.errorHandler);
     },
 ```
 
@@ -615,8 +652,8 @@ the binaries across.
  install -Dm755 "target/arm-unknown-linux-gnueabihf/release/rover-cli" "${mount}/usr/local/bin/rover-cli"
  install -Dm755 "target/arm-unknown-linux-gnueabihf/release/rover-server" "${mount}/usr/local/bin/rover-server"
  install -Dm755 "src/bin/rover-server.service" "${mount}/etc/systemd/system/rover-server.service"
-+mkdir -p  /srv/rover/ui
-+cp -r ui/dist/* "/srv/rover/ui/"
++mkdir -p  "${mount}/srv/rover/ui"
++cp -r ui/dist/* "${mount}/srv/rover/ui/"
  
  # Prep the chroot
  mount -t proc none ${mount}/proc
