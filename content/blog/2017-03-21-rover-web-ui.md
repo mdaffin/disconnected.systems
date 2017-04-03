@@ -21,8 +21,9 @@ of the rest api we developed in the last post to give us a nice way to
 interactively control the rover. Rather then keeping this to a bare bones
 example we will be building the start of a modern frontend web application that
 will act as a base we can build upon later. For this we are going to look at and
-tie together a few different frontend technologies such as [vue.js](TODO),
-[webpack](TODO) and [concise.css](TODO) and others.
+tie together a few different frontend technologies such as
+[vue.js](https://vuejs.org/), [webpack](https://webpack.js.org/) and
+[concise.css](http://concisecss.com/) and others.
 
 ## Setting Up The Dev Environment And Project
 
@@ -34,9 +35,10 @@ our browser side dependencies in addition to running some tools useful in
 development.
 
 Node.js is the first component we need to install as npm and many other tools
-are based off it. Head over to the [node.js install guide](TODO) and follow the
-instructions for your system. Once done you should have both `nodejs` and `npm`
-installed, verify this with the following.
+are based off it. Head over to the [node.js install
+guide](https://nodejs.org/en/download/) and follow the instructions for your
+system. Once done you should have both `nodejs` and `npm` installed, verify this
+with the following.
 
 ```shell
 node --version
@@ -51,11 +53,6 @@ The only other tool we will need is `vue-cli` which can be install globally with
 ```shell
 npm install -g vue-cli
 ```
-
-TODO
-https://medium.com/codingthesmartway-com-blog/vue-js-2-quickstart-tutorial-2017-246195cfbdd2#.8w94isatl
-https://vuejs-templates.github.io/webpack/
-https://vuejs.org/v2/guide/index.html
 
 Our front end code is going to live inside the `ui` subdirectory of the root of
 our project. `vue-cli` can be used to create this directory with all of the
@@ -88,10 +85,13 @@ vue init webpack ui
 #     npm run dev
 #   
 #   Documentation can be found at https://vuejs-templates.github.io/webpack
-
 ```
 
-Now do what the output tells us
+You can read more about vue-cli
+[here](https://medium.com/codingthesmartway-com-blog/vue-js-2-quickstart-tutorial-2017-246195cfbdd2#.8w94isatl)
+and vue in general [here](https://vuejs.org/v2/guide/index.html).
+
+We can start the dev server by running the following.
 
 ```shell
 cd ui
@@ -126,13 +126,14 @@ running in the background as we develop the site.
 The ui has already been configured with a hole bunch of core dependencies but
 our application will require a few extra ones.
 
-* [Concise CSS]() is a simple css framework that give us a nice
-  looking base theme to start from. It is similar to bootstrap but light weight,
-  simpler and pure css. 
-* [Vue Resources]() is a http client for the vue framework. It is what we will
-  use to make http calls to our backend and handle the responses.
+* [Concise CSS](http://concisecss.com/) is a simple css framework that give us a
+  nice looking base theme to start from. It is similar to bootstrap but light
+  weight, simpler and pure css.
+* [Vue Resources](https://github.com/pagekit/vue-resource) is a http client for
+  the vue framework. It is what we will use to make http calls to our backend
+  and handle the responses.
 
-These dependencies can be installed and added to our `ui/project.json` by
+These dependencies can be installed and added tour `ui/project.json` by
 running.
 
 ```shell
@@ -141,11 +142,13 @@ npm install --save concise-ui
 npm install --save vue-resource
 ```
 
-`vue-cli` has configured webpack to automatically handel and build css files for
-us so all we need to do to is to import them in `ui/src/main.js` and webpack
-will find and concatenate/minify them along with the css from the vue components
-into a single resource when we build the project. We must also register
-`vue-resource` with vue and set some configuration options.
+`vue-cli` has configured webpack to automatically build (ie concatenate and
+minify) css files for us so all we need to do to is to import them in
+`ui/src/main.js` and webpack will find and process them along with the css from
+the vue components into a single resource when we build the project.
+
+We must also register `vue-resource` with vue and set some configuration
+options.
 
 ```diff
  // The Vue build version to load with the `import` command
@@ -173,47 +176,52 @@ environments. We can make use of this to set different api urls for dev and
 production. 
 
 The development environment can be configured with `ui/config/dev.env.js`. We
-default it to the hostname but if zero-conf/avahi is not available in your
-environment replace this with the ip address of the rover.
+add a variable for the base url of our api and default it to the hostname of the
+rover. But if zero-conf/avahi is not available in your environment replace this
+with the ip address of the rover.
 
 ```diff
  var merge = require('webpack-merge')
  var prodEnv = require('./prod.env')
  
  module.exports = merge(prodEnv, {
-+  API_URL: '"http://rpizw-rover.local:3000"',
++  BASE_URL: '"http://rpizw-rover.local:3000"',
    NODE_ENV: '"development"'
  })
 ```
 
-The production environment can be configured with `ui/config/prod.env.js`. We
-set it to an empty string to use a relative url as it will be served the same
-webserver as our api.
+The production environment can be configured with `ui/config/prod.env.js`. Like
+above we also add the base url of our api but set it to an empty string instead.
+This will tell it to use a relative url so we do not need to know how the user
+initially connected to our rover.
 
 ```diff
  module.exports = {
-+  API_URL: '""',
++  BASE_URL: '""',
    NODE_ENV: '"production"'
  }
 ```
 
+Note the double quoted expressions, this is required by the `DefinePlugin` from
+webpack that is setting up these values. You can look inside the build directory
+for exactly how this is setup if you are interested.
+
 ## The Controls Component
 
-This will be our main and for now only functional component. All of its logic
-and styles will live in `ui/src/components/Controls.vue`. Vue components have
-tree main sections.
+This will be our only functional component for now. All of its logic and styles
+will live in `ui/src/components/Controls.vue` and like all vue components it has
+three main sections.
 
 ### Template
 
-The template section contains the html templated code for our component.
+The template section contains the templated html code for our component.
 
-The last error received from the api should be displayed to the user to show
-them what went wrong. This will be done using an alert box from the concise-ui
-framework along with some vue data bindings. The `errorMessage` variable will be
-used to hold any error messages that we wish to display so we bind that inside a
-`<p>` tag. Then we can use a `v-if` to set the element to not be rendered when
-the `errorMessage` is set to `false`. Lastly we create a small close button to
-allow the user to clear the error message when clicked by setting the `errorMessage` variable to `false`.
+If a call to the api, or anything else, goes wrong we want to alert the user to
+this with a nice error message. We do this by creating an alert-box element
+(part of concise-ui) that is visible only when the variable `errorMessage` is
+not false which displays the contents of that variable. This allows us to show
+the error simply by setting that variable when something goes wrong. We hide it
+by adding a close button that simply sets the variable to `false`.
 
 ```html
 <template>
@@ -224,13 +232,16 @@ allow the user to clear the error message when clicked by setting the `errorMess
     </section>
 ```
 
-In the second section we will have all of the controls. Firstly two range
-sliders to show/set the current speed of both the left and right servos. They
-will have a minimum value of `-10` to indicate full reverse and a max of `10`
-for full forwards where `0` is stopped - following our api values. These two
-sliders are then bound to the `left` and `right` variables using `v-model`.
+The rest of our template describes the actual controls we want. First, two range
+sliders to show/set the current speed and direction of both the left and right
+servos. These values are bound to the `left` and `right` variables on our
+component which we will use to send the desired speeds to the rover later. We
+have also adjusted the range from -10 (reverse) to 10 (forward) down from -100
+to 100 as we do not need the full precision in the ui and it makes it slightly
+nicer to set exact speeds, these will be multiplied by 10 before sending the
+request to the rover.
 
-  ```html
+```html
     <section>
       <div class="controls">
         <form>
@@ -248,15 +259,15 @@ sliders are then bound to the `left` and `right` variables using `v-model`.
               </label>
             </div>
           </div>
-  ```
+```
 
-For the last controls we use three buttons, one to start/stop the rover, one to
-enable/disable the rover and one to reset the rover. Both the toggleable buttons
-have their text linked to either the `stopped` or `enabled` variable to ensure
-they display the right text respectively. All the buttons are linked to a
-function when they are clicked, which we will look at in a bit.
+For the rest of the controls we use three buttons, one to start/stop the rover,
+one to enable/disable the rover and one to reset the rover. Both the toggleable
+buttons have their text linked to either the `stopped` or `enabled` variable to
+ensure they display the right text respectively. All the buttons are linked to a
+function when they are clicked, which we will look at in the next section.
 
-  ```html
+```html
           <div>
             <button @click="toggleStopped">
               <span v-if="stopped">Start</span>
@@ -288,7 +299,8 @@ const API_URL = `${process.env.BASE_URL}/api`;
 ```
 
 Vue requires some functions to be exported that it will use to create the
-components. TODO(describe name). 
+components, all of the rest of the functions here are inside this export block.
+The name option gives our component an id vue can use to identify it.
 
 ```javascript
 export default {
@@ -297,7 +309,7 @@ export default {
 
 The data function is called during the component creation to get the default
 variable that the component will contain. We use it to initialize all of the
-variable we require to some sane defaults.
+variable we require to some sane default.
 
 ```javascript
   data() {
@@ -364,12 +376,13 @@ returned errors.
 `calculateSpeeds` is another helper function that sets the speeds of the left
 and right servos based on which current buttons are pressed. It does this by
 adding or subtracting 10 from the left and right speed based on which buttons
-are pressed, then limiting each value to be between -10 and 10. This was if `w`
-is pressed the rover will move at full speed forwards. If `a` is pressed then it
-will rotate on the spot to the left. But if both `w` and `a` are pressed it will
-move in an arc to the left. It does not however call the api at all, only sets
-up the speeds locally. Instead the api will be called periodically and send the
-currently set values which we will see in the `start`/`stop` functions below.
+are pressed, then limiting each value to be between -10 and 10. This means that
+if `w` is pressed the rover will move at full speed forwards. If `a` is pressed
+then it will rotate on the spot to the left. But if both `w` and `a` are pressed
+it will move in an arc to the left. It does not however call the api at all,
+only sets up the speeds locally. Instead the api will be called periodically and
+send the currently set values which we will see in the `start`/`stop` functions
+below.
 
 ```javascript
     calculateSpeeds() {
@@ -411,18 +424,18 @@ currently set values which we will see in the `start`/`stop` functions below.
 ```
 
 The rover will be controlled by periodically sending the currently set speeds to
-it every 50 milliseconds while it is not stopped. We do this instead of simply
-sending one command every time something changes as it gives a more predictable
-number of requests sent and conversely that the rover needs to processes,
-effectively stopping you from overwhelming the rover with a burst of requests if
-you change the speed slider too quickly. It will also lets us build some fail
-safes into the rovers rest api. For example we could get it to auto stop if no
-request has been received in 200 milliseconds due to a connection loss or a
+it every 50 milliseconds while it is not in the stopped state. We do this
+instead of simply sending one command every time something changes as it gives a
+more predictable number of requests per second sent and then processed by the
+rover, effectively stopping you from overwhelming the rover with a burst of
+requests if you change the speed too quickly. It will also lets us build some
+fail safes into the rovers rest api. For example we could get it to auto stop if
+no request has been received in 200 milliseconds due to a connection loss or a
 browser crash. We will however not be looking at that in this post.
 
 There is a trade off with how often we send the commands, slower and it is less
 responsive, faster and it requires more processing to handle all of the
-requests. 50-100 milliseconds gave a good balance between these values but it
+requests. 50-100 milliseconds gave a good balance between these tradeoffs but it
 was noted that the rest api is heaver on the pis cpu then I would have really
 liked. We will looking at more efficient ways to do this in the future for now
 it is good enough for the current task.
@@ -548,7 +561,8 @@ variables to true or false, or calling one off functions and then call the
 The style sections allows us to define any extra css our component needs. We
 define it as `scoped` to limit the css to only the elements we define above
 rather then applying them globally. We only do some basic stuff to anchor the
-controls to the bottom of the page and center them, nothing very exiting.
+controls to the bottom of the page and center them and generally make them look
+nicer.
 
 ```html
 <style scoped>
@@ -575,9 +589,10 @@ main {
 ## The Root Component
 
 The applications root component is located at `ui/src/App.vue` and will hold
-anything we require on all pages of our application - which is currently none.
-So lets remove the logo and custom styling of the default boiler plate that was
-generated for us.
+anything we require on all pages of our application - which is currently
+nothing. So lets remove the logo and custom styling of the default boiler plate
+that was generated for us. We can expand on this later as we develop them
+application in future posts.
 
 ```diff
  <template>
@@ -606,14 +621,14 @@ Note that the `<router-view>` is where our component will be placed by the
 router depending on which page we load. We don't strictly need the router and
 could have just written our component as the root component but this will give
 us more flexibility later should we decide to add more pages or other components
-to the site.
+to the application.
 
 ## The Router
 
 `vue-router` allows us to render different components based on the url of the
 page. We are not strictly taking advantage of this feature yet but will keep it
 in place to make expanding our site easier at a later date. All we require is to
-update the router to tell it about our new component and to use it inplace of
+update the router to tell it about our new component and to use it in place of
 the `Hello` component for the root path `/`. Edit `ui/src/router/index.js` with
 the following changes.
 
@@ -645,8 +660,8 @@ We can now delete `ui/src/components/Hello.vue` as we will no longer require it.
 Finally we can build and package our ui into the image alongside the rest api.
 If you recall from our last post static files will be served from
 `/srv/rover/ui` so all we need to do is copy our built files to that location
-inside the image. This can be done in the `create-image` script where we copy
-the binaries across.
+inside the image. This can be done in the `create-image` script in the same spot
+that we copy the binaries across.
 
 ```diff
  install -Dm755 "target/arm-unknown-linux-gnueabihf/release/rover-cli" "${mount}/usr/local/bin/rover-cli"
@@ -682,31 +697,29 @@ the following.
 
 ## Conclusion
 
-There is now allot of boilerplate in our project that we have not even begun to
-explain. But we now have a solid web application we can start building on top of
-that meets allot of modern web standards and is quite easy to work with.
+We now have a solid foundation to start working from, a nice ui and api to
+manually control our rover allowing us to position/reset it with ease. I would
+like to expand upon this in the future to allow running and uploading of custom
+scripts and programs to preform different dedicated tasks - to give similar
+workflow, in a way, to uploading a sketches to an arduino as well as to
+integrate the view from the pis camera. But in the next few posts I plan to
+start hooking the rover up to some sensors to get it to interact with the world.
+
 Considering this application was not very complex we could have this with a
 simple html page and some simple javascript using jquery but I wanted to take
 this chance to learn more about some of the emerging web technologies that are
-popping up all over the place.
+popping up all over the place and to make it easier to grow the project in the
+future.
 
-Overall I found vue very easy to work with, its simple and has some excellent
+Overall I found vue.js very easy to work with, its simple and has some excellent
 documentation with plenty of examples about. Coupled with webpack makes the
 process very fluid and more familiar to the compiled work flows I am used to.
-Allowing you to have a highly organized source that compiles down to a small and
-clean set of deployable artifacts without a hugely complicated build pipeline -
-something I have always missed when working on browser side code in previous
-projects.
+Allowing you to have a highly organized and loosely coupled source that compiles
+down to a small and clean set of deployable artifacts without needing to set up
+a hugely complicated build pipeline by hand - something I have always missed
+when working on browser side code in previous projects.
 
 Again I have skipped over the unit testing side of the project, not doing so
 would have distracted away from the core concepts of this post and made it far
 to long. I hope to look back at this in a future post, possibly once the
-application has evolved a bit more.
-
-We now have a solid base to start working from, we have a nice ui to manually
-control our rover allowing us to position/reset it with ease. I would like to
-expand upon this in the future to allow running and uploading of custom scripts
-and programs to preform different dedicated tasks - to give similar workflow, in
-a way, to uploading a sketches to an arduino. But in the next few posts I plan
-to start hooking the rover up to some sensors to get it to interact with the
-world.
+application has evolved a bit more beyond the proof of concept stage.
