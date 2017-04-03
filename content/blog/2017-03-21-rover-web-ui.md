@@ -1,7 +1,7 @@
 +++
-date = "2017-03-21T20:20:50Z"
+date = "2017-04-03T18:19:41+01:00"
 title = "Web Interface To Control The Rover"
-draft = true
+draft = false
 description = "Looks at how to build a web interface using vue.js and webpack to control the raspberry pi rover"
 slug = "rover-web-ui"
 tags = ["javascript", "raspberry-pi", "vue.js", "webpack"]
