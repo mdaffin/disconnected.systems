@@ -664,6 +664,22 @@ inside the image. This can be done in the `create-image` script in the same spot
 that we copy the binaries across.
 
 ```diff
+@@ -27,6 +27,11 @@ if [ ! -f "target/arm-unknown-linux-gnueabihf/release/rover-se
+rver" ]; then
+     exit 1
+ fi
+ 
++if [ ! -d "ui/dist" ]; then
++    echo "'ui/dist' not found. Have you run 'cd ui; npm install && npm run build'?"
++    exit 1
++fi
++
+ # Unmount drives and general cleanup on exit, the trap ensures this will always
+ # run execpt in the most extream cases.
+ cleanup() {
+
+ ...
+
  install -Dm755 "target/arm-unknown-linux-gnueabihf/release/rover-cli" "${mount}/usr/local/bin/rover-cli"
  install -Dm755 "target/arm-unknown-linux-gnueabihf/release/rover-server" "${mount}/usr/local/bin/rover-server"
  install -Dm755 "src/bin/rover-server.service" "${mount}/etc/systemd/system/rover-server.service"
