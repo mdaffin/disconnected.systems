@@ -675,7 +675,7 @@ rver" ]; then
 +fi
 +
  # Unmount drives and general cleanup on exit, the trap ensures this will always
- # run execpt in the most extream cases.
+ # run except in the most extreme cases.
  cleanup() {
 
  ...
@@ -739,3 +739,8 @@ Again I have skipped over the unit testing side of the project, not doing so
 would have distracted away from the core concepts of this post and made it far
 to long. I hope to look back at this in a future post, possibly once the
 application has evolved a bit more beyond the proof of concept stage.
+
+You can view the final source code on the
+[v0.5](https://github.com/mdaffin/rpizw-rover/tree/v0.5) branch or download the
+image created from this process
+[here](https://github.com/mdaffin/rpizw-rover/releases/tag/v0.5.0).
