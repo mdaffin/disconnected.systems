@@ -4,7 +4,22 @@ date: 2018-01-19T20:18:17Z
 draft: true
 ---
 
-TODO add intro
+When you use Archlinux for any length of time you start collecting a set of
+[AUR] packages that you frequently use. Now Archlinux has loads of [AUR
+helpers] that make managing packages in AUR painless. Once you start using arch
+on multiple systems it can start to become a pain to rebuild the same package
+on each system. In this post I will show you how to use an Amazon S3 bucket to
+create a cheap, low maintance Archlinux repository as well as making use of the
+aurutils package to make building and upgrading AUR packages a painless
+excersise.
+
+Although everything we are going to do in this post will easly fit inside the
+AWS free tier, it only lasts for 12 months so will start costing eventually.
+Make sure to delete any resources we create once you are done with them to
+avoid an unexpected charge from AWS way in the future. Even without the free
+tier it should only cost no more then a few dollars a month to maintain the
+bucket. You can also use alternitives like Digital Oceans Spaces or Google
+Clouds Bucket or even an existing static file webserver you control.
 
 ## Dependencies
 
@@ -13,11 +28,13 @@ installed from aur and will be the only package we are required to
 build/install manually.
 
 * [aurutils]: a set of utilities that make it easy to manage/update a repo with
-  aur packages
+  aur packages.
 * [s3fs-fuse]: allows us to mount an s3 bucket locally so we can add/update the
-  repo using local tools
-* [repose]: an alternitive to add-repo, but makes updating the repo easier
-* base-devel: needed to build aurutils and other packages
+  repo using local tools.
+* [repose]: an alternitive to add-repo, but makes deploying the repo easier
+  inside a bucket. Aurutils automatically uses repose if it is installed, so we
+  will not explictly use. ^
+* base-devel: needed to build aurutils and other packages.
 
 To install all of these run the following.
 
@@ -47,6 +64,10 @@ gpg --recv-key 6BC26A17B9B7018A
 [aurutils]: https://github.com/AladW/aurutils
 [s3fs-fuse]: https://github.com/s3fs-fuse/s3fs-fuse
 [repose]: https://github.com/vodik/repose
+
+^ The reason we use repose instead of repo-add is because it just works inside
+a bucket, were repo-add creates symlinks which don't always work when served
+via a bucket
 
 ## Creating the Amazon S3 Bucket
 
@@ -105,13 +126,13 @@ have to generate a new key.
 
 Save this key to ~/.passwd-s3fs in the form
 
-```
+```ini
 bucket:access_key:secret_key
 ```
 
 Like the following.
 
-```
+```ini
 mdaffin-arch:AKIAID7W4RGIV46DPSEA:Uuf3GvIhkJodtSgRoxoXUfxgWSNYGA6ekZv/niZK
 ```
 
@@ -179,7 +200,7 @@ repo are uptodate.
 
 For aursync to work we need to add a repo to `/etc/pacman.conf`
 
-```
+```ini
 [mdaffin]
 SigLevel = Optional TrustAll
 Server = https://s3.eu-west-2.amazonaws.com/mdaffin-arch/repo/x86_64/
@@ -222,7 +243,8 @@ mdaffin/aurutils 1.5.3-5 [installed]
 And thats it, you have created a repo inside an amazon s3 bucket. You can add
 more packages to this repo using the aursync command above.
 
-To check for and update all the packages in the repo simply add `-u` to the aursync command.
+To check for and update all the packages in the repo simply add `-u` to the
+aursync command.
 
 ```bash
 aursync --repo mdaffin --root bucket/repo/x86_64 -u
@@ -236,6 +258,45 @@ fusermount -u bucket
 
 [amzon web console]: https://s3.console.aws.amazon.com/s3/home
 
-## Possible pros/cons about amazon s3 and digital ocean, more details about each - pricing etc.
+## Wrapper Script
 
-## Conclusion
+We can automate most of this with a simple wrapper script around aursync.
+Simply save this script somewhere, replace the `BUCKET`, `REPO_PATH` and
+`REPO_NAME` variables with your own and call it like you would aursync:
+`./aursync_wrapper PACKAGE` or `./aursync_wrapper -u`.
+
+```bash
+#!/bin/bash
+# Wraps aursync command to mount an amazon s3 bucket which contains a repository
+set -uo pipefail
+trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
+
+BUCKET=mdaffin-arch
+REPO_PATH=repo/x86_64
+REPO_NAME=mdaffin
+
+exit_cmd=""
+defer() { exit_cmd="$@; $exit_cmd"; }
+trap 'bash -c "$exit_cmd"' EXIT
+
+repo="$(mktemp -d)"
+defer "rmdir '$repo'"
+
+s3fs "${BUCKET}" "$repo" -o "nosuid,nodev,default_acl=public-read"
+defer "fusermount -u '$repo'"
+mkdir -p "$repo/${REPO_PATH}"
+
+aursync --repo "$REPO_NAME" --root "$repo/$REPO_PATH" "$@"
+```
+
+## AWS S3 Alternitives
+
+If you don't wish to use amazon buckets there are some alternitives such as
+[Digital Ocean Spaces] or [Google Cloud Buckets] that can be used inplace. Some
+are comptable with the s3 api and thus can be used with the instructions above
+while others require a different fuse wrapper. For example, if you had your own
+static file web server you could use could use [sshfs] client instead.
+
+[Digital Ocean Spaces]: https://m.do.co/c/8fba3fc95fef
+[Google Cloud Buckets]: https://cloud.google.com/storage/
+[sshfs]: https://github.com/libfuse/sshfs
