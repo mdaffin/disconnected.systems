@@ -1,8 +1,11 @@
----
-title: "Hosting an Archlinux Repo in an Amazon S3 Bucket"
-date: 2018-01-19T20:18:17Z
-draft: true
----
++++
+date = "2018-01-21T11:28:17Z"
+title = "Hosting an Archlinux Repo in an Amazon S3 Bucket"
+draft = false
+description = "How to host an Archlinux repository in an Amazon S3 bucket with aurutils"
+slug = "archlinux-repo-in-aws-bucket"
+tags = ["linux", "automation", "archlinux"]
++++
 
 When you use Archlinux for any length of time you start collecting sets of
 [AUR] packages that you frequently use. Now, Archlinux has loads of [AUR
