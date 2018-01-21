@@ -26,9 +26,9 @@ server.
 
 ## Dependencies
 
-We only require a few packages to get us going, only `aurutils` needs to be
-installed from AUR and will be the only package we are required to
-build/install manually.
+We only require a few packages to get us going of which only `aurutils` needs to
+be installed from AUR. It will be the only package we are required to
+build and install manually.
 
 * [aurutils]: a set of utilities that make it easy to manage/update a repo with
   AUR packages.
@@ -68,9 +68,8 @@ gpg --recv-key 6BC26A17B9B7018A
 [s3fs-fuse]: https://github.com/s3fs-fuse/s3fs-fuse
 [repose]: https://github.com/vodik/repose
 
-^ The reason we use repose instead of repo-add is that it just works inside a
-bucket, were repo-add creates symlinks which don't always work when served via
-a bucket
+*^ We are using `repose` instead of `repo-add` as `repo-add` creates symlinks to
+the database which do not always work inside buckets.*
 
 ## Creating the Amazon S3 Bucket
 
@@ -138,8 +137,6 @@ Like the following.
 ```ini
 mdaffin-arch:AKIAID7W4RGIV46DPSEA:Uuf3GvIhkJodtSgRoxoXUfxgWSNYGA6ekZv/niZK
 ```
-
-*Note that this is not a real key, replace it with your own*
 
 And ensure it is only readable by your user
 
