@@ -6,19 +6,23 @@ draft: true
 
 When you use Archlinux for any length of time you start collecting sets of
 [AUR] packages that you frequently use. Now, Archlinux has loads of [AUR
-helpers] that make managing packages in AUR painless. But when you start using
-arch on multiple systems it becomes annoying to rebuild AUR packages on each
-system. In this post, I will show you how to use an Amazon S3 bucket to create
-a cheap, low maintenance Archlinux repository. As well as making use of the
-aurutils package to make building and upgrading AUR packages a painless
-exercise.
+helpers] that make managing AUR packages painless, but when you start using
+arch on multiple systems it becomes annoying and time consuming to rebuild AUR
+packages on each system. In this post, I will show you how to use an Amazon S3
+bucket to create a cheap, low maintenance Archlinux repository. As well as
+making use of the `aurutils` package to make building and upgrading AUR packages
+a painless exercise.
 
-Although everything we are going to do in this post will fit inside the AWS
-free tier, it only lasts for 12 months. Make sure to delete any resources you
-create once you are done to avoid an unexpected charge from AWS way in the
-future. Even without the free tier, it should only cost no more than a few
-dollars a month to maintain the bucket. You can also use alternatives like
-Digital Oceans Spaces, Google Cloud or a static file web server.
+Although everything we are going to do in this post will fit inside the **AWS
+free tier**, it **only lasts** for **12 months**. Make sure to **delete** any
+**resources** you create once you are done to avoid an **unexpected charge**
+from AWS way in the future. Even without the free tier, it should only cost no
+more than a few dollars a month to maintain the bucket. You can also use
+alternatives like Digital Oceans Spaces, Google Cloud or a static file web
+server.
+
+[AUR]: https://aur.archlinux.org/
+[AUR helpers]: https://wiki.archlinux.org/index.php/AUR_helpers
 
 ## Dependencies
 
