@@ -135,10 +135,10 @@ Keep this key secret as it will give anyone with it the ability to
 create/modify your buckets. If you lose the key or no longer require it then
 head to the user page and remove it from the user.
 
-Save this key to `~/.passwd-s3fs` in the form
+Save it to `~/.passwd-s3fs` in the form
 
 ```ini
-bucket:access_key:secret_key
+bucket_name:access_key:secret_key
 ```
 
 And ensure it is only readable by your user
