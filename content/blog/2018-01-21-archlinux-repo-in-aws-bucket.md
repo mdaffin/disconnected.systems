@@ -105,40 +105,40 @@ After you should have one public bucket listed like so.
 
 ## Access credintials
 
-Under your account select *My Security Credentials*.
+We now need to create an access key that has permissions to edit this bucket.
+We can do this by creating a new restricted user that only have access to the
+Amazon S3 buckets.
 
-![Account Settings](/images/amazon-s3/05-account-settings.png)
+Head over to the [AWS IAM management console] and add a new user. Then enter
+the username and ensure *Programmatic access* check box is selected.
 
-You might get a warning about creating account credentials.
+![Account Name](/images/amazon-s3/05-create-user.png)
 
-![Account Warning](/images/amazon-s3/06-account-warning.png)
+Click Next to head to the permission page then *Attach existing policies
+directly*. Search for *S3* and check *AmazonS3FullAccess*.
 
-This is simply informing you that the credentials we are creating will give
-whoever has them full access to your account. You can create more restricted
-credentials if you want by creating a user and giving it access to the bucket
-we created before. But for simplicity, I am going to stick with the root
-credentials. **Do not upload these credentials anywhere public or insecure**
+![Account Permissions](/images/amazon-s3/06-permissions.png)
 
-Expand the *Access keys* menu and click *Create New Access Key*.
+Click *Next* and on the review page double check it has *Programmatic access*
+and *AmazonS3FullAccess*.
 
-![Create Access Key](/images/amazon-s3/07-create-access-key.png)
+![Account Review](/images/amazon-s3/07-review.png)
 
-This will create an access key for you, make sure you copy it somewhere
-locally, once you close this screen you will lose the secret part of the key
-and will have to generate a new key.
+Click *Create User* to get the access key. Take note of the *Access key ID* as
+well as the *Secret access key*. Ensure you save these somewhere, once you
+leave this page you will not have access to the secret key through the AWS
+console and will have to regenerate a new key.
 
-![Access Key](/images/amazon-s3/08-access-key.png)
+![Account Secret](/images/amazon-s3/08-access-key.png)
 
-Save this key to ~/.passwd-s3fs in the form
+Keep this key secret as it will give anyone with it the ability to
+create/modify your buckets. If you lose the key or no longer require it then
+head to the user page and remove it from the user.
+
+Save this key to `~/.passwd-s3fs` in the form
 
 ```ini
 bucket:access_key:secret_key
-```
-
-Like the following.
-
-```ini
-mdaffin-arch:AKIAID7W4RGIV46DPSEA:Uuf3GvIhkJodtSgRoxoXUfxgWSNYGA6ekZv/niZK
 ```
 
 And ensure it is only readable by your user
