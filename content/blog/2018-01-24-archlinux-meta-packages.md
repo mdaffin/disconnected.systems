@@ -49,3 +49,128 @@ s3fs-fuse 1.80-2
 ```
 
 Here you can see my system has a desktop interface, the Dell XPS additions and is configured for development. Note that there are additional packages as well - but not too many. These are packages which I wanted on this system only, but not on my systems in general. The use of meta-packages helps to keep this list clear and makes it easier to find/remove unused packages. From here I can either chose to add them to a meta-package, remove them or just leave them on this one system.
+
+## Creating a Meta-Package
+
+This is actually really simple, all you require is a PKGBUILD file along with any configs you want. You can read more about the finer details about [createing a package] and [PKGBUILD] file structure which are both worth a read or at least to look up as a refence. I will give a quick example and then talk about somehow to deal with some problematic situations.
+
+So, the first part to creating meta-packages is specifing dependencies, here is a minimal PKGBUILD config 
+
+```bash
+# Maintainer: Michael Daffin <michael@daffin.io>
+pkgname=mdaffin-base
+pkgver=0.0.5
+pkgrel=1
+pkgdesc="Base system configuration for mdaffin systems"
+arch=('any')
+url="https://github.com/mdaffin/arch-repo"
+license=('MIT')
+groups=('mdaffin')
+depends=(
+    # package list
+)
+```
+
+Simply list the packages you want to install with this package in the `depends` block. A good set of packages to start with is the `base` group. But there is a problem - you cannot specify groups of packages as dependencies so we must first expand the group to get a list of packages in that group.
+
+```bash
+ % pacman -Sqg base                                                                                                                       :(
+bash
+bzip2
+coreutils
+cryptsetup
+device-mapper
+dhcpcd
+diffutils
+e2fsprogs
+file
+filesystem
+findutils
+gawk
+gcc-libs
+gettext
+glibc
+grep
+gzip
+inetutils
+iproute2
+iputils
+jfsutils
+less
+licenses
+linux
+logrotate
+lvm2
+man-db
+man-pages
+mdadm
+nano
+netctl
+pacman
+pciutils
+pcmciautils
+perl
+procps-ng
+psmisc
+reiserfsprogs
+s-nail
+sed
+shadow
+sysfsutils
+systemd-sysvcompat
+tar
+texinfo
+usbutils
+util-linux
+vi
+which
+xfsprogs
+```
+
+Then simple sourround all of these with quotes `'`  and include them in the depends list like so;
+
+```bash
+depends=(
+    'bash'
+    'bzip2'
+    'coreutils'
+    'cryptsetup'
+    'device-mapper'
+    ...
+    'which'
+    'xfsprogs'
+)
+```
+
+And there, that's our first meta package. Though it's currently not much more helpful than the base group so go ahead and add any additional packages you want. 
+For example, I have added these (as well as many others) to the list as I use them on all of my system.
+
+```bash
+    'sudo'
+    'neovim'
+    'avahi'
+    'nss-mdns'
+```
+
+Now we have our base packages installed it is time to configure some of them. Some config is very simple, simply add the file as you want it alongside the PKGBUILD then add `sources`, `md5sum` or `sha256sum` and a `package()` sections to  the PKGBUILD config like the following;
+
+```bash
+source=('locale.conf'
+        'vconsole.conf'
+        'sudoers.wheel'
+        'mdaffin-base.sh')
+md5sums=('f6ade2d2d1e9b9313f6a49a7ea7b81ea'
+         '12733d28ff3b5352ea1c3d84b27cd6bd'
+         '52719e50fbbea8255275964ba70aa0a7'
+         '9463e8e19ee914684f7bd5190243aa3f')
+
+package() {
+    install -Dm 0644 locale.conf "$pkgdir/etc/locale.conf"
+    install -Dm 0644 vconsole.conf "$pkgdir/etc/vconsole.conf"
+    install -Dm 0640 sudoers.wheel "$pkgdir/etc/sudoers.d/wheel"
+    install -Dm 0755 mdaffin-base.sh "$pkgdir/etc/profile.d/mdaffin-base.sh"
+}
+```
+
+[creating a package]: https://wiki.archlinux.org/index.php/creating_packages#Meta_packages_and_groups
+[PKGBUILD]: https://wiki.archlinux.org/index.php/PKGBUILD
