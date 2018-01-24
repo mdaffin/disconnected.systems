@@ -21,13 +21,31 @@ In my [last post], I talked about how you can create and maintain a custom Arch 
 [last post]: /blog/archlinux-repo-in-aws-bucket/
 [meta packages]: https://wiki.archlinux.org/index.php/creating_packages#Meta_packages_and_groups
 
-## How Pacman installs packages and basic package structure
+## What are Meta-Packages
 
+This is quite simple, meta-packages a simply packages that install nothing, but depend on other packages. The result of this is that you can install a group of packages at once by installing a single meta-packages. Now Arch Linux has a similar method; package groups, while they serve a similar purpose they are suitably different. This difference is when you add or remove dependencies - groups will not install/remove additional dependencies whereas meta packages will. This is what we want; when we add a dependency we want all our systems to automatically install it when they update.
 
-## Meta-packages: why and how?
+Now, we are going to abuse this concept slightly and not only use them to install groups of packages via dependencies but also to install related system configuration. This is not something `pacman` is really designed to do and results in some hacky workaround which we will discuss below. The end result, however, works very well in practice.
 
-## Some examples problems and hacks
+## Organising Our Meta-Packages
 
-## Building a package and adding to a repo
+We can create as many or as few meta-packages as we require. If you want to configure all of your systems identically you can create a single mega-meta-package that defines all of the dependencies and packages that you want. Or you can bundle up each application with related packages and configs into separate packages. You can even create a hierarchy of packages by depending on other meta packages you have created. This can be useful for creating more complex systems of overrides.
 
-## Conclusion
+For example, I have a set of packages that I install on all of my systems - so I created a meta package `mdaffin-base` to contain these. Note that I will start all my packages with `mdaffin-` to make searching/filtering easier. I can then create a `mdaffin-server` that depends on this base package as well as addition packages that I use on servers while also creating a `mdaffin-desktop` that contains all the packages I use on my desktop systems. This has the advantage that I can update the base package to install or change something on all the system I manage, or add/change something inside my desktop package to only affect my desktop systems.
+
+In spite of this, on each system, I only need to install one package, either `mdaffin-server` or `mdaffin-desktop` and they will both pull in the base configs.  But you can also separate packages orthogonally, for example in addition to the `mdaffin-desktop` I have a `mdaffin-devel` that contains development utilities and tools. This package can be installed alongside, or separately from the main desktop package. This allows me to configure any system for development simply by running `pacman -S mdaffin-develop` but most of my systems do not have to include these. You can also have packages for specific systems, such as my `mdaffin-dell-xps-13` which requires additional packages and configs that are required for my Dell XPS 13 which are not needed on my desktops or other systems.
+
+One major advantage of using meta-packages like this is it is very simple to see how your system is configured with simple `pacman` commands, for example, to see packages that were explicitly installed run the following
+
+```bash
+% pacman -Qe
+hugo 0.34-1
+krita 3.3.3-1
+mdaffin-dell-xps-13 0.0.2-1
+mdaffin-desktop 0.0.9-1
+mdaffin-devel 0.0.3-1
+powertop 2.9-1
+s3fs-fuse 1.80-2
+```
+
+Here you can see my system has a desktop interface, the Dell XPS additions and is configured for development. Note that there are additional packages as well - but not too many. These are packages which I wanted on this system only, but not on my systems in general. The use of meta-packages helps to keep this list clear and makes it easier to find/remove unused packages. From here I can either chose to add them to a meta-package, remove them or just leave them on this one system.
