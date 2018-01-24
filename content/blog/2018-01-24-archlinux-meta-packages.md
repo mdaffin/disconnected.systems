@@ -52,9 +52,9 @@ Here you can see my system has a desktop interface, the Dell XPS additions and i
 
 ## Creating a Meta-Package
 
-This is actually really simple, all you require is a PKGBUILD file along with any configs you want. You can read more about the finer details about [createing a package] and [PKGBUILD] file structure which are both worth a read or at least to look up as a refence. I will give a quick example and then talk about somehow to deal with some problematic situations.
+This is actually really simple, all you require is a PKGBUILD file along with any configs you want. You can read more about the finer details about [createing a package] and [PKGBUILD] file structure, both of which are worth a read or at least to look up as a reference. I will give a quick example and then talk about somehow to deal with some problematic situations.
 
-So, the first part to creating meta-packages is specifing dependencies, here is a minimal PKGBUILD config 
+So, the first part of creating meta-packages is specifying dependencies, here is a minimal PKGBUILD config 
 
 ```bash
 # Maintainer: Michael Daffin <michael@daffin.io>
@@ -127,7 +127,7 @@ which
 xfsprogs
 ```
 
-Then simple sourround all of these with quotes `'`  and include them in the depends list like so;
+Then simple surround all of these with quotes `'`  and include them in the depends list like so;
 
 ```bash
 depends=(
@@ -143,7 +143,8 @@ depends=(
 ```
 
 And there, that's our first meta package. Though it's currently not much more helpful than the base group so go ahead and add any additional packages you want. 
-For example, I have added these (as well as many others) to the list as I use them on all of my system.
+
+For example, I have added these (as well as many others) to the list as I use them on all of my systems.
 
 ```bash
     'sudo'
