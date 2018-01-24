@@ -172,6 +172,13 @@ package() {
     install -Dm 0755 mdaffin-base.sh "$pkgdir/etc/profile.d/mdaffin-base.sh"
 }
 ```
+Here I have four files, `locale.conf`, `vconsole.conf` which contain the basic locale and console settings as described on the ArchWiki. `sudoers.wheel` contains the `sudo` config needed to allow anyone in the `wheel` group access to run any command with `sudo` and `mdaffin-base.sh` which contains extra environment variables and shell configuration which I like to use. 
+
+`locale.conf` and `vconsole.conf` are nice and easy to install as these files do not exist by default and no package in the base group owns or creates them. `sudoers.wheel` and `mdaffin-base.sh` are also trivial to install as both `sudo` and shells are set up to allow packages to extend their config by using config directories, which include any file, or files with particular extensions when they start up.
+
+Note that we do not mark any configs as `configs` in PKGBUILD. This is intentional. Files marked as configs in PKGBUILD are treated specially by pacman and are designed for files which the user might want to edit. As such if they differ from the version that was originally installed pacman will not update/replace them but instead, leave them in place and allow the user to manually update them. For most packages, this is what you want, but for our meta-packages, we don't want the user to customise them - that's the job of the meta-package and this is what allows us to keep all our systems in sync. This is a mild break from how you are meant to design well-rounded packages but we don't really care as these are specific to us and not intended for general use and should not be uploaded to AUR.
+
+
 
 [creating a package]: https://wiki.archlinux.org/index.php/creating_packages#Meta_packages_and_groups
 [PKGBUILD]: https://wiki.archlinux.org/index.php/PKGBUILD
