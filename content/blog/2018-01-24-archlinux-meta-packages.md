@@ -52,7 +52,7 @@ Here you can see my system has a desktop interface, the Dell XPS additions and i
 
 ## Creating a Meta-Package
 
-This is actually really simple, all you require is a PKGBUILD file along with any configs you want. You can read more about the finer details about [createing a package] and [PKGBUILD] file structure, both of which are worth a read or at least to look up as a reference. I will give a quick example and then talk about somehow to deal with some problematic situations.
+This is actually really simple, all you require is a `PKGBUILD` file along with any configs you want. You can read more about the finer details about [createing a package] and [PKGBUILD] file structure, both of which are worth a read or at least to look up as a reference. I will give a quick example and then talk about somehow to deal with some problematic situations.
 
 So, the first part of creating meta-packages is specifying dependencies, here is a minimal PKGBUILD config 
 
@@ -70,6 +70,11 @@ depends=(
     # package list
 )
 ```
+
+[creating a package]: https://wiki.archlinux.org/index.php/creating_packages#Meta_packages_and_groups
+[PKGBUILD]: https://wiki.archlinux.org/index.php/PKGBUILD
+
+### Adding Dependencies
 
 Simply list the packages you want to install with this package in the `depends` block. A good set of packages to start with is the `base` group. But there is a problem - you cannot specify groups of packages as dependencies so we must first expand the group to get a list of packages in that group.
 
@@ -153,6 +158,8 @@ For example, I have added these (as well as many others) to the list as I use th
     'nss-mdns'
 ```
 
+### Adding Config Files
+
 Now we have our base packages installed it is time to configure some of them. Some config is very simple, simply add the file as you want it alongside the PKGBUILD then add `sources`, `md5sum` or `sha256sum` and a `package()` sections to  the PKGBUILD config like the following;
 
 ```bash
@@ -172,13 +179,49 @@ package() {
     install -Dm 0755 mdaffin-base.sh "$pkgdir/etc/profile.d/mdaffin-base.sh"
 }
 ```
+
 Here I have four files, `locale.conf`, `vconsole.conf` which contain the basic locale and console settings as described on the ArchWiki. `sudoers.wheel` contains the `sudo` config needed to allow anyone in the `wheel` group access to run any command with `sudo` and `mdaffin-base.sh` which contains extra environment variables and shell configuration which I like to use. 
 
 `locale.conf` and `vconsole.conf` are nice and easy to install as these files do not exist by default and no package in the base group owns or creates them. `sudoers.wheel` and `mdaffin-base.sh` are also trivial to install as both `sudo` and shells are set up to allow packages to extend their config by using config directories, which include any file, or files with particular extensions when they start up.
 
 Note that we do not mark any configs as `configs` in PKGBUILD. This is intentional. Files marked as configs in PKGBUILD are treated specially by pacman and are designed for files which the user might want to edit. As such if they differ from the version that was originally installed pacman will not update/replace them but instead, leave them in place and allow the user to manually update them. For most packages, this is what you want, but for our meta-packages, we don't want the user to customise them - that's the job of the meta-package and this is what allows us to keep all our systems in sync. This is a mild break from how you are meant to design well-rounded packages but we don't really care as these are specific to us and not intended for general use and should not be uploaded to AUR.
 
+### Overwriting Existing Configs
 
+There is one last bit to managing configs in our meta-packages, unfortunately, this part is a bit of a hack so it is worth talking about how packages work. Anything inside `$pkgdir`, after all of the sections have run, is included in the package and will be installed on the target system as they appear inside `$pkgdir`. All of these files are removed when the package is removed, including during an update, before being replaced by newer versions of the files. Now, you mark certain files as config files, ones that should be backed up and not replaced during an upgrade, by placing them in the `backup` array in `PKGBUILD`.
 
-[creating a package]: https://wiki.archlinux.org/index.php/creating_packages#Meta_packages_and_groups
-[PKGBUILD]: https://wiki.archlinux.org/index.php/PKGBUILD
+Since most packages do not support config directories (where they load any config file inside a directory, such as how shells read all `*.sh` files from `/etc/profile.d`) the only way to configure some packages is to edit the config files owned by a package. Now, `pacman` directly forbids this and for good reason, but we only want to modify config files, the same way a user would modify these files but in an automated way. Given that our meta-packages are designed by you for you and no one else and that these packages are not expected to be uploaded to the AUR or generally used by anyone else it is less of a problem to make them a little hacky. If anyone knows of a better way to achieve this please let me know.
+
+The general idea is to place the config we want alongside the config we want to replace. I am going to take the i3 config as an example. First, we place the config in our package like any other config - next to PKGBUILD, in the `sources` and `md5sum` or `sha256sum` arrays.  Now, i3 places its system config in `/etc/i3/config`, but we cannot overwrite this file directly in `$pkgdir` so let's install it alongside this file in `$pkgdir/etc/i3/mdaffin-desktop-config`. The relevant bits of the `PKGBUILD` becomes:
+
+```bash
+source=('i3-config')
+md5sums=('d9dcd133475af688ed86a879821c9384')
+package() {
+    install -Dm 0644 i3-config "$pkgdir/etc/i3/mdaffin-desktop-config"
+}
+
+```
+
+So far, no hacks, but also this file does not do anything. We could simply instruct the user to copy this file over the actual config - probably something you would/should do in a more official package - but in our case, we want to minimise anything the user has to do to their system. Luckily `pacman` offers a way to run commands during various stages of the install/upgrade process, these are called hooks. And we can use them to automate this copying step. Now since we are only modifying config (aka files in another packages `backup` array) `pacman` will not overwrite them during an upgrade of the official package, but treat it like the user has changed the config themselves.
+
+These hooks are defined in a file, call it whatever you like but they are typically called `package-name.install` and referenced in `PKGBUILD`'s `install` key. So inside your `PKGBUILD` add something like:
+
+```bash
+...
+install=mdaffin-desktop.install
+...
+```
+
+]Then inside `mdaffin-desktop.install` (which should be placed next to the `PKGBUILD` file) add the following hooks.
+
+```bash
+post_install() {
+    post_upgrade
+}
+
+post_upgrade() {
+    cp /etc/i3/mdaffin-desktop-config /etc/i3/config 
+    cp /etc/xdg/termite/mdaffin-desktop.config /etc/xdg/termite/config
+}
+```
