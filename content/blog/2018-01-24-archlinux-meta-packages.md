@@ -226,7 +226,7 @@ post_upgrade() {
 }
 ```
 
-## Starting Services
+### Starting Services
 
 One last common thing we want to do is enable/start services. Typically arch does not auto enable or start services but leaves this up to the user. This is normally nice as it lets you configure them before they start. But we are dropping the config files into the package and don't really want to have to remember all of the services to start/enable.
 
