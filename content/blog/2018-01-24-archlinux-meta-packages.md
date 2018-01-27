@@ -275,3 +275,65 @@ repose --verbose --xz --root="repo/x86_64/" mdaffin
 Now you can install the package as any other package with `pacman` as long as you have your repo added to `/etc/pacman.conf`.
 
 [last post]: /blog/archlinux-repo-in-aws-bucket/
+
+## Git Repo and Scripting the Build
+
+Now we can create meta package and publish them for use lets place these in a git repo (or another version control system if you prefer) and write a wrapper script to make building/uploading the packages even easier. You can find [my repo] on github, feel free to use it as a reference or clone it to create your own but the packages in there are tuned to my liking and so I encourage you to create your own with how you like your systems setup.
+
+Let us start with a new repo.
+
+```bash
+mkdir arch-repo
+cd arch-repo
+git init
+```
+
+I like to put all of my packages inside `pkg/<package name>` to keep them in one place. So let's copy the package we created above to that location
+
+```bash
+mkdir pkg
+cp -r ~/mdaffin-base pkg/mdaffin-base
+```
+
+But there a whole bunch of temporary/generated files we don't want to commit to let's add a gitignore for these.
+
+```bash
+cat <<'EOF' >.gitignore
+*.pkg.tar.xz
+*.tar.gz
+/pkg/**/pkg/
+/pkg/**/src/
+repo/
+*.log
+/root/
+EOF
+```
+
+Now stage these files and check we are not including anything we don't want.
+
+```bash
+% git add .
+% git status
+On branch master
+
+No commits yet
+
+Changes to be committed:
+  (use "git rm --cached <file>..." to unstage)
+
+    new file:   .gitignore
+    new file:   pkg/mdaffin-base/PKGBUILD
+    new file:   pkg/mdaffin-base/locale.conf
+    new file:   pkg/mdaffin-base/mdaffin-base.install
+    new file:   pkg/mdaffin-base/mdaffin-base.sh
+    new file:   pkg/mdaffin-base/sudoers.wheel
+    new file:   pkg/mdaffin-base/vconsole.conf
+```
+
+If anything is listed that you don't want, just add it to the .gitignore and run `git reset <file>`. Repeat until you are happy then commit.
+
+```bash
+git commit -m "My first package"
+```
+
+[my repo]: https://github.com/mdaffin/arch-repo
