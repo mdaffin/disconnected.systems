@@ -243,3 +243,35 @@ post_install() {
 ```
 
 Note that `--now` on a `systemctl enable` causes it to also start the service in addition to enabling it, basically equivalent to `systemctl start` and `systemctl enable` in one command.
+
+## Building the Package
+
+Once you have crafted a package to your liking it is time to build it. This can be done with `makepkg` as anyone who has built a package from AUR should be aware. But instead, I will make use of its lesser-known wrapper `makechrootpkg`. While a little bit involved it does provide a clean build for packages by building them in a fresh chroot environment rather than your host system. The downside is that it takes some prep work and is a little slower. Feel free to continue to use `makepkg` if you want.
+
+To save time on installing a base arch system into each chroot, `makechrootpkg` relies on a prepped root which it copies for each package it builds. We can create this root fs by running `mkarchroot`.
+
+```bash
+mkdir -p ./chroots
+mkarchroot -C /etc/pacman.conf ./chroots/root base-devel
+```
+
+`chroot` is where all of the chroots will live and `root` is the base root fs `makechrootpkg` will use by default. Now while inside our packages directory run `makechrootpkg` and tell it what directory to use for the chroots scratch area.
+
+```bash
+makechrootpkg -cur ./chroots
+```
+
+Once done you will end up with a `*.pkg.tar.xz` package in the current directory just like with `makepkg`.
+
+Lastly, we can install this package into a repo, such as the one I showed you how to create in my [last post] by mounting the repo, copying the package into it and running `repose` to update the package database.
+
+```bash
+mkdir -p repo
+s3fs mdaffin-arch:/repo "repo" -o "nosuid,nodev,default_acl=public-read"
+cp *.pkg.tar.xz "repo/x86_64/"
+repose --verbose --xz --root="repo/x86_64/" mdaffin
+```
+
+Now you can install the package as any other package with `pacman` as long as you have your repo added to `/etc/pacman.conf`.
+
+[last post]: /blog/archlinux-repo-in-aws-bucket/
