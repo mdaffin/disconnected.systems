@@ -225,3 +225,21 @@ post_upgrade() {
     cp /etc/xdg/termite/mdaffin-desktop.config /etc/xdg/termite/config
 }
 ```
+
+## Starting Services
+
+One last common thing we want to do is enable/start services. Typically arch does not auto enable or start services but leaves this up to the user. This is normally nice as it lets you configure them before they start. But we are dropping the config files into the package and don't really want to have to remember all of the services to start/enable.
+
+Now there are a couple of ways to do this, we could create symlinks in the correct places to enable services to start on boot, which can be very handy when you are installing our packages in a chroot on the live cd. But this will not start the services immediately on already running systems, such as if you install an extra package or upgrade a package with a new service you want to enable. It would start on next boot - but that requires a reboot, something I like to avoid where possible.
+
+We can also use the `post_install` hook from the previous section to tell `systemctl` to start and enable the service on the first install, where the user is then free to disable/stop it thereafter. We could also add it to the `post_upgrade` hook to ensure it gets reenabled after an upgrade, or if you add an extra service to a package later on. For example, my desktop package has these in the install script (in addition to the things in the previous section).
+
+```bash
+post_install() {
+    systemctl enable --now sddm
+    systemctl enable --now connman
+    systemctl enable --now avahi-daemon
+}
+```
+
+Note that `--now` on a `systemctl enable` causes it to also start the service in addition to enabling it, basically equivalent to `systemctl start` and `systemctl enable` in one command.
