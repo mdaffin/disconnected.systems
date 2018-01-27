@@ -337,3 +337,59 @@ git commit -m "My first package"
 ```
 
 [my repo]: https://github.com/mdaffin/arch-repo
+
+### The Build Script
+
+The commands above can be wrapped into a helper script to make building and uploading the packages very simple. Here is the script in its entirety;
+
+```bash
+#!/bin/bash
+set -uo pipefail
+trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
+
+exit_cmd=""
+defer() { exit_cmd="$@; $exit_cmd"; }
+trap 'bash -c "$exit_cmd"' EXIT
+
+PACKAGES=${@:-pkg/*}
+CHROOT="$PWD/root"
+
+BUCKET=mdaffin-arch
+REPO_PATH=repo/x86_64
+REPO_NAME=mdaffin
+
+mkdir -p "$CHROOT"
+[[ -d "$CHROOT/root" ]] || mkarchroot -C /etc/pacman.conf $CHROOT/root base base-devel
+
+for package in $PACKAGES; do
+    cd "$package"
+    rm -f *.pkg.tar.xz
+    makechrootpkg -cur $CHROOT
+    cd -
+done
+
+repo="$(mktemp -d)"
+defer "rmdir '$repo'"
+
+s3fs "$BUCKET" "$repo" -o "nosuid,nodev,default_acl=public-read"
+defer "fusermount -u '$repo'"
+
+rsync --ignore-existing -v pkg/*/*.pkg.tar.xz "$repo/$REPO_PATH"
+repose --verbose --xz --root="$repo/$REPO_PATH" "$REPO_NAME"
+```
+
+
+It starts with some boilerplate code which I will skip over, read [this post][bash-strict-mode] for more details about it.
+
+Next is a cleanup helper, again I am not going to talk about it here (but might in a future post if there is interest). All you need to know is that any command added by the `defer` function will be run in reverse order when the program exits for any reason. This ensures we clean up no matter how the program exits.
+
+Some useful variables are then defined, `${@:-pkg/*}` means take all arguments, but if there are none default to `pkg/*`. This allows us to only build a single package, any number of packages but default to all packages if none are supplied. `BUCKET`, `REPO_PATH` and `REPO_NAME` should be changed to match your repo.
+
+We create the chroot directory and init the main root fs if it does not already exist. And then loop over all the packages to build them one at a time, during which we delete all old package files left over from previous builds. This keeps the list of built packages down and ensures we only upload the latest build version.
+
+Lastly, we mount the remote repo to a tempory directory and copy all packages we have built to the repo. We ignore any that already exist in the repo with `--ignore-existing` on the `rsync` command. Packages should be immutable once uploaded to the repo if you want to change a package you should increment its version number which will create a newer non-conflicting package. Ideally we should refuse to build any package that already exists in the repo with the same version and a future version of this may do that but for now, this is good enough. The final command updates the repo database with any packages that were added.
+
+Some of this should look familar from the script we created in the last post. It would be handy to store both of these scripts inside our repo under the `./bin/` directory. I have also created a `shell` script that mounts the repo and drops you in a shell, auto cleaning up after you exit the shell. I found this useful for manually fixing things in the repo as I was developing everything. I will not cover it in this post as the bulk of it has been described above. You can view/download it from [here][shell-wrapper].
+
+[bash-strict-mode]:
+[shell-wrapper]:
