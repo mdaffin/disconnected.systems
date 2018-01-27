@@ -378,7 +378,6 @@ rsync --ignore-existing -v pkg/*/*.pkg.tar.xz "$repo/$REPO_PATH"
 repose --verbose --xz --root="$repo/$REPO_PATH" "$REPO_NAME"
 ```
 
-
 It starts with some boilerplate code which I will skip over, read [this post][bash-strict-mode] for more details about it.
 
 Next is a cleanup helper, again I am not going to talk about it here (but might in a future post if there is interest). All you need to know is that any command added by the `defer` function will be run in reverse order when the program exits for any reason. This ensures we clean up no matter how the program exits.
@@ -389,7 +388,20 @@ We create the chroot directory and init the main root fs if it does not already 
 
 Lastly, we mount the remote repo to a tempory directory and copy all packages we have built to the repo. We ignore any that already exist in the repo with `--ignore-existing` on the `rsync` command. Packages should be immutable once uploaded to the repo if you want to change a package you should increment its version number which will create a newer non-conflicting package. Ideally we should refuse to build any package that already exists in the repo with the same version and a future version of this may do that but for now, this is good enough. The final command updates the repo database with any packages that were added.
 
-Some of this should look familar from the script we created in the last post. It would be handy to store both of these scripts inside our repo under the `./bin/` directory. I have also created a `shell` script that mounts the repo and drops you in a shell, auto cleaning up after you exit the shell. I found this useful for manually fixing things in the repo as I was developing everything. I will not cover it in this post as the bulk of it has been described above. You can view/download it from [here][shell-wrapper].
+Some of this should look familiar from the script we created in the last post. It would be handy to store both of these scripts inside our repo under the ./bin/ directory. I have also created a shell script that mounts the repo and drops you in a shell, auto cleaning up after you exit the shell. I found this useful for manually fixing things in the repo as I was developing everything. I will not cover it in this post as the bulk of it has been described above. You can view/download it from [here][shell-wrapper].
 
 [bash-strict-mode]:
 [shell-wrapper]:
+
+## Summary
+
+
+Now, this is quite a lot of work to set up initially and might not be worth it if you only manage one or two Arch Linux systems that you rarely change. But if you manage multiple systems and want to keep them in sync it can be worth it. Once you have set everything up for the first time tweaks to the packages is much simpler making ongoing maintenance less time consuming than manually ensuring all of your systems have your latest settings.
+
+It is also worth noting that this does not solve the issue of keeping user files in sync. But most of the user files I want to keep in sync also have system level defaults that I can keep in sync instead lowering the number of files I need to manage in my home directory. This works best when you only have one user, or all your users are fine with the same default settings, but they can always override them within their own home directory like you normally would.
+
+There is one last step to make managing multiple Arch Linux systems almost fully automated, the installation process. I will cover that in my next post as this one has become long enough.
+
+Any thoughts, suggestions, problems you have faced, discuss them on this [reddit thread]
+
+[reddit thread]: 
