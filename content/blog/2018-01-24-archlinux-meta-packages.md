@@ -62,9 +62,9 @@ This is a hidden and quite powerful feature of this method. Whereas on most arch
 
 ## Creating a Meta-Package
 
-This is actually really simple, all you require is a `PKGBUILD` file along with any configs you want. You can read more about the finer details about [createing a package] and [PKGBUILD] file structure, both of which are worth a read or at least to look up as a reference. I will give a quick example and then talk about somehow to deal with some problematic situations.
+All you require to build a meta-package is a `PKGBUILD` file along with any configs you want. You can read more about the finer details about [createing a package] and [PKGBUILD] file structure, both of which are worth a read or at least to look up as a reference. I will give a quick example and then talk about somehow to deal with some problematic situations.
 
-So, the first part of creating meta-packages is specifying dependencies, here is a minimal PKGBUILD config 
+So, the first part of creating meta-packages is specifying dependencies, here is a minimal PKGBUILD config. All you need to do is fill in the details with your own and flesh out the dependency list.
 
 ```bash
 # Maintainer: Michael Daffin <michael@daffin.io>
@@ -86,71 +86,25 @@ depends=(
 
 ### Adding Dependencies
 
-Simply list the packages you want to install with this package in the `depends` block. A good set of packages to start with is the `base` group. But there is a problem - you cannot specify groups of packages as dependencies so we must first expand the group to get a list of packages in that group.
+List the packages you want to be installed with this package in the `depends` block, as quoted strings separated by white space (such as a newline). A good set of packages to start with is the `base` group. But there is a problem - you cannot specify groups of packages as dependencies so we must first expand the group to get a list of packages in that group.
 
 ```bash
- % pacman -Sqg base                                                                                                                       :(
+ % pacman -Sqg base
 bash
 bzip2
 coreutils
-cryptsetup
-device-mapper
-dhcpcd
-diffutils
-e2fsprogs
-file
-filesystem
-findutils
-gawk
-gcc-libs
-gettext
-glibc
-grep
-gzip
-inetutils
-iproute2
-iputils
-jfsutils
-less
-licenses
-linux
-logrotate
-lvm2
-man-db
-man-pages
-mdadm
-nano
-netctl
-pacman
-pciutils
-pcmciautils
-perl
-procps-ng
-psmisc
-reiserfsprogs
-s-nail
-sed
-shadow
-sysfsutils
-systemd-sysvcompat
-tar
-texinfo
-usbutils
-util-linux
-vi
+...
 which
 xfsprogs
 ```
 
-Then simple surround all of these with quotes `'`  and include them in the depends list like so;
+Then surround all of these with quotes and include them in the depends list like so.
 
 ```bash
 depends=(
     'bash'
     'bzip2'
     'coreutils'
-    'cryptsetup'
-    'device-mapper'
     ...
     'which'
     'xfsprogs'
@@ -189,6 +143,8 @@ package() {
     install -Dm 0755 mdaffin-base.sh "$pkgdir/etc/profile.d/mdaffin-base.sh"
 }
 ```
+
+**NEEDS MORE WORK, need to see if locale.conf is a problem**
 
 Here I have four files, `locale.conf`, `vconsole.conf` which contain the basic locale and console settings as described on the ArchWiki. `sudoers.wheel` contains the `sudo` config needed to allow anyone in the `wheel` group access to run any command with `sudo` and `mdaffin-base.sh` which contains extra environment variables and shell configuration which I like to use. 
 
@@ -238,11 +194,9 @@ post_upgrade() {
 
 ### Starting Services
 
-One last common thing we want to do is enable/start services. Typically arch does not auto enable or start services but leaves this up to the user. This is normally nice as it lets you configure them before they start. But we are dropping the config files into the package and don't really want to have to remember all of the services to start/enable.
+One last common thing we want to do is enable/start services. Typically, Arch Linux does not auto enable or start services, instead, it leaves this up to the user. This is normally a better approach as it lets you configure them before they are started for the first time. But we are configuring the applications with our meta-packages so why not enable and start the services as well.
 
-Now there are a couple of ways to do this, we could create symlinks in the correct places to enable services to start on boot, which can be very handy when you are installing our packages in a chroot on the live cd. But this will not start the services immediately on already running systems, such as if you install an extra package or upgrade a package with a new service you want to enable. It would start on next boot - but that requires a reboot, something I like to avoid where possible.
-
-We can also use the `post_install` hook from the previous section to tell `systemctl` to start and enable the service on the first install, where the user is then free to disable/stop it thereafter. We could also add it to the `post_upgrade` hook to ensure it gets reenabled after an upgrade, or if you add an extra service to a package later on. For example, my desktop package has these in the install script (in addition to the things in the previous section).
+We can also use the `post_install` hook from the previous section to get `systemctl` to start and enable the service on the first install, where the user is then free to disable/stop it thereafter. We could also add it to the `post_upgrade` hook to ensure it gets reenabled after an upgrade, or if you add an extra service to a package later on. For example, my desktop package has these in the install script (in addition to the things in the previous section).
 
 ```bash
 post_install() {
@@ -252,28 +206,30 @@ post_install() {
 }
 ```
 
-Note that `--now` on a `systemctl enable` causes it to also start the service in addition to enabling it, basically equivalent to `systemctl start` and `systemctl enable` in one command.
+Note that `--now` on a `systemctl enable` causes it to also start the service in addition to enabling it, basically equivalent to `systemctl start` and `systemctl enable` in one command. `systemctl` will also behave correctly inside a chroot environment (such as when pacstraping a system).
 
 ## Building the Package
 
 Once you have crafted a package to your liking it is time to build it. This can be done with `makepkg` as anyone who has built a package from AUR should be aware. But instead, I will make use of its lesser-known wrapper `makechrootpkg`. While a little bit involved it does provide a clean build for packages by building them in a fresh chroot environment rather than your host system. The downside is that it takes some prep work and is a little slower. Feel free to continue to use `makepkg` if you want.
 
-To save time on installing a base arch system into each chroot, `makechrootpkg` relies on a prepped root which it copies for each package it builds. We can create this root fs by running `mkarchroot`.
+To save time on installing a base arch system into each chroot, `makechrootpkg` relies on a preprepared root which it copies for each package it builds. We can create this root fs by running `mkarchroot`.
 
 ```bash
 mkdir -p ./chroots
 mkarchroot -C /etc/pacman.conf ./chroots/root base-devel
 ```
 
-`chroot` is where all of the chroots will live and `root` is the base root fs `makechrootpkg` will use by default. Now while inside our packages directory run `makechrootpkg` and tell it what directory to use for the chroots scratch area.
+`chroot` is where all of the chroots for each of our build environments will live and `root` is the base root fs `makechrootpkg` will use as a base for each environment by default.
+
+While inside our packages directory run `makechrootpkg` and tell it what directory to use for the chroot environments (`-r`).
 
 ```bash
 makechrootpkg -cur ./chroots
 ```
 
-Once done you will end up with a `*.pkg.tar.xz` package in the current directory just like with `makepkg`.
+Once done you will end up with a `<package>-<version>.pkg.tar.xz` package in the current directory just like with `makepkg`.
 
-Lastly, we can install this package into a repo, such as the one I showed you how to create in my [last post] by mounting the repo, copying the package into it and running `repose` to update the package database.
+For the last step we will install this package into a repo, such as the one I showed you how to create in my [last post]. This is done by mounting the repo, copying the package into it and running `repose` to update the package database.
 
 ```bash
 mkdir -p repo
@@ -282,15 +238,13 @@ cp *.pkg.tar.xz "repo/x86_64/"
 repose --verbose --xz --root="repo/x86_64/" mdaffin
 ```
 
-Now you can install the package as any other package with `pacman` as long as you have your repo added to `/etc/pacman.conf`.
+You can install the package as any other package with `pacman` as long as you have your repo added to `/etc/pacman.conf`.
 
 [last post]: /blog/archlinux-repo-in-aws-bucket/
 
 ## Git Repo and Scripting the Build
 
-Now we can create meta package and publish them for use lets place these in a git repo (or another version control system if you prefer) and write a wrapper script to make building/uploading the packages even easier. You can find [my repo] on github, feel free to use it as a reference or clone it to create your own but the packages in there are tuned to my liking and so I encourage you to create your own with how you like your systems setup.
-
-Let us start with a new repo.
+Now that we can create meta-package and publish them for use let's place these in a git repo (or another version control system if you prefer) and write a wrapper script to make building/uploading the packages even easier. You can find [my repo] on github, feel free to use it as a reference or clone it to create your own but the packages in there are tuned to my liking and so I encourage you to create your own with how you like your systems setup.
 
 ```bash
 mkdir arch-repo
@@ -392,13 +346,13 @@ It starts with some boilerplate code which I will skip over, read [this post][ba
 
 Next is a cleanup helper, again I am not going to talk about it here (but might in a future post if there is interest). All you need to know is that any command added by the `defer` function will be run in reverse order when the program exits for any reason. This ensures we clean up no matter how the program exits.
 
-Some useful variables are then defined, `${@:-pkg/*}` means take all arguments, but if there are none default to `pkg/*`. This allows us to only build a single package, any number of packages but default to all packages if none are supplied. `BUCKET`, `REPO_PATH` and `REPO_NAME` should be changed to match your repo.
+Some useful variables are then defined, `${@:-pkg/*}` means take all arguments, but if there are none default to `pkg/*`. This allows us to build a single package, any number of packages or by default all packages. `BUCKET`, `REPO_PATH` and `REPO_NAME` should be changed to match your repo.
 
-We create the chroot directory and init the main root fs if it does not already exist. And then loop over all the packages to build them one at a time, during which we delete all old package files left over from previous builds. This keeps the list of built packages down and ensures we only upload the latest build version.
+We create the chroot directory and init the main root fs if it does not already exist. Then loop over all the packages to build them one at a time with `makechrootpkg`, during which we delete all old package files left over from previous builds. This keeps the list of built packages down and ensures we only upload the latest build version.
 
-Lastly, we mount the remote repo to a tempory directory and copy all packages we have built to the repo. We ignore any that already exist in the repo with `--ignore-existing` on the `rsync` command. Packages should be immutable once uploaded to the repo if you want to change a package you should increment its version number which will create a newer non-conflicting package. Ideally we should refuse to build any package that already exists in the repo with the same version and a future version of this may do that but for now, this is good enough. The final command updates the repo database with any packages that were added.
+Lastly, we mount the remote repo to a tempory directory and copy all packages we have built into the repo. We ignore any that already exist in the repo with `--ignore-existing` on the `rsync` command. Packages should be immutable once uploaded to the repo if you want to change a package you should increment its version number which will create a newer non-conflicting package. Ideally we should refuse to build any package that already exists in the repo with the same version and a future version of this script may do that but for now, this is good enough. The final command updates the repo database with any packages that were added.
 
-Some of this should look familiar from the script we created in the last post. It would be handy to store both of these scripts inside our repo under the ./bin/ directory. I have also created a shell script that mounts the repo and drops you in a shell, auto cleaning up after you exit the shell. I found this useful for manually fixing things in the repo as I was developing everything. I will not cover it in this post as the bulk of it has been described above. You can view/download it from [here][shell-wrapper].
+Some of this should look familiar from the script we created in the last post. It would be handy to store both this script and the `aursync` script from my previous post inside our repo under the ./bin/ directory. I have also created a shell script that mounts the repo and drops you in a shell, auto cleaning up after you exit the shell. I found this useful for manually fixing things in the repo as I was developing everything. I will not cover it in this post as the bulk of it has been described above. You can view/download it [here][shell-wrapper].
 
 [bash-strict-mode]: /blog/another-bash-strict-mode/
 [shell-wrapper]: https://github.com/mdaffin/arch-repo/blob/71c6e07afc0a349b518444f5f383bd9dc44f05e0/bin/shell
