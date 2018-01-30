@@ -1,18 +1,18 @@
 +++
 date = "2018-01-21T11:28:17Z"
-title = "Hosting an Archlinux Repo in an Amazon S3 Bucket"
+title = "Hosting an Arch Linux Repo in an Amazon S3 Bucket"
 draft = false
-description = "How to host an Archlinux repository in an Amazon S3 bucket with aurutils"
+description = "How to host an Arch Linux repository in an Amazon S3 bucket with aurutils"
 slug = "archlinux-repo-in-aws-bucket"
 tags = ["linux", "automation", "archlinux"]
 +++
 
-When you use Archlinux for any length of time you start collecting sets of
-[AUR] packages that you frequently use. Now, Archlinux has loads of [AUR
+When you use Arch Linux for any length of time you start collecting sets of
+[AUR] packages that you frequently use. Now, Arch Linux has loads of [AUR
 helpers] that make managing AUR packages painless, but when you start using
 arch on multiple systems it becomes annoying and time consuming to rebuild AUR
 packages on each system. In this post, I will show you how to use an Amazon S3
-bucket to create a cheap, low maintenance Archlinux repository. As well as
+bucket to create a cheap, low maintenance Arch Linux repository. As well as
 making use of the `aurutils` package to make building and upgrading AUR packages
 a painless exercise.
 
