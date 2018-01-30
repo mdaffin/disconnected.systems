@@ -124,41 +124,32 @@ For example, I have added these (as well as many others) to the list as I use th
 
 ### Adding Config Files
 
-Now we have our base packages installed it is time to configure some of them. Some config is very simple, simply add the file as you want it alongside the PKGBUILD then add `sources`, `md5sum` or `sha256sum` and a `package()` sections to  the PKGBUILD config like the following;
+Adding a config file to a package is done just like any other package except you also add it to the `backup` array in the `PKGBUILD`. This instructs pacman to not replace the file during an upgrade if the user has modified it at all. But we don't want this for our package - we want to treat config files as any other package file to be replaced on an upgrade. We do this to stop the configs from drifting apart at the risk of losing some changes to one system if you don't add those changes back to the package.
+
+Some packages don't drop a default config, while others will read and merge all files inside a certain directory. These types of packages are easy to add configs for, we just add the file to our package and let packman place it in the correct place. To do this place the configs you want next to the `PKGBUILD` and add it to the `sources` array with a corresponding entry in `md5sum` or `sha256sum` (or equivalent) arrays. Then add an `install` line in the `package` function to copy the file to the correct location inside `$pkgdir`, like so:
 
 ```bash
-source=('locale.conf'
-        'vconsole.conf'
+source=('vconsole.conf'
         'sudoers.wheel'
         'mdaffin-base.sh')
-md5sums=('f6ade2d2d1e9b9313f6a49a7ea7b81ea'
-         '12733d28ff3b5352ea1c3d84b27cd6bd'
+md5sums=('12733d28ff3b5352ea1c3d84b27cd6bd'
          '52719e50fbbea8255275964ba70aa0a7'
          '9463e8e19ee914684f7bd5190243aa3f')
 
 package() {
-    install -Dm 0644 locale.conf "$pkgdir/etc/locale.conf"
     install -Dm 0644 vconsole.conf "$pkgdir/etc/vconsole.conf"
     install -Dm 0640 sudoers.wheel "$pkgdir/etc/sudoers.d/wheel"
     install -Dm 0755 mdaffin-base.sh "$pkgdir/etc/profile.d/mdaffin-base.sh"
 }
 ```
 
-**NEEDS MORE WORK, need to see if locale.conf is a problem**
-
-Here I have four files, `locale.conf`, `vconsole.conf` which contain the basic locale and console settings as described on the ArchWiki. `sudoers.wheel` contains the `sudo` config needed to allow anyone in the `wheel` group access to run any command with `sudo` and `mdaffin-base.sh` which contains extra environment variables and shell configuration which I like to use. 
-
-`locale.conf` and `vconsole.conf` are nice and easy to install as these files do not exist by default and no package in the base group owns or creates them. `sudoers.wheel` and `mdaffin-base.sh` are also trivial to install as both `sudo` and shells are set up to allow packages to extend their config by using config directories, which include any file, or files with particular extensions when they start up.
-
-Note that we do not mark any configs as `configs` in PKGBUILD. This is intentional. Files marked as configs in PKGBUILD are treated specially by pacman and are designed for files which the user might want to edit. As such if they differ from the version that was originally installed pacman will not update/replace them but instead, leave them in place and allow the user to manually update them. For most packages, this is what you want, but for our meta-packages, we don't want the user to customise them - that's the job of the meta-package and this is what allows us to keep all our systems in sync. This is a mild break from how you are meant to design well-rounded packages but we don't really care as these are specific to us and not intended for general use and should not be uploaded to AUR.
-
 ### Overwriting Existing Configs
 
-There is one last bit to managing configs in our meta-packages, unfortunately, this part is a bit of a hack so it is worth talking about how packages work. Anything inside `$pkgdir`, after all of the sections have run, is included in the package and will be installed on the target system as they appear inside `$pkgdir`. All of these files are removed when the package is removed, including during an update, before being replaced by newer versions of the files. Now, you mark certain files as config files, ones that should be backed up and not replaced during an upgrade, by placing them in the `backup` array in `PKGBUILD`.
+However, most packages drop a default config file to give the users a base to start editing and do not support config directories. These are problematic as pacman will not allow us to simply install our config over them. Unfotinuatly pacman has no nice way around this limitation but there is a slightly hacky way to work around the problem using pacman's hooks.
 
-Since most packages do not support config directories (where they load any config file inside a directory, such as how shells read all `*.sh` files from `/etc/profile.d`) the only way to configure some packages is to edit the config files owned by a package. Now, `pacman` directly forbids this and for good reason, but we only want to modify config files, the same way a user would modify these files but in an automated way. Given that our meta-packages are designed by you for you and no one else and that these packages are not expected to be uploaded to the AUR or generally used by anyone else it is less of a problem to make them a little hacky. If anyone knows of a better way to achieve this please let me know.
+Instead of dropping the config file directly into place, we can drop it alongside the existing file, that way we get no conflict in the packages. Then we can use the `post_install` and `post_upgrade` hooks to copy our config into place. The downside of this approach is that pacman does not own or manage the lifecycle of this file, at least not directly - it will still treat it as a config file for the original package. To be backed up or removed upon the removal of the original package. It will also not be reverted when we remove our package but this can be worked around by using the `post_install` hook to backup the original config and the `pre_remove` hook to restore it if you desire. If anyone knows of a better solution to this please let me know.
 
-The general idea is to place the config we want alongside the config we want to replace. I am going to take the i3 config as an example. First, we place the config in our package like any other config - next to PKGBUILD, in the `sources` and `md5sum` or `sha256sum` arrays.  Now, i3 places its system config in `/etc/i3/config`, but we cannot overwrite this file directly in `$pkgdir` so let's install it alongside this file in `$pkgdir/etc/i3/mdaffin-desktop-config`. The relevant bits of the `PKGBUILD` becomes:
+Let's take a look at how I did this with my i3 config file in my `mdaffin-desktop` package. First, we install the config file like we did in the previous section, but this time next to the original config.
 
 ```bash
 source=('i3-config')
@@ -169,17 +160,16 @@ package() {
 
 ```
 
-So far, no hacks, but also this file does not do anything. We could simply instruct the user to copy this file over the actual config - probably something you would/should do in a more official package - but in our case, we want to minimise anything the user has to do to their system. Luckily `pacman` offers a way to run commands during various stages of the install/upgrade process, these are called hooks. And we can use them to automate this copying step. Now since we are only modifying config (aka files in another packages `backup` array) `pacman` will not overwrite them during an upgrade of the official package, but treat it like the user has changed the config themselves.
+Then we define the hooks in a separate install file, which is a bash script with at least one of the following functions defined.
 
-These hooks are defined in a file, call it whatever you like but they are typically called `package-name.install` and referenced in `PKGBUILD`'s `install` key. So inside your `PKGBUILD` add something like:
+* `pre_install()` - runs before the package contents are installed the first time the package is installed
+* `post_install()` - after the package contents are installed the first time the package is installed
+* `pre_upgrade()` - before the package contents are installed when a package is being upgraded
+* `post_upgrade()` - after the package contents are installed when a package is being upgraded
+* `pre_remove()` - before the package contents are removed when a package is being removed
+* `post_remove()` - after the package contents are removed when a package is being removed
 
-```bash
-...
-install=mdaffin-desktop.install
-...
-```
-
-]Then inside `mdaffin-desktop.install` (which should be placed next to the `PKGBUILD` file) add the following hooks.
+Let's call this file `mdaffin-desktop.install`, once again place it next to the `PKGBUILD` file. It can be called whatever you want but `<package-name>.install` is done by convention.
 
 ```bash
 post_install() {
@@ -188,9 +178,18 @@ post_install() {
 
 post_upgrade() {
     cp /etc/i3/mdaffin-desktop-config /etc/i3/config 
-    cp /etc/xdg/termite/mdaffin-desktop.config /etc/xdg/termite/config
 }
 ```
+
+This copies the file from the file that was dropped by the package, to its live location during an upgrade or install. Next, we need to tell makepkg about this install file by adding the following to `PKGBUILD`.
+
+```bash
+...
+install=mdaffin-desktop.install
+...
+```
+
+This will tell makepkg to include this install script in the package and pacman will run the relevant functions during an install or upgrade of the package.
 
 ### Starting Services
 
@@ -287,7 +286,6 @@ Changes to be committed:
 
     new file:   .gitignore
     new file:   pkg/mdaffin-base/PKGBUILD
-    new file:   pkg/mdaffin-base/locale.conf
     new file:   pkg/mdaffin-base/mdaffin-base.install
     new file:   pkg/mdaffin-base/mdaffin-base.sh
     new file:   pkg/mdaffin-base/sudoers.wheel
@@ -359,8 +357,7 @@ Some of this should look familiar from the script we created in the last post. I
 
 ## Summary
 
-
-Now, this is quite a lot of work to set up initially and might not be worth it if you only manage one or two Arch Linux systems that you rarely change. But if you manage multiple systems and want to keep them in sync it can be worth it. Once you have set everything up for the first time tweaks to the packages is much simpler making ongoing maintenance less time consuming than manually ensuring all of your systems have your latest settings.
+Now, this is quite a lot of work to set up initially and might not be worth it if you only manage one or two Arch Linux systems that you rarely change. But if you manage multiple systems and want to keep them in sync it can be worth the effort. Once you have set everything up for the first time tweaks to the packages are much simpler to make and ongoing maintenance less time consuming than manually ensuring all of your systems have your latest settings.
 
 It is also worth noting that this does not solve the issue of keeping user files in sync. But most of the user files I want to keep in sync also have system level defaults that I can keep in sync instead lowering the number of files I need to manage in my home directory. This works best when you only have one user, or all your users are fine with the same default settings, but they can always override them within their own home directory like you normally would.
 
