@@ -28,7 +28,7 @@ My ultimate goal is to find a way to automatically install Arch Linux on a syste
 [SaltStack]: https://saltstack.com/
 [salt-arch]: https://github.com/mdaffin/salt-arch
 [last post]: /blog/archlinux-repo-in-aws-bucket/
-[meta-packages]: https://wiki.archlinux.org/index.php/creating_packages#Meta_packages_and_groups
+[meta-packages]: https://wiki.archlinux.org/index.php/creating_packages
 
 ## What are Meta-Packages
 
