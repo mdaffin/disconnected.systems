@@ -158,6 +158,8 @@ And ensure it is only readable by your user
 chmod 0600 ~/.passwd-s3fs
 ```
 
+[AWS IAM management console]: https://console.aws.amazon.com/iam/home#/users
+
 ## Mounting the Bucket
 
 Amazon S3 Buckets can be mounted locally with the [s3fs-fuse] utilities. This
@@ -275,7 +277,7 @@ Finally, when you are done unmount the bucket with `fusermount`.
 fusermount -u bucket
 ```
 
-[amzon web console]: https://s3.console.aws.amazon.com/s3/home
+[amazon web console]: https://s3.console.aws.amazon.com/s3/home
 
 ## Wrapper Script
 
