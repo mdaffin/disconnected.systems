@@ -7,16 +7,14 @@ slug = "archlinux-meta-packages"
 tags = ["linux", "automation", "archlinux"]
 +++
 
-In this three-part series, I will show you one way to simplify and manage
-multiple Arch Linux systems using a custom repo, packages and installer. Each
-part is can be used by its self, but they are designed to build upon and
-complement each other.
+In this three-part series, I will show you one way to simplify and manage multiple Arch Linux systems using a custom repo, a set of meta-packages and a scripted installer. Each part is standalone and can be used by its self, but they are designed to build upon and complement each other each focusing on a different part of the problem.
 
 - **Part 1:** [Hosting an Arch Linux Repo in an Amazon S3 Bucket]
 - **Part 2:** *Managing Arch Linux with Meta Packages*
-- **Part 3:** Creating a Custom Arch Linux Installer (not yet released)
+- **Part 3:** [Creating a Custom Arch Linux Installer]
 
 [Hosting an Arch Linux Repo in an Amazon S3 Bucket]: /blog/archlinux-repo-in-aws-bucket
+[Creating a Custom Arch Linux Installer]: /blog/archlinux-installer
 
 I really enjoy Arch Linux for its customisation - you can truly make it *your* own. But while crafting your system exactly how you want it once can be a fun and rewarding experience, repeating this process on multiple computers becomes tedious. Worst, it very easily leads to inconsistencies between each system as you forget things that you configured or as you slowly evolve your configs on each system you set up. The more systems you manage the worst this problem becomes.
 

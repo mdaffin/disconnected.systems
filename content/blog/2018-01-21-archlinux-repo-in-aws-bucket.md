@@ -8,15 +8,17 @@ tags = ["linux", "automation", "archlinux"]
 +++
 
 In this three-part series, I will show you one way to simplify and manage
-multiple Arch Linux systems using a custom repo, packages and installer. Each
-part is can be used by its self, but they are designed to build upon and
-complement each other.
+multiple Arch Linux systems using a custom repo, a set of meta-packages and a
+scripted installer. Each part is standalone and can be used by its self, but
+they are designed to build upon and complement each other each focusing on a
+different part of the problem.
 
 - **Part 1:** *Hosting an Arch Linux Repo in an Amazon S3 Bucket*
 - **Part 2:** [Managing Arch Linux with Meta Packages]
-- **Part 3:** Creating a Custom Arch Linux Installer (not yet released)
+- **Part 3:** [Creating a Custom Arch Linux Installer]
 
 [Managing Arch Linux with Meta Packages]: /blog/archlinux-meta-packages
+[Creating a Custom Arch Linux Installer]: /blog/archlinux-installer
 
 When you use Arch Linux for any length of time you start collecting sets of
 [AUR] packages that you frequently use. Now, Arch Linux has loads of [AUR
