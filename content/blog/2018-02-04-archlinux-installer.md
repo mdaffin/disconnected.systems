@@ -380,3 +380,7 @@ Now you have fully automated the Arch Linux install process, and when combined w
 You can even take this a step further and bake the installer into a [custom arch iso][archiso]. But I did not find this worth the effort unless you want to automate the installation of Arch Linux on multiple identical systems, such as running Arch with a kiosk browser on a bunch of monitors.
 
 [archiso]: https://wiki.archlinux.org/index.php/archiso
+
+[Discuss on Reddit]
+
+[Discuss on Reddit]: https://www.reddit.com/r/archlinux/comments/7v7g4w/managing_multiple_arch_linux_systems_with/
