@@ -374,6 +374,6 @@ Now, this is quite a lot of work to set up initially and might not be worth it i
 
 It is also worth noting that this does not solve the issue of keeping user files in sync. But most of the user files I want to keep in sync also have system level defaults that I can keep in sync instead lowering the number of files I need to manage in my home directory. This works best when you only have one user, or all your users are fine with the same default settings, but they can always override them within their own home directory like you normally would.
 
-[Discuss on Reddit]
+*[Discuss on Reddit]*
 
 [Discuss on Reddit]: https://www.reddit.com/r/archlinux/comments/7v7g4w/managing_multiple_arch_linux_systems_with/
