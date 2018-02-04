@@ -196,6 +196,9 @@ EOF
 
 The last thing we need to do is configure the system. This stage is quite short for my systems as most of the work is done by the meta-packages that I created in [part 2]. If you choose not to use meta-packages then expand this as much as you require. You can automate the configuration of your entire set up if you want to or bootstrap configuration managers like [SaltStack] or [Ansible] if you want to get really fancy.
 
+[SaltStack]: https://saltstack.com/
+[Ansible]: https://www.ansible.com/
+
 At a minimum run `genfstab`
 
 ```bash
