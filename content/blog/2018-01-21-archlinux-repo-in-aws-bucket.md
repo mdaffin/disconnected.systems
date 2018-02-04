@@ -324,6 +324,6 @@ static file web server you could use could use [sshfs] client instead.
 [Google Cloud Buckets]: https://cloud.google.com/storage/
 [sshfs]: https://github.com/libfuse/sshfs
 
-[Discuss on Reddit]
+*[Discuss on Reddit]*
 
 [Discuss on Reddit]: https://www.reddit.com/r/archlinux/comments/7v7g4w/managing_multiple_arch_linux_systems_with/
