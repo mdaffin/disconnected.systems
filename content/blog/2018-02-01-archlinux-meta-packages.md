@@ -368,6 +368,14 @@ Some of this should look familiar from the script we created in the last post. I
 [bash-strict-mode]: /blog/another-bash-strict-mode/
 [shell-wrapper]: https://github.com/mdaffin/arch-repo/blob/71c6e07afc0a349b518444f5f383bd9dc44f05e0/bin/shell
 
+## Example Config Meta-Packages
+
+Here are some examples of system config meta packages that others have created:
+
+- [mdaffin/arch-repo](https://github.com/mdaffin/arch-repo/tree/master/pkg/desktop)
+- [Earnestly/pkgbuilds](https://github.com/Earnestly/pkgbuilds/tree/master/system-config)
+- [Foxboron/PKGBUILDS](https://github.com/Foxboron/PKGBUILDS/tree/master/foxboron-system)
+
 ## Summary
 
 Now, this is quite a lot of work to set up initially and might not be worth it if you only manage one or two Arch Linux systems that you rarely change. But if you manage multiple systems and want to keep them in sync it can be worth the effort. Once you have set everything up for the first time tweaks to the packages are much simpler to make and ongoing maintenance less time consuming than manually ensuring all of your systems have your latest settings.
