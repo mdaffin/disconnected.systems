@@ -1,0 +1,18 @@
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    
+    
+        <url>
+            <loc>http://127.0.0.1:1111/</loc>
+        </url>
+    
+    
+        <url>
+            <loc>http://127.0.0.1:1111/categories/</loc>
+        </url>
+    
+    
+        <url>
+            <loc>http://127.0.0.1:1111/tags/</loc>
+        </url>
+    
+</urlset>

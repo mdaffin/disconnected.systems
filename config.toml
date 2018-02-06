@@ -1,11 +1,7 @@
-baseurl = "//disconnected.systems"
-title = "Disconnected Systems"
-languageCode = "en-gb"
+base_url = "https://disconnected.systems"
 
-pygmentsStyle = "monokai"
-pygmentsUseClasses = true
-PygmentsCodeFences = true
+compile_sass = true
+highlight_code = true
 
-googleAnalytics = "UA-57006875-2"
-
-disqusShortname = "disconsys"
+[extra]
+author = "Michael Daffin"
