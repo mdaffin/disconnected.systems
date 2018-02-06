@@ -3,19 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="description" content="">
-  <meta name="author" content="">
+  <meta name="author" content="{{ config.extra.author }}">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="HandheldFriendly" content="True">
   <meta name="MobileOptimized" content="320">
-  <meta name="author" content="{{ config.extra.author }}">
   <base href="{{ config.base_url }}">
   <link rel="icon" type="image/png" href="/images/favicon.png">
-  <link href="//fonts.googleapis.com/css?family=Open+Sans|Russo+One" rel="stylesheet">
-  <link rel="stylesheet" type="text/css" media="screen" href="/css/concise.min.css" />
-  <link rel="stylesheet" href="/css/monokai.css">
-  <link rel="stylesheet" href="/css/custom.css">
+  <link rel="stylesheet" href="{{ get_url(path="main.css") }}">
+  <link rel="stylesheet" href='https://fonts.googleapis.com/css?family=Lato:400,700,300' type='text/css'>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
   <title>{% block title %}{{ config.title }}{% endblock title %}</title>
 </head>
 <body>
+    <h1>Hello</h1>
 </body>
 </html>
