@@ -6,3 +6,12 @@ $desktop: 769px + (2 * $gap);
 $widescreen: 769px + (2 * $gap);
 $fullhd: 769px + (2 * $gap);
 @import "vendor/bulma-0.6.2/bulma";
+
+
+.media-content a {
+    color: $text;
+}
+
+.media-content a :hover {
+    color: $link;
+}

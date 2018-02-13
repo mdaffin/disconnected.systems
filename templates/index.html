@@ -55,6 +55,7 @@
                 </nav>
             </div>
         </section>
+
         {% block content %}
         <section class="section">
             <div class="container">
@@ -62,8 +63,26 @@
                     {% set blog = get_section(path="blog/_index.md") %}
                     {% for page in blog.pages %}
                     {% if page.date %}
-                    <article class="post">
-                        <h3 class="post__title"><a href="{{ page.permalink }}">{{ page.title }}</a></h3>
+                    <article class="media">
+                        <figure class="media-left">
+                            <a href="{{ page.permalink }}">
+                                <p class="image is-64x64">
+                                {% if page.extra.thumbnail %}
+                                <img src="{{ page.extra.thumbnail }}">
+                                {% endif %}
+                                </p>
+                            </a>
+                        </figure>
+                        <div class="media-content">
+                            <a href="{{ page.permalink }}">
+                                <p>
+                                <strong>{{ page.title }}</strong> <small><em>{{ page.date | date(format="%e %b %Y") }}</em></small>
+                                <br>
+
+                                {{ page.description }}
+                                </p>
+                            </a>
+                        </div>
                     </article>
                     {% endif %}
                     {% endfor %}
@@ -71,5 +90,21 @@
             </div>
         </section>
         {% endblock content %}
+
+        <footer class="footer">
+            <div class="container">
+                <div class="content has-text-centered">
+                    <p>Found an issue? Report it <a href="https://gitlab.com/mdaffin/mdaffin.gitlab.io/issues">here</a>.</p>
+                    <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+                        <img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
+                    </a>
+                    <p>Disconnected Systems by Michael Daffin.
+                    Site content is licensed under
+                    <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+                        Creative Commons Attribution-ShareAlike 4.0 International License
+                    </a>.</p>
+                </div>
+            </div>
+        </footer>
     </body>
 </html>
