@@ -5,8 +5,19 @@ $tablet: 769px;
 $desktop: 769px + (2 * $gap);
 $widescreen: 769px + (2 * $gap);
 $fullhd: 769px + (2 * $gap);
-@import "vendor/bulma-0.6.2/bulma";
 
+@import "vendor/bulma-0.6.2/sass/utilities/_all";
+@import "vendor/bulma-0.6.2/sass/base/_all";
+@import "vendor/bulma-0.6.2/sass/elements/container";
+@import "vendor/bulma-0.6.2/sass/elements/content";
+@import "vendor/bulma-0.6.2/sass/elements/image";
+@import "vendor/bulma-0.6.2/sass/elements/title";
+@import "vendor/bulma-0.6.2/sass/elements/icon";
+@import "vendor/bulma-0.6.2/sass/elements/other";
+@import "vendor/bulma-0.6.2/sass/components/media";
+@import "vendor/bulma-0.6.2/sass/components/navbar";
+@import "vendor/bulma-0.6.2/sass/grid/columns";
+@import "vendor/bulma-0.6.2/sass/layout/_all";
 
 .media-content a {
     color: $text;
