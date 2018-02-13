@@ -1,20 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="description" content="">
-  <meta name="author" content="{{ config.extra.author }}">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="HandheldFriendly" content="True">
-  <meta name="MobileOptimized" content="320">
-  <base href="{{ config.base_url }}">
-  <link rel="icon" type="image/png" href="/images/favicon.png">
-  <link rel="stylesheet" href="{{ get_url(path="main.css") }}">
-  <link rel="stylesheet" href='https://fonts.googleapis.com/css?family=Lato:400,700,300' type='text/css'>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
-  <title>{% block title %}{{ config.title }}{% endblock title %}</title>
-</head>
-<body>
-    <h1>Hello</h1>
-</body>
+    <head>
+        <meta charset="utf-8">
+        <meta name="description" content="">
+        <meta name="author" content="{{ config.extra.author }}">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <base href="{{ config.base_url }}">
+        <link rel="icon" type="image/png" href="/images/favicon.png">
+        <link rel="stylesheet"
+              href="{{ get_url(path="main.css") }}">
+        <script defer
+              src="https://use.fontawesome.com/releases/v5.0.0/js/all.js"></script>
+        <link rel="stylesheet"
+              href='https://fonts.googleapis.com/css?family=Lato:400,700,300'
+              type='text/css'>
+        <title>{% block tab_title %}{{ config.title }}{% endblock tab_title %}</title>
+        <script defer src="https://cdn.jsdelivr.net/npm/vue"></script>
+    </head>
+    <body>
+        <section class="hero is-dark">
+            <div class="hero-body">
+                <div class="container">
+                    {% block header_title %}
+                    <h1 class="title">
+                        {{ config.title }}
+                    </h1>
+                    <h2 class="subtitle">
+                        {{ config.extra.tagline }}
+                    </h2>
+                    {% endblock header_title %}
+                </div>
+            </div>
+            <div class="hero-foot">
+                <nav class="tabs">
+                    <div class="container">
+                        <ul>
+                            <li class="is-active">
+                                <a href="{{ get_url(path="") }}">Blog</a>
+                            </li>
+                            <li>
+                                <a href="https://github.com/mdaffin">
+                                    <span class="icon"><i class="fab fa-github fa-lg"></i></span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://gitlab.com/mdaffin">
+                                    <span class="icon"><i class="fab fa-gitlab fa-lg"></i></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </section>
+        {% block content %}
+        <section class="section">
+            <div class="container">
+                <div class="list-posts">
+                    {% set blog = get_section(path="blog/_index.md") %}
+                    {% for page in blog.pages %}
+                    {% if page.date %}
+                    <article class="post">
+                        <h3 class="post__title"><a href="{{ page.permalink }}">{{ page.title }}</a></h3>
+                    </article>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        {% endblock content %}
+    </body>
 </html>

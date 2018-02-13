@@ -1,7 +1,9 @@
 base_url = "https://disconnected.systems"
+title = "Disconnected Systems"
 
 compile_sass = true
 highlight_code = true
 
 [extra]
 author = "Michael Daffin"
+tagline = "Programming, Linux and all things Open Source"

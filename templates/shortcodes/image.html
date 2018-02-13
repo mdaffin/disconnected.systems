@@ -1,0 +1,12 @@
+{% set url = src %}
+<div class="columns">
+    <div class="column"></div>
+    <div class="column is-three-quarters">
+        <a href="{{ url }}">
+            <figure class='image'>
+                <img src='{{ url }}' {% if title %}alt='{{ title }}' title='{{title}}'{% endif %}>
+            </figure>
+        </a>
+    </div>
+    <div class="column"></div>
+</div>

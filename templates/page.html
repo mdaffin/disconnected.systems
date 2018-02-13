@@ -1,0 +1,26 @@
+{% extends "index.html" %}
+
+{% block tab_title %}
+{{ page.title }} - {{ config.title }}
+{% endblock tab_title %}
+
+{% block header_title %}
+<h1 class="title">
+    {{ page.title }}
+</h1>
+<h2 class="subtitle">
+    {{ page.date | date(format="%e %b %Y") }}
+</h2>
+{% endblock header_title %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="content">
+            <article>
+                {{ page.content | safe }}
+            </article>
+        </div>
+    </div>
+</section>
+{% endblock content %}

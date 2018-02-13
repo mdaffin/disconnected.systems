@@ -1,1 +1,8 @@
-@import 'vendor/sierra/sierra';
+@charset "utf-8";
+
+@import "vendor/bulma-0.6.2/sass/utilities/initial-variables";
+$tablet: 769px;
+$desktop: 769px + (2 * $gap);
+$widescreen: 769px + (2 * $gap);
+$fullhd: 769px + (2 * $gap);
+@import "vendor/bulma-0.6.2/bulma";
