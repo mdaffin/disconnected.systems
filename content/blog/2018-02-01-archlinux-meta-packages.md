@@ -38,7 +38,7 @@ Now, we are going to abuse this concept slightly and not only use them to instal
 
 You can create as many or as few meta-packages as you require. The more you have, the more there is to maintain. The less you have the less flexible they become. How many you require depends on your needs but I recommend starting with few large packages that do the bulk of the work that is common to all or most of your systems. Then create smaller more specific ones, that depends on these more general ones.
 
-For example, I have [`mdaffin-base`] that contains everything that I require on all of my systems. Then [`mdaffin-desktop`] for any system that needs a desktop interface, such as my desktops and laptops. This package depends on `mdaffin-base` so I still only have one package to install. But then I have a [`mdaffin-dell-xps-13`] which contains very specific settings only useful on my laptop. This, in turn, depends on [`mdaffin-desktop`].
+For example, I have [`mdaffin-base`] that contains everything that I require on all of my systems. Then [`mdaffin-desktop`] for any system that needs a desktop interface, such as my desktops and laptops. This package depends on [`mdaffin-base`] so I still only have one package to install. But then I have a [`mdaffin-dell-xps-13`] which contains very specific settings only useful on my laptop. This, in turn, depends on [`mdaffin-desktop`].
 
 Separate to this I have [`mdaffin-devel`] package that contains a whole bunch of development tools and languages that I commonly use and want on any system that I do development on. Changing a system to a development system becomes as simple as `pacman -S mdaffin-devel`.
 
@@ -68,10 +68,10 @@ mdaffin-devel
 
 This is a hidden and quite powerful feature of this method. Whereas on most Arch Linux systems you might see hundreds of packages explicitly installed with no way to track why you installed them, we only have a handful. This is actually very useful as it lets you track bloat on your systems over time where you can either promote them to one of your meta-packages if you use them a lot or remove them from your systems if you don't. You also have the option of commenting the dependencies in your meta-packages to remind you why you added them.
 
-[`mdaffin-base`]: https://github.com/mdaffin/arch-repo/tree/master/pkg/base
-[`mdaffin-desktop`]: https://github.com/mdaffin/arch-repo/tree/master/pkg/desktop
-[`mdaffin-dell-xps-13`]: https://github.com/mdaffin/arch-repo/tree/master/pkg/dell-xps-13
-[`mdaffin-devel`]: https://github.com/mdaffin/arch-repo/tree/master/pkg/devel
+[`mdaffin-base`]: https://github.com/mdaffin/arch-repo/tree/5ce54e82b1d763c18493fda3d9bb78bd8a5b9786/pkg/base
+[`mdaffin-desktop`]: https://github.com/mdaffin/arch-repo/tree/5ce54e82b1d763c18493fda3d9bb78bd8a5b9786/pkg/desktop
+[`mdaffin-dell-xps-13`]: https://github.com/mdaffin/arch-repo/tree/5ce54e82b1d763c18493fda3d9bb78bd8a5b9786/pkg/dell-xps-13
+[`mdaffin-devel`]: https://github.com/mdaffin/arch-repo/tree/5ce54e82b1d763c18493fda3d9bb78bd8a5b9786/pkg/devel
 
 ## Creating a Meta-Package
 
@@ -372,7 +372,7 @@ Some of this should look familiar from the script we created in the last post. I
 
 Here are some examples of system config meta packages that others have created:
 
-- [mdaffin/arch-repo](https://github.com/mdaffin/arch-repo/tree/master/pkg/desktop)
+- [mdaffin/arch-repo](https://github.com/mdaffin/arch-repo/tree/master/pkg/mdaffin)
 - [Earnestly/pkgbuilds](https://github.com/Earnestly/pkgbuilds/tree/master/system-config)
 - [Foxboron/PKGBUILDS](https://github.com/Foxboron/PKGBUILDS/tree/master/foxboron-system)
 
