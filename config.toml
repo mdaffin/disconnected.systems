@@ -1,4 +1,4 @@
-base_url = "https://disconnected.systems"
+baseurl = "https://disconnected.systems"
 title = "Disconnected Systems"
 
 compile_sass = true
