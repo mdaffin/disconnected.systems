@@ -125,10 +125,10 @@ or remove them from your systems if you don't. You also have the option of
 commenting the dependencies in your meta-packages to remind you why you added
 them.
 
-[`mdaffin-base`]: https://github.com/mdaffin/arch-pkg/tree/5ce54e82b1d763c18493fda3d9bb78bd8a5b9786/pkg/base
-[`mdaffin-desktop`]: https://github.com/mdaffin/arch-pkg/tree/5ce54e82b1d763c18493fda3d9bb78bd8a5b9786/pkg/desktop
-[`mdaffin-dell-xps-13`]: https://github.com/mdaffin/arch-pkg/tree/5ce54e82b1d763c18493fda3d9bb78bd8a5b9786/pkg/dell-xps-13
-[`mdaffin-devel`]: https://github.com/mdaffin/arch-pkg/tree/5ce54e82b1d763c18493fda3d9bb78bd8a5b9786/pkg/devel
+[`mdaffin-base`]: https://github.com/mdaffin/arch-pkgs/tree/5ce54e82b1d763c18493fda3d9bb78bd8a5b9786/pkg/base
+[`mdaffin-desktop`]: https://github.com/mdaffin/arch-pkgs/tree/5ce54e82b1d763c18493fda3d9bb78bd8a5b9786/pkg/desktop
+[`mdaffin-dell-xps-13`]: https://github.com/mdaffin/arch-pkgs/tree/5ce54e82b1d763c18493fda3d9bb78bd8a5b9786/pkg/dell-xps-13
+[`mdaffin-devel`]: https://github.com/mdaffin/arch-pkgs/tree/5ce54e82b1d763c18493fda3d9bb78bd8a5b9786/pkg/devel
 
 ## Creating a Meta-Package
 
@@ -148,7 +148,7 @@ pkgver=0.0.1
 pkgrel=1
 pkgdesc="Base system configuration for mdaffin systems"
 arch=('any')
-url="https://github.com/mdaffin/arch-pkg"
+url="https://github.com/mdaffin/arch-pkgs"
 license=('MIT')
 depends=(
     # package list
@@ -408,8 +408,8 @@ create your own but the packages in there are tuned to my liking and so I
 encourage you to create your own with how you like your systems setup.
 
 ```bash
-mkdir arch-pkg
-cd arch-pkg
+mkdir arch-pkgs
+cd arch-pkgs
 git init
 ```
 
@@ -463,7 +463,7 @@ run `git reset <file>`. Repeat until you are happy then commit.
 git commit -m "My first package"
 ```
 
-[my repo]: https://github.com/mdaffin/arch-pkg
+[my repo]: https://github.com/mdaffin/arch-pkgs
 
 ### The Build Script
 
@@ -546,13 +546,13 @@ bulk of it has been described above. You can view/download it
 [here][shell-wrapper].
 
 [bash-strict-mode]: /blog/another-bash-strict-mode/
-[shell-wrapper]: https://github.com/mdaffin/arch-pkg/blob/71c6e07afc0a349b518444f5f383bd9dc44f05e0/bin/shell
+[shell-wrapper]: https://github.com/mdaffin/arch-pkgs/blob/71c6e07afc0a349b518444f5f383bd9dc44f05e0/bin/shell
 
 ## Example Config Meta-Packages
 
 Here are some examples of system config meta packages that others have created:
 
-- [mdaffin/arch-pkg](https://github.com/mdaffin/arch-pkg/tree/master/pkg/mdaffin)
+- [mdaffin/arch-pkgs](https://github.com/mdaffin/arch-pkgs/tree/master/pkg/mdaffin)
 - [Earnestly/pkgbuilds](https://github.com/Earnestly/pkgbuilds/tree/master/system-config)
 - [Foxboron/PKGBUILDS](https://github.com/Foxboron/PKGBUILDS/tree/master/foxboron-system)
 
