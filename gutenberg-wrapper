@@ -1,0 +1,11 @@
+#!/bin/bash
+set -uo pipefail
+trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
+IFS=$'\n\t'
+
+if ! [[ -f ./bin/gutenberg ]]; then
+  mkdir -p bin
+  curl -sL https://github.com/Keats/gutenberg/releases/download/v0.3.1/gutenberg-v0.3.1-x86_64-unknown-linux-gnu.tar.gz | tar -xz -C bin
+fi
+
+./bin/gutenberg "$@"
