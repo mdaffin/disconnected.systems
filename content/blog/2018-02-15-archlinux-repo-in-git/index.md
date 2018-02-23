@@ -254,3 +254,6 @@ repo which can take a bit more time than using a networked file system.
 Luckily it is very easy to switch between the two methods as it just requires
 you to download the repo and upload it somewhere else.
 
+*[Discuss on Reddit]*
+
+[Discuss on Reddit]: https://www.reddit.com/r/archlinux/comments/7zodod/hosting_an_arch_linux_repo_in_a_hosted_git/
