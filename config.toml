@@ -3,6 +3,7 @@ title = "Disconnected Systems"
 
 compile_sass = true
 highlight_code = true
+generate_categories_pages = true
 
 [extra]
 author = "Michael Daffin"

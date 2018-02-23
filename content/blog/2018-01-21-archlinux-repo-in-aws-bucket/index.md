@@ -1,7 +1,6 @@
 +++
 date = 2018-01-21T11:28:17Z
 title = "Automating Arch Linux Part 1: Hosting an Arch Linux Repo in an Amazon S3 Bucket"
-draft = false
 description = "How to host an Arch Linux repository in an Amazon S3 bucket with aurutils"
 slug = "archlinux-repo-in-aws-bucket"
 tags = ["linux", "automation", "archlinux"]
@@ -13,12 +12,13 @@ scripted installer. Each part is standalone and can be used by its self, but
 they are designed to build upon and complement each other each focusing on a
 different part of the problem.
 
-- **Part 1:** *Hosting an Arch Linux Repo in an Amazon S3 Bucket*
+- **Part 1:** Hosting an Arch Linux Repo in an *Amazon S3 Bucket* or [Hosted Git Repository]
 - **Part 2:** [Managing Arch Linux with Meta Packages]
 - **Part 3:** [Creating a Custom Arch Linux Installer]
 
-[Managing Arch Linux with Meta Packages]: /blog/archlinux-meta-packages
-[Creating a Custom Arch Linux Installer]: /blog/archlinux-installer
+[Hosted Git Repository]: /blog/archlinux-repo-in-a-git-repo/
+[Managing Arch Linux with Meta Packages]: /blog/archlinux-meta-packages/
+[Creating a Custom Arch Linux Installer]: /blog/archlinux-installer/
 
 When you use Arch Linux for any length of time you start collecting sets of
 [AUR] packages that you frequently use. Now, Arch Linux has loads of [AUR
@@ -209,7 +209,7 @@ packages. The two main utilities we will use are `aursearch`, which can search
 AUR for packages that match a given pattern.
 
 ```bash
-% aursearch aurutils                                                              :(
+% aursearch aurutils
 aur/aurutils 1.5.3-5 (55)
     helper tools for the arch user repository
 aur/aurutils-git 1.5.3.r234.g15ef2ab-1 (5)

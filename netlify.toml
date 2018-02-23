@@ -1,3 +1,15 @@
 [build]
   publish = "public"
   command = "./gutenberg-wrapper build"
+
+[context.deploy-preview.environment]
+  command = "./gutenberg-wrapper build -u ${DEPLOY_URL}"
+
+[context.branch-deploy]
+  command = "./gutenberg-wrapper build -u ${DEPLOY_URL}"
+
+[context.feature]
+  command = "./gutenberg-wrapper build -u ${DEPLOY_URL}"
+
+[context."features/branch"]
+  command = "./gutenberg-wrapper build -u ${DEPLOY_URL}"

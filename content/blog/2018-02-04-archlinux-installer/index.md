@@ -1,7 +1,6 @@
 +++
 date = 2018-02-04T14:28:00Z
 title = "Automating Arch Linux Part 3: Creating a Custom Arch Linux Installer"
-draft = false
 description = "How to create a script to automate the installation of Arch Linux"
 slug = "archlinux-installer"
 tags = ["linux", "automation", "archlinux"]
@@ -13,11 +12,12 @@ scripted installer. Each part is standalone and can be used by its self, but
 they are designed to build upon and complement each other each focusing on a
 different part of the problem.
 
-- **Part 1:** [Hosting an Arch Linux Repo in an Amazon S3 Bucket]
+- **Part 1:** Hosting an Arch Linux Repo in an [Amazon S3 Bucket] or [Hosted Git Repository]
 - **Part 2:** [Managing Arch Linux with Meta Packages]
 - **Part 3:** *Creating a Custom Arch Linux Installer*
 
-[Hosting an Arch Linux Repo in an Amazon S3 Bucket]: /blog/archlinux-repo-in-aws-bucket
+[Amazon S3 Bucket]: /blog/archlinux-repo-in-aws-bucket
+[Hosted Git Repository]: /blog/archlinux-repo-in-a-git-repo/
 [Managing Arch Linux with Meta Packages]: /blog/archlinux-meta-packages
 
 The Arch Linux install process can be quite daunting to new users, but once you

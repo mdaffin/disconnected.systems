@@ -14,6 +14,14 @@
 {% endblock header_title %}
 
 {% block content %}
+    <div class="container">
+        <div class="content">
+            {% if page.category %}
+            {% set cat_url = get_taxonomy_url(kind="category", name=page.category) %}
+            <a href="{{cat_url}}">{{page.category}}</a>
+            {%endif%}
+        </div>
+    </div>
 <section class="section">
     <div class="container">
         <div class="content">
