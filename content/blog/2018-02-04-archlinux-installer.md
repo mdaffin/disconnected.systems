@@ -1,5 +1,5 @@
 +++
-date = 2018-02-04T14:28:00Z
+date = "2018-02-04T14:28:00Z"
 title = "Automating Arch Linux Part 3: Creating a Custom Arch Linux Installer"
 description = "How to create a script to automate the installation of Arch Linux"
 slug = "archlinux-installer"

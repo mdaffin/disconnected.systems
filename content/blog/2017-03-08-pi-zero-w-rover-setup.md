@@ -1,5 +1,5 @@
 +++
-date = 2017-03-08T13:03:47Z
+date = "2017-03-08T13:03:47Z"
 title = "Pi Zero W Rover Setup"
 draft = false
 description = "Configure the pi zeros usb serial, networking and hardware pwm pins to control a servo wirelessly"

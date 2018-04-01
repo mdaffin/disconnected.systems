@@ -2,7 +2,7 @@
 title = "Arduino Powered Rover"
 description = "A simple arduino powered robot"
 slug = "arduino-powered-rover"
-date = 2012-10-24
+date = "2012-10-24T00:00:00Z"
 tags = [ "arduino", "robotics" ]
 aliases = [
     "/arduino-powered-rover/",

@@ -1,5 +1,5 @@
 +++
-date = 2017-03-10T23:21:07Z
+date = "2017-03-10T23:21:07Z"
 title = "Customising Raspberry Pi Images with Github and Travis"
 draft = false
 description = "Make use of github and travis to automate the customisation of raspberry pi images"

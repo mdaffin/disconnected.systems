@@ -1,5 +1,5 @@
 +++
-date = 2018-02-23T13:43:00Z
+date = "2018-02-23T13:43:00Z"
 title = "Automating Arch Linux Part 1b: Hosting an Arch Linux Repo in a Hosted Git Repository"
 description = "How to host an Arch Linux repository in a Hosted Git Repository with aurutils"
 slug = "archlinux-repo-in-a-git-repo"

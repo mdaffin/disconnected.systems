@@ -2,7 +2,7 @@
 title = "Shrimping it"
 description = "A quick tutorial on assembling a minimal DIY arduino known as the shrimp."
 slug = "shrimping-it"
-date = 2013-09-24
+date = "2013-09-24T00:00:00Z"
 tags = [ "shrimp", "arduino", "atmega328p" ]
 aliases = [
     "/shrimping-it/",
