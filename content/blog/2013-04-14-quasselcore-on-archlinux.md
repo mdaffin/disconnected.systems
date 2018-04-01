@@ -2,7 +2,7 @@
 title = "QuasselCore on Archlinux"
 description = "A guide to setting up a quassel server on an Arch Linux server."
 slug = "quasselcore-on-archlinux"
-date = 2013-04-14
+date = "2013-04-14T00:00:00Z"
 tags = [ "archlinux", "linux" ]
 aliases = [
     "/quasselcore-on-archlinux/",

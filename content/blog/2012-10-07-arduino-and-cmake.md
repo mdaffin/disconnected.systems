@@ -2,7 +2,7 @@
 title = "Arduino and CMake"
 description = "A guide to building and uploading an arduino sketch with out the Arduino IDE using CMake."
 slug = "arduino-and-cmake"
-date = 2012-10-07
+date = "2012-10-07T00:00:00Z"
 tags = [ "arduino", "cmake" ]
 aliases = [
     "/arduino-and-cmake/",

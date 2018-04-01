@@ -2,7 +2,7 @@
 title = "Nim on Arduino"
 description = "A minimal example of programming an arduino uno in the nim language"
 slug = "nim-on-adruino"
-date = 2015-11-02
+date = "2015-11-02T00:00:00Z"
 tags = [ "nim", "arduino", "atmega328p" ]
 aliases = [
     "/nim-on-arduino/",

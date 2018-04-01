@@ -1,5 +1,5 @@
 +++
-date = 2017-03-19T17:20:50Z
+date = "2017-03-19T17:20:50Z"
 title = "Writing A Rest API For The Pi Rover"
 draft = false
 description = "Using the iron web framework to build a simple rest api for the raspberry pi zero w rover"

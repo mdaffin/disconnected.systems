@@ -2,7 +2,7 @@
 title = "Create Custom ArchlinuxArm Images for the Raspberry Pi"
 description = "Setup a raspberry pi archlinuxarm image or sd-card before needing to boot the pi."
 slug = "raspberry-pi-archlinuxarm-setup"
-date = 2016-03-21
+date = "2016-03-21T00:00:00Z"
 tags = ["raspberry pi", "archlinuxarm", "arm", "chroot"]
 aliases = [
     "/raspberry-pi-archlinuxarm-setup/",

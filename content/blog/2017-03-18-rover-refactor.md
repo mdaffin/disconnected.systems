@@ -1,5 +1,5 @@
 +++
-date = 2017-03-18T21:45:01Z
+date = "2017-03-18T21:45:01Z"
 title = "Small Refactor To Prepare For Writing The Rest API"
 draft = false
 description = "Small tweaks to the rovers code and overall project layout in preparation for adding a webserver that can control the rover."

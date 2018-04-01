@@ -2,7 +2,7 @@
 title = "XBee Configuration"
 description = "A beginners guide on configuring and communicating over two xbees."
 slug = "xbee-configuration"
-date = 2012-11-17
+date = "2012-11-17T00:00:00Z"
 tags = [ "xbee" ]
 aliases = [
     "/xbee-configuration/",

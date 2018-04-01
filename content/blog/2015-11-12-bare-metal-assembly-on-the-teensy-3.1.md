@@ -2,7 +2,7 @@
 title = "Bare Metal Assembly on the Teensy 3.1"
 description = "A look at bare metal programming in assembly on the teensy 3.1 with out external dependencies."
 slug = "bare-metal-assembly-on-the-teensy-3.1"
-date = 2015-11-12
+date = "2015-11-12T00:00:00Z"
 tags = [ "assembly", "teensy", "arm" ]
 aliases = [
     "/bare-metal-assembly-on-the-teensy-3.1/",

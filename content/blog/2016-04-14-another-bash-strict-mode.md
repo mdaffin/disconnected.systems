@@ -2,7 +2,7 @@
 title = "Another Bash Strict Mode"
 description = "Cause bash scripts to fail fast and loud to aid debugging."
 slug = "another-bash-strict-mode"
-date = 2016-04-14
+date = "2016-04-14T00:00:00Z"
 tags = ["linux", "bash", "shell"]
 aliases = [
     "/another-bash-strict-mode/",

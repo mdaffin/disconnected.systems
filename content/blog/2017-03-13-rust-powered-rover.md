@@ -1,5 +1,5 @@
 +++
-date = 2017-03-13T17:37:43Z
+date = "2017-03-13T17:37:43Z"
 title = "Using Rust to Control a Raspberry Pi Zero W Rover"
 draft = false
 description = "Creates a simple program in rust to control the raspberry pi zero w rover we have been building"

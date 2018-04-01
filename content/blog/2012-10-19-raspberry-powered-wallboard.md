@@ -2,7 +2,7 @@
 title = "Raspberry Powered Wallboard"
 description = "A guide on how to setup a raspberry pi to use as a wallboard that once booted automatically loads a webpage."
 slug = "raspberry-powered-wallboard"
-date = 2012-10-19
+date = "2012-10-19T00:00:00Z"
 tags = [ "raspberry-pi", "archlinuxarm", "archlinux", "linux" ]
 aliases = [
     "/raspberry-powered-wallboard/",

@@ -1,5 +1,5 @@
 +++
-date = 2018-02-01T09:00:00Z
+date = "2018-02-01T09:00:00Z"
 title = "Automating Arch Linux Part 2: Managing Arch Linux with Meta Packages"
 description = "Show how you can use meta package to manage multiple arch linux systems"
 slug = "archlinux-meta-packages"

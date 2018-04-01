@@ -2,7 +2,7 @@
 title = "Bare Metal C on the Teensy 3.1"
 description = "A look at bare metal programming in c on the teensy 3.1 with out external dependencies."
 slug = "bare-metal-c-on-the-teensy-3.1"
-date = 2015-11-23
+date = "2015-11-23T00:00:00Z"
 tags = [ "c", "teensy", "arm" ]
 aliases = [
     "/bare-metal-c-on-the-teensy-3.1/",
