@@ -3,8 +3,8 @@ backend:
   branch: master
 
 publish_mode: editorial_workflow
-media_folder: "static/images/blog"
-public_folder: "/images/uploads"
+media_folder: "static/blog"
+public_folder: "/blog/"
 
 collections:
   - name: "blog"
