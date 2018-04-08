@@ -1,3 +1,7 @@
 /bin/
 /build/
 /public/
+
+.nuxt/
+node_modules/
+*.log
