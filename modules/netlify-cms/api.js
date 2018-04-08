@@ -26,8 +26,6 @@ function newCollectionsRouter(collections) {
                     },
                 }
             )
-            const post =  {content: frontmatter.content, ...frontmatter.data}
-            console.log(post)
             return {content: frontmatter.content, ...frontmatter.data}
         } catch (e) {
             throw `Error parsing frontmatter for '${file_name}' at ${e.line},${e.column}: ${e.message}`;
@@ -52,22 +50,32 @@ function newCollectionsRouter(collections) {
         const collection_name = req.params.collection;
         const collection_folder = path.resolve(load_collection(collection_name).folder);
         const files = fs.readdirSync(collection_folder).filter(f => f.endsWith(".md"));
-        const posts = files.map(f => load_post(path.join(collection_folder, f)));
-        res.end(JSON.stringify(await posts));
+        const posts = await Promise.all(files.map(f => load_post(path.join(collection_folder, f))));
+        res.end(JSON.stringify(posts.map(post => ({...post, content: undefined}))));
     }
 
-    function get_post(req, res, next) {
+    async function get_post(req, res, next) {
         const collection_name = req.params.collection;
-        const post_name = req.params.post;
-        const post = get_post(path.join(post_name))
-        res.end(JSON.stringify(post))
+        const slug = req.params.slug;
+        const collection_folder = path.resolve(load_collection(collection_name).folder);
+
+        // TODO Grossly ineffecent - need a better way to pull out the slug. Or maybe just cache results.
+        const files = fs.readdirSync(collection_folder).filter(f => f.endsWith(".md"));
+        const posts = await Promise.all(files.map(f => load_post(path.join(collection_folder, f))));
+
+        const post = posts.find(x => x.slug == slug)
+        if (post !== undefined) {
+            res.end(JSON.stringify(post))
+        } else {
+            next()
+        }
     }
 
     const router = Router()
     router.get('/', get_collections)
     router.get('/:collection', get_collection)
     router.get('/:collection/posts', get_posts)
-    router.get('/:collection/posts/:post', get_post)
+    router.get('/:collection/posts/:slug', get_post)
     return router
 }
 
