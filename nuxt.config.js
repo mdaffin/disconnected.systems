@@ -13,5 +13,5 @@ module.exports = {
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
     ]
   },
-  modules: ["~/modules/netlify-cms"],
+  modules: ["~/modules/nuxtlify"],
 }
