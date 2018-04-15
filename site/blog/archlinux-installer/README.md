@@ -118,7 +118,7 @@ devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)
 device=$(dialog --stdout --menu "Select installtion disk" 0 0 0 ${devicelist}) || exit 1
 ```
 
-{{ image(src="/blog/archlinux-installer/01-dialog-disk.png", title="dialog disk selection") }}
+![dialog disk selection](/blog/archlinux-installer/01-dialog-disk.png)
 
 In addition to looking fancy, this also helps to reduce typos and requires less
 typing. The list is sorted by reverse size so the disk you want is likely at
@@ -391,7 +391,7 @@ parted --script "${device}" -- mklabel gpt \
   mkpart primary linux-swap 129MiB ${swap_end} \
   mkpart primary ext4 ${swap_end} 100%
 
-# Simple globbing was not enough as on one device I needed to match /dev/mmcblk0p1 
+# Simple globbing was not enough as on one device I needed to match /dev/mmcblk0p1
 # but not /dev/mmcblk0boot1 while being able to match /dev/sda1 on other devices.
 part_boot="$(ls ${device}* | grep -E "^${device}p?1$")"
 part_swap="$(ls ${device}* | grep -E "^${device}p?2$")"

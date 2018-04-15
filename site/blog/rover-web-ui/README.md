@@ -45,7 +45,7 @@ guide](https://nodejs.org/en/download/) and follow the instructions for your
 system. Once done you should have both `nodejs` and `npm` installed, verify this
 with the following.
 
-```sh
+```bash
 node --version
 #v7.7.2
 npm --version
@@ -55,7 +55,7 @@ npm --version
 The only other tool we will need is `vue-cli` which can be install globally with
 `npm` by running the following.
 
-```sh
+```bash
 npm install -g vue-cli
 ```
 
@@ -64,7 +64,7 @@ our project. `vue-cli` can be used to create this directory with all of the
 boiler plate code needed by vue.js and webpack as well as many other niceties we
 can make use of later.
 
-```sh
+```bash
 vue init webpack ui
 #
 #  This will install Vue 2.x version of the template.
@@ -84,11 +84,11 @@ vue init webpack ui
 #   vue-cli · Generated "ui".
 #
 #   To get started:
-#   
+#
 #     cd ui
 #     npm install
 #     npm run dev
-#   
+#
 #   Documentation can be found at https://vuejs-templates.github.io/webpack
 ```
 
@@ -98,7 +98,7 @@ and vue in general [here](https://vuejs.org/v2/guide/index.html).
 
 We can start the dev server by running the following.
 
-```sh
+```bash
 cd ui
 npm install
 npm run dev
@@ -141,7 +141,7 @@ our application will require a few extra ones.
 These dependencies can be installed and added tour `ui/project.json` by
 running.
 
-```sh
+```bash
 npm install --save concise.css
 npm install --save concise-ui
 npm install --save vue-resource
@@ -162,14 +162,14 @@ options.
 +import VueResource from 'vue-resource';
  import App from './App';
  import router from './router';
- 
+
 +import '../node_modules/concise.css/dist/concise.css';
 +import '../node_modules/concise-ui/dist/concise-ui.css';
 +
  Vue.config.productionTip = false;
 +Vue.use(VueResource);
 +Vue.http.options.xhr = { withCredentials: true };
- 
+
  /* eslint-disable no-new */
  new Vue({
 ```
@@ -178,7 +178,7 @@ options.
 
 The `config` directory allows us to set different variables for different
 environments. We can make use of this to set different api urls for dev and
-production. 
+production.
 
 The development environment can be configured with `ui/config/dev.env.js`. We
 add a variable for the base url of our api and default it to the hostname of the
@@ -188,7 +188,7 @@ with the ip address of the rover.
 ```diff
  var merge = require('webpack-merge')
  var prodEnv = require('./prod.env')
- 
+
  module.exports = merge(prodEnv, {
 +  BASE_URL: '"http://rpizw-rover.local:3000"',
    NODE_ENV: '"development"'
@@ -608,7 +608,7 @@ application in future posts.
  </template>
  ...
  </script>
- 
+
  <style>
 -#app {
 -  font-family: 'Avenir', Helvetica, Arial, sans-serif;
@@ -642,9 +642,9 @@ the following changes.
  import Router from 'vue-router';
 -import Hello from '@/components/Hello';
 +import Controls from '@/components/Controls';
- 
+
  Vue.use(Router);
- 
+
  ...
    routes: [
      {
@@ -673,7 +673,7 @@ that we copy the binaries across.
 rver" ]; then
      exit 1
  fi
- 
+
 +if [ ! -d "ui/dist" ]; then
 +    echo "'ui/dist' not found. Have you run 'cd ui; npm install && npm run build'?"
 +    exit 1
@@ -690,7 +690,7 @@ rver" ]; then
  install -Dm755 "src/bin/rover-server.service" "${mount}/etc/systemd/system/rover-server.service"
 +mkdir -p  "${mount}/srv/rover/ui"
 +cp -r ui/dist/* "${mount}/srv/rover/ui/"
- 
+
  # Prep the chroot
  mount -t proc none ${mount}/proc
 ```

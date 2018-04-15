@@ -60,7 +60,7 @@ You can have as many binaries in there as you wish in a single crate by doing
 this. Lets rename our binary to `rover-cli` by moving it to
 `src/bin/rover-cli.rs`. We also need to move `cli.yml` to the same place.
 
-```sh
+```bash
 mkdir src/bin
 mv src/main.rs src/bin/rover-cli.rs
 mv src/cli.yml src/bin/cli.yml
@@ -90,22 +90,22 @@ index 596d005..f0cafaf 100644
 +extern crate rpizw_rover;
  #[macro_use]
  extern crate clap;
- 
+
 -mod error;
 -mod rover;
 -
 -use error::*;
 +use rpizw_rover::error::*;
- 
+
  const PWM_CHIP: u32 = 0;
  const LEFT_PWM: u32 = 0;
 @@ -15,7 +10,7 @@ const RIGHT_PWM: u32 = 1;
- 
+
  fn run() -> Result<()> {
      use clap::App;
 -    use rover::Rover;
 +    use rpizw_rover::Rover;
- 
+
      let yaml = load_yaml!("cli.yml");
      let matches = App::from_yaml(yaml).version(crate_version!()).get_matches();
 ```
@@ -115,7 +115,7 @@ To build all of the binaries in our project just run `cargo build` or with the
 build --bin <bin_name>`. So to cross compile our rover-cli bin for the pi we can
 run.
 
-```sh
+```bash
 cargo build --bin rover-cli --target arm-unknown-linux-gnueabihf
 ```
 
@@ -145,7 +145,7 @@ index 3396e2d..b3beffb 100644
              right: right,
          })
      }
- 
+
 +    /// Exports and setup the period for the servos.
 +    pub fn export(&self) -> Result<()> {
 +        self.left.export().chain_err(|| "failed to export the left motor pwm channel")?;
@@ -159,7 +159,7 @@ index 3396e2d..b3beffb 100644
      /// enabled.
 @@ -82,10 +86,8 @@ impl Rover {
      }
- 
+
      /// Unexports the motors so they can no longer be used
 -    pub fn unexport(self) -> Result<()> {
 -        self.left.enable(false).chain_err(|| "failed to disable left motor")?;
@@ -180,15 +180,15 @@ index f0cafaf..bf6a5fa 100644
 +++ b/src/bin/rover-cli.rs
 @@ -16,6 +16,7 @@ fn run() -> Result<()> {
      let matches = App::from_yaml(yaml).version(crate_version!()).get_matches();
- 
+
      let rover = Rover::new(PWM_CHIP, LEFT_PWM, RIGHT_PWM)?;
 +    rover.export()?;
- 
+
      if let Some(_) = matches.subcommand_matches("disable") {
          rover.enable(false)
 @@ -36,6 +37,7 @@ fn run() -> Result<()> {
          Ok(())
- 
+
      } else if let Some(_) = matches.subcommand_matches("unexport") {
 +        rover.enable(false)?;
          rover.unexport()
@@ -208,7 +208,7 @@ index 5d8540c..9c350e8 100755
 +++ b/create-image
 @@ -17,8 +17,8 @@ rpi_tar="ArchLinuxARM-rpi-latest.tar.gz"
  rpi_url="http://archlinuxarm.org/os/${rpi_tar}"
- 
+
  # Check to see if the binary has been built, we check this first to we can bail early.
 -if [ ! -f "target/arm-unknown-linux-gnueabihf/release/rpizw-rover" ]; then
 -    echo "'target/arm-unknown-linux-gnueabihf/release/rpizw-rover' not found. Have you run 'cargo build --release --target=arm-unknown-linux-gnueabihf'?"
@@ -216,14 +216,14 @@ index 5d8540c..9c350e8 100755
 +    echo "'target/arm-unknown-linux-gnueabihf/release/rover-cli' not found. Have you run 'cargo build --release --target=arm-unknown-linux-gnueabihf'?"
      exit 1
  fi
- 
+
 @@ -63,7 +63,7 @@ tar -xpf "${rpi_tar}" -C ${mount} 2> >(grep -v "Ignoring unknown extended header
- 
+
  # Copy our installation script and other artifacts
  install -Dm755 "${script}" "${mount}/tmp/${script}"
 -install -Dm755 "target/arm-unknown-linux-gnueabihf/release/rpizw-rover" "${mount}/usr/local/bin/rpizw-rover"
 +install -Dm755 "target/arm-unknown-linux-gnueabihf/release/rover-cli" "${mount}/usr/local/bin/rover-cli"
- 
+
  # Prep the chroot
  mount -t proc none ${mount}/proc
 ```
@@ -237,7 +237,7 @@ Until the upstream archlinuxarm update their rootfs we must make a small change
 to our `setup` script to stop the initial update from breaking. Add the following
 to the top of `setup` just before the first `pacman -Syu ...`.
 
-```sh
+```bash
 # Fix for a recent change in ca-certificates-utils this can be removed once upstream rootfs has been update.
 # https://www.archlinux.org/news/ca-certificates-utils-20170307-1-upgrade-requires-manual-intervention/
 pacman -Syuw --noconfirm

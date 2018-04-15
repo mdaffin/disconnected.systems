@@ -93,16 +93,16 @@ the database which do not always work inside raw links to repos.*
 
 Head over to [Gitlab] and create a new repository.
 
-{{ smallimage(src="/blog/archlinux-repo-in-a-git-repo/01-new-repo.png", title="New Repo") }}
+![New Repo](/blog/archlinux-repo-in-a-git-repo/01-new-repo.png) !!!! TODO smallimage
 
 Give it an name and ensure that it is public. It needs to be public to allow
 pacman to download packages from it without any kind of authentication.
 
-{{ image(src="/blog/archlinux-repo-in-a-git-repo/02-create-repo.png", title="Create Repo") }}
+![Create Repo](/blog/archlinux-repo-in-a-git-repo/02-create-repo.png)
 
 And finally grab the clone URL for your new repository.
 
-{{ image(src="/blog/archlinux-repo-in-a-git-repo/03-clone-url.png", title="Clone URL") }}
+![Clone URL](/blog/archlinux-repo-in-a-git-repo/03-clone-url.png)
 
 And clone it locally and create a directory to house your Arch Linux repo such
 as `x86_64` - It is convention to separate Arch Linux repos via the
@@ -222,13 +222,13 @@ alias gitc='git -C "${DATA_DIR}/repo"'
 
 if [[ -d "${DATA_DIR}/repo" ]]; then
     # DATA_DIR exists, reset and pull any changes
-    gitc reset --hard 
+    gitc reset --hard
     gitc clean -xffd
     gitc checkout "${GIT_BRANCH}"
     gitc pull
 else
     # DATA_DIR does not exist, so clone it
-    git clone -b "${GIT_BRANCH}" "${CLONE_URL}" "${DATA_DIR}/repo" 
+    git clone -b "${GIT_BRANCH}" "${CLONE_URL}" "${DATA_DIR}/repo"
 fi
 
 mkdir -p "${DATA_DIR}/repo/${REPO_PATH}"

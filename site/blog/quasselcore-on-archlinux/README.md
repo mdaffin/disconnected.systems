@@ -22,7 +22,7 @@ to many dependencies for a headless server. Lucky there is a
 perfectly. Installation is simple enough, use packer, yaourt or simply download and build the
 package manually:
 
-```sh
+```bash
 wget https://aur.archlinux.org/packages/qu/quasselcore/quasselcore.tar.gz
 tar -xf quasselcore.tar.gz
 cd quasselcore
@@ -41,7 +41,7 @@ This allows quassel to listen to any ip address.
 
 Now just start the service and set it to run on boot
 
-```sh
+```bash
 sudo systemctl enable quassel
 sudo systemctl start quassel
 ```
@@ -68,13 +68,13 @@ This is important if you wish the communication between the core and the client 
 is optional if you are just using it over a local network. The quasselcore package already has ssl
 enabled in the build script, so to enable it all you need to do is generate the certificates:
 
-```sh
+```bash
 sudo -u quassel openssl req -x509 -nodes -days 365 -newkey rsa:1024 -keyout ~quassel/quasselCert.pem -out ~quassel/quasselCert.pem
 ```
 
 and then restart quassel:
 
-```sh
+```bash
 sudo systemctl restart quassel
 ```
 
@@ -82,7 +82,7 @@ sudo systemctl restart quassel
 
 After set up you can add new users by logging into the server and running 
 
-```sh
+```bash
 sudo quasselcore --configdir=/var/lib/quassel --add-user
 ```
 
@@ -91,6 +91,6 @@ Note that there is no easy way to delete a user once added.
 
 You can change a forgotten password by running 
 
-```sh
+```bash
 sudo quasselcore --configdir=/var/lib/quassel --change-userpass=USERNAME
 ```

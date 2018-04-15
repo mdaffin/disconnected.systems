@@ -216,7 +216,7 @@ impl ResponsePayload {
 Iron has a very useful macro `itry!` that wraps rusts `try!` macro making it
 easier to return `IronErrors`. We have reimplemented this macro so that we can
 json encode the error messages produced and place it in the body of the
-response. It has three possible ways it can be called, 
+response. It has three possible ways it can be called,
 
 * `rtry!(rover.stop())` - that produce the default message and an internal server error.
 * `rtry!(rover.stop(), "could not stop: {}")` - that produces a custom message
@@ -268,7 +268,7 @@ fn reset_rover() -> rpizw_rover::error::Result<()> {
 fn main() {
 ```
 
-First we setup the env_logger so it is ready for whenever we require it and 
+First we setup the env_logger so it is ready for whenever we require it and
 reset the rover as defined in the last section.
 ```rust
     env_logger::init().unwrap();
@@ -484,13 +484,13 @@ impl AfterMiddleware for CORS {
 
 Compile the code like we did for the `rover-cli` tool
 
-```sh
+```bash
 cargo build --bin rover-server --target=arm-unknown-linux-gnueabihf
 ```
 
 Then upload and run the server
 
-```sh
+```bash
 scp target/arm-unknown-linux-gnueabihf/debug/rover-server alarm@rpizw-rover.local:
 ssh -t alarm@rpizw-rover.local sudo RUST_LOG=info ./rover-server
 ```
@@ -504,7 +504,7 @@ We can now call the endpoints using curl or rest api explorer like
 
 Try out some of the following.
 
-```sh
+```bash
 curl -XPUT http://rpizw-rover.local:3000/api/speed -d '{"left":100,"right":100}'
 #{"success":true}
 curl -XPUT http://rpizw-rover.local:3000/api/speed -d '{"left":-100,"right":-100}'
@@ -544,7 +544,7 @@ setup the wireless for the moment).
 
 Lets move the server to `/usr/local/bin`
 
-```sh
+```bash
 sudo mv ./rover-server /usr/local/bin/rover-server
 ```
 
@@ -552,7 +552,7 @@ Then create a service at `src/bin/rover-server.service` with the following
 contents (do this locally rather then on the pi so we can include it in the repo
 and add it to the image in the next section).
 
-```sh
+```bash
 [Unit]
 Description=Rest API for a Raspberry Pi Zero W Rover
 
@@ -566,7 +566,7 @@ WantedBy=multi-user.target
 
 And copy it to our rover, ssh into the rover and install/start the service.
 
-```sh
+```bash
 scp src/bin/rover-server.service alarm@rpizw-rover.local:
 ssh -t alarm@rpizw-rover.local
 > sudo cp rover-server.service /etc/systemd/system/rover-server.service
@@ -592,7 +592,7 @@ index a026d6c..76fe54a 100755
 @@ -22,6 +22,11 @@ if [ ! -f "target/arm-unknown-linux-gnueabihf/release/rover-cli" ]; then
      exit 1
  fi
- 
+
 +if [ ! -f "target/arm-unknown-linux-gnueabihf/release/rover-server" ]; then
 +    echo "'target/arm-unknown-linux-gnueabihf/release/rover-server' not found. Have you run 'cargo build --release --target=arm-unknown-linux-gnueabihf'?"
 +    exit 1
@@ -607,7 +607,7 @@ index a026d6c..76fe54a 100755
  install -Dm755 "target/arm-unknown-linux-gnueabihf/release/rover-cli" "${mount}/usr/local/bin/rover-cli"
 +install -Dm755 "target/arm-unknown-linux-gnueabihf/release/rover-server" "${mount}/usr/local/bin/rover-server"
 +install -Dm755 "src/bin/rover-server.service" "${mount}/etc/systemd/system/rover-server.service"
- 
+
  # Prep the chroot
  mount -t proc none ${mount}/proc
 ```
@@ -622,7 +622,7 @@ index 0c7f4be..5ceb245 100755
 @@ -51,6 +51,9 @@ ln -sf /usr/lib/systemd/system/getty@ttyGS0.service /etc/systemd/system/getty.ta
  # Enable hardware pwm
  grep 'dtoverlay=pwm-2chan,pin=12,func=4,pin2=13,func2=4' /boot/config.txt >/dev/null || echo 'dtoverlay=pwm-2chan,pin=12,func=4,pin2=13,func2=4' >> /boot/config.txt
- 
+
 +# Enable the rover-server to start on boot
 +ln -sf /etc/systemd/system/rover-server.service /etc/systemd/system/multi-user.target.wants/rover-server.service
 +
@@ -633,7 +633,7 @@ index 0c7f4be..5ceb245 100755
 
 Now you can build the binary and image by running.
 
-```sh
+```bash
 cargo build --release --target=arm-unknown-linux-gnueabihf
 sudo ./create-image
 ```

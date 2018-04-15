@@ -43,7 +43,7 @@ minicom or screen are just as good (Windows users can use putty) and connect to
 the XBee serial port (/dev/ttyUSB0 or what ever it shows up as) at the default
 baud rate of 9200:
 
-```sh
+```bash
 picocom -lc /dev/ttyUSB0
 ```
 
@@ -63,14 +63,14 @@ either don't type anything for a few seconds or type "ATCN&lt;CR&gt;". While in
 command mode you can read the current settings by typing the associated command
 such as:
 
-```sh
+```bash
 ATMY<CR>
 0
 ```
 
 or set it by adding a value before you hit return
 
-```sh
+```bash
 ATMY1<CR>
 OK
 ATMY<CR>
@@ -84,7 +84,7 @@ backspace to correct typos and have to instead start the command again. You can
 also chain together commands by dropping the AT after the first command and
 separating them by commas like this,
 
-```sh
+```bash
 ATMY1,WR,CN<CR>
 ```
 
@@ -103,7 +103,7 @@ The first thing you should do when configuring a new XBee module is reset the
 device to its factory defaults. This will help prevent any configurations made
 previously from silently messing up your project. Enter command mode and type
 
-```sh
+```bash
 ATRE<CR>
 ```
 
@@ -116,7 +116,7 @@ the XBee memory which can be done with the **WR** command. You should issue this
 command when ever you have finished editing the commands to ensure that the
 changes you made will be preserved after a reboot or power up.
 
-```sh
+```bash
 ATWR<CR>
 ```
 
@@ -127,7 +127,7 @@ it) you can issue the FR command to tell the device to do a software reset. This
 is useful to do after you have configured your device (and saved the settings!)
 to ensure the XBee is using the correct settings.
 
-```sh
+```bash
 ATFR<CR>
 ```
 
@@ -168,7 +168,7 @@ one another, so plug-in the first XBee and open up picocom and send the
 following (remember to not press enter (or any other key) after the +++ until
 you receive the OK response);
 
-```sh
+```bash
 +++
 OK
 ATRE<CR>
@@ -179,7 +179,7 @@ OKOKOKOKOK
 
 Then connect the second  XBee and send the following;
 
-```sh
+```bash
 +++
 OK
 ATRE<CR>

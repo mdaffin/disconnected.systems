@@ -47,7 +47,7 @@ distribution's package managers or from inside a Arduino SDK's tools directory:
 
 ###### layout.ld
 
-```text
+```
 MEMORY {
     FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 256K
     RAM  (rwx) : ORIGIN = 0x1FFF8000, LENGTH = 64K
@@ -70,7 +70,7 @@ SECTIONS {
 There are two main blocks to the linker script called `MEMORY` and `SECTIONS`.
 The `MEMORY` block tells the linker how the storage address space should be
 broken up. Typical microncontrollers have two main type os storage, flash
-(slower but non-volatile) and ram (faster but volatile). 
+(slower but non-volatile) and ram (faster but volatile).
 
 At a minimum you should define where the non-volitile (flash) and volitile
 (ram) storage blocks, which is what we do above. These values are defined in
@@ -79,14 +79,14 @@ one](https://www.pjrc.com/teensy/K20P64M72SF1RM.pdf).  For example, in our
 linker scripts we have split the storage address space into two parts, one for
 non-volatile `FLASH` storage and the other for volatile `RAM` storage. We tell
 the linker where these regions start, the `ORIGIN` and how long they are, the
-`LENGTH`. 
+`LENGTH`.
 
 You can split these sections up as much as you like and in doing so can change
 the permissions for various different parts. For example, you can make a
 section for read only, non executable data to protect that section from being
 manuplated at runtime with the following.
 
-```text
+```
 MEMORY {
     FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 128K
     RODATA (ro) : ORIGIN = 0x00020000, LENGTH = 128K
@@ -265,7 +265,7 @@ is connected to.
 
 ```asm
     // Enable system clock on all GPIO ports - page 254
-    ldr r6, = 0x40048038 
+    ldr r6, = 0x40048038
     ldr r0, = 0x00043F82 // 0b1000011111110000010
     str r0, [r6]
 

@@ -26,7 +26,7 @@ don't know how to install ArchLinux to an sd card. Boot the image from the
 Raspberry Pi and login as root (the password is root as well). As with any
 install the very first thing you should do is update the system:
 
-```sh
+```bash
 pacman -Syu
 ```
 
@@ -35,7 +35,7 @@ pacman -Syu
 In keeping with best security practices its best to run things that don't need
 to run as root as a normal user. Create a new user called "wb" with:
 
-```sh
+```bash
 useradd -m wb
 passwd wb
 > Enter new UNIX password: <type password here>
@@ -47,7 +47,7 @@ Now logout of root and login as the new user. When you need to run a command as
 root now you can login as root from another tty or you can run a single command
 as root with:
 
-```sh
+```bash
 su root command
 ```
 
@@ -59,7 +59,7 @@ and any command that start with a $ should be run as the normal user.
 We are going to need xorg in order to run graphical programs so now is a good
 time to install it along with a window manager of your choice:
 
-```sh
+```bash
 pacman -S xorg-server xorg-xinit xorg-xset xterm ratpoison
 ```
 
@@ -73,7 +73,7 @@ To tell xinit what to do when a user tried to start a xorg session you need to
 edit ~/.xinitrc of that user, so edit /home/wb/.xinitrc with the following
 contents:
 
-```sh
+```bash
 setterm -blank 0 -powersave off -powerdown 0
 xset -dpms
 xset s off
@@ -93,7 +93,7 @@ we don't want on a wallboard.
 
 To test if this works run:
 
-```sh
+```bash
 startx
 ```
 
@@ -110,7 +110,7 @@ doesn't have lots of menus so makes it ideal for a wall board.
 
 To install it run:
 
-```sh
+```bash
 pacman -S uzbl-browser
 ```
 
@@ -119,13 +119,13 @@ shouldn't be needed for a wallboard.
 
 Once installed you can replace the
 
-```sh
+```bash
 exec xterm
 ```
 
 line in /home/wb/.xinitrc with
 
-```sh
+```bash
 exec uzbl-browser http://www.example.com
 ```
 
@@ -147,7 +147,7 @@ ArchLinux now uses systemd by default so we need to create a new service file to
 auto login to the wb user. Create a copy the getty@.service and place it in
 /etc/systemd/system:
 
-```sh
+```bash
 cp /usr/lib/systemd/system/getty@.service /etc/systemd/system/autologin@.service
 ```
 
@@ -168,7 +168,7 @@ Change tty1 if you want to login to another tty. See
 for more info about editing the service file to your needs. Now set this service
 to run at boot by running:
 
-```sh
+```bash
 systemctl daemon-reload
 systemctl disable getty@tty1.service
 systemctl enable autologin@tty1.service
@@ -176,7 +176,7 @@ systemctl enable autologin@tty1.service
 
 you can start it now to test it by running:
 
-```sh
+```bash
 systemctl stop getty@tty1.service
 systemctl start autologin@tty1.service
 ```
@@ -187,7 +187,7 @@ another tty.
 Lastly we need to start x when the wb user logs in. This can be done by editing
 their .bash_profile file and add the following to the end:
 
-```sh
+```bash
 startx
 logout
 ```
@@ -202,7 +202,7 @@ the wb user manually.
 
 You can now reboot the raspberry pi
 
-```sh
+```bash
 reboot
 ```
 

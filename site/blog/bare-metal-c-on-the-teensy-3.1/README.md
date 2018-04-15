@@ -14,7 +14,7 @@ title: Bare Metal C on the Teensy 3.1
 ---
 
 As a follow on from my previous post about writing [bare metal assembly on the
-teensy 3.1](/bare-metal-assembly-on-the-teensy-3.1/) I wanted to see what it
+teensy 3.1](../bare-metal-assembly-on-the-teensy-3.1) I wanted to see what it
 would take to port it to C. There where a few bits missing from the assembly
 example that are more important in the C port, which I will cover in this post.
 
@@ -34,7 +34,7 @@ section in the `SECTIONS` block.
 
 ###### [layout.ld](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/layout.ld#L36-L46)
 
-```text
+```
 SECTIONS {
     . = 0x00000000;
     .text : {
@@ -53,7 +53,7 @@ global variables, which can be modified so should be placed in `RAM`.
 
 ###### [layout.ld](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/layout.ld#L48-L55)
 
-```text
+```
     .data : {
         . = ALIGN(4);
         _sdata = .;
@@ -78,7 +78,7 @@ located outside of it, we just place it at the top for convenience.
 
 ###### [layout.ld](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/layout.ld#L29)
 
-```text
+```
 _sflashdata = LOADADDR(.data);
 ```
 
@@ -92,7 +92,7 @@ create that next, again storing the start and end in `_sbss` and `_ebss`.
 
 ###### [layout.ld](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/layout.ld#L57-L64)
 
-```text
+```
     .bss : {
         . = ALIGN(4);
         _sbss = .;
@@ -290,7 +290,7 @@ void usage_fault_handler() { while (1); }
 
 To compile and upload we swap out the assembler for the c compiler and add the `-nostdlib` and `-c` flags to stop gcc including the std libraries and to tell it to compile without linking.
 
-```sh
+```bash
 arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -nostdlib -c -o crt0.o crt0.c
 arm-none-eabi-ld -T layout.ld -o crt0.elf crt0.o
 arm-none-eabi-objcopy -O ihex -R .eeprom crt0.elf crt0.hex
