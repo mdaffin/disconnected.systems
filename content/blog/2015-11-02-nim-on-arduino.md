@@ -1,14 +1,16 @@
-+++
-title = "Nim on Arduino"
-description = "A minimal example of programming an arduino uno in the nim language"
-slug = "nim-on-adruino"
-date = "2015-11-02T00:00:00Z"
-tags = [ "nim", "arduino", "atmega328p" ]
-aliases = [
-    "/nim-on-arduino/",
-    "/posts/nim-on-arduino/",
-]
-+++
+---
+aliases:
+- /nim-on-arduino/
+- /posts/nim-on-arduino/
+date: '2015-11-02T00:00:00Z'
+description: A minimal example of programming an arduino uno in the nim language
+slug: nim-on-adruino
+tags:
+- nim
+- arduino
+- atmega328p
+title: Nim on Arduino
+---
 
 There has been a few interesting projects over the past few years that have tried to bring alternative languages to the embedded world. The [espruino](http://www.espruino.com/) and [micropython](https://micropython.org/) are two very interesting project that allow you to run programs written in javascript and python on a micro-controller. However they have one large drawback, they only support their own boards and therefore can only run them on a limited number of micro-controllers. These are two very interesting new programming languages designed for low level system programming making them ideally suited for micro-controllers - rust and nim.
 

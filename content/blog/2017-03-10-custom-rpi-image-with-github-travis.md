@@ -1,11 +1,17 @@
-+++
-date = "2017-03-10T23:21:07Z"
-title = "Customising Raspberry Pi Images with Github and Travis"
-draft = false
-description = "Make use of github and travis to automate the customisation of raspberry pi images"
-slug = "custom-rpi-image-with-github-travis"
-tags = ["linux", "automation", "raspberry-pi", "github", "travis"]
-+++
+---
+date: '2017-03-10T23:21:07Z'
+description: Make use of github and travis to automate the customisation of raspberry
+  pi images
+draft: false
+slug: custom-rpi-image-with-github-travis
+tags:
+- linux
+- automation
+- raspberry-pi
+- github
+- travis
+title: Customising Raspberry Pi Images with Github and Travis
+---
 
 Over the coming months I am goring to be building upon my [raspberry pi
 rover](/blog/pi-zero-w-rover-setup) and over this

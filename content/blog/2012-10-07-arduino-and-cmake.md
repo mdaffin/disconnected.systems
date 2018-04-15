@@ -1,14 +1,16 @@
-+++
-title = "Arduino and CMake"
-description = "A guide to building and uploading an arduino sketch with out the Arduino IDE using CMake."
-slug = "arduino-and-cmake"
-date = "2012-10-07T00:00:00Z"
-tags = [ "arduino", "cmake" ]
-aliases = [
-    "/arduino-and-cmake/",
-    "/posts/arduino-and-cmake/",
-]
-+++
+---
+aliases:
+- /arduino-and-cmake/
+- /posts/arduino-and-cmake/
+date: '2012-10-07T00:00:00Z'
+description: A guide to building and uploading an arduino sketch with out the Arduino
+  IDE using CMake.
+slug: arduino-and-cmake
+tags:
+- arduino
+- cmake
+title: Arduino and CMake
+---
 
 The arduino is a great platform for embedded development and the ide it comes
 with is a good starting point. However, it lacks many features that make it a

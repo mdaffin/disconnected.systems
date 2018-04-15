@@ -1,11 +1,14 @@
-+++
-date = "2017-03-13T17:37:43Z"
-title = "Using Rust to Control a Raspberry Pi Zero W Rover"
-draft = false
-description = "Creates a simple program in rust to control the raspberry pi zero w rover we have been building"
-slug = "rust-powered-rover"
-tags = ["rust", "raspberry-pi"]
-+++
+---
+date: '2017-03-13T17:37:43Z'
+description: Creates a simple program in rust to control the raspberry pi zero w rover
+  we have been building
+draft: false
+slug: rust-powered-rover
+tags:
+- rust
+- raspberry-pi
+title: Using Rust to Control a Raspberry Pi Zero W Rover
+---
 
 Over the past few weeks I have been starting to build a raspberry pi zero w
 controlled rover.

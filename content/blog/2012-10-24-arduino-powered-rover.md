@@ -1,14 +1,15 @@
-+++
-title = "Arduino Powered Rover"
-description = "A simple arduino powered robot"
-slug = "arduino-powered-rover"
-date = "2012-10-24T00:00:00Z"
-tags = [ "arduino", "robotics" ]
-aliases = [
-    "/arduino-powered-rover/",
-    "/posts/arduino-powered-rover/",
-]
-+++
+---
+aliases:
+- /arduino-powered-rover/
+- /posts/arduino-powered-rover/
+date: '2012-10-24T00:00:00Z'
+description: A simple arduino powered robot
+slug: arduino-powered-rover
+tags:
+- arduino
+- robotics
+title: Arduino Powered Rover
+---
 
 Over the past couple of weeks I have been developing an arduino powered
 autonomous rover.

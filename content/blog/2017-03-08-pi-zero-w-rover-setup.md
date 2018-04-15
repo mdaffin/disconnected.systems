@@ -1,23 +1,27 @@
-+++
-date = "2017-03-08T13:03:47Z"
-title = "Pi Zero W Rover Setup"
-draft = false
-description = "Configure the pi zeros usb serial, networking and hardware pwm pins to control a servo wirelessly"
-slug = "pi-zero-w-rover-setup"
-tags = ["linux", "robot", "serial", "raspberry-pi", "pwm"]
-aliases = [
-    "/pi-zero-w-rover-setup/",
-    "/posts/pi-zero-w-rover-setup/",
-]
-gallery = [
-    "/blog/pi-zero-w-rover-setup/rover-01.jpg",
-    "/blog/pi-zero-w-rover-setup/rover-02.jpg",
-    "/blog/pi-zero-w-rover-setup/rover-03.jpg",
-    "/blog/pi-zero-w-rover-setup/rover-04.jpg",
-    "/blog/pi-zero-w-rover-setup/rover-05.jpg",
-    "/blog/pi-zero-w-rover-setup/rover-06.jpg",
-]
-+++
+---
+aliases:
+- /pi-zero-w-rover-setup/
+- /posts/pi-zero-w-rover-setup/
+date: '2017-03-08T13:03:47Z'
+description: Configure the pi zeros usb serial, networking and hardware pwm pins to
+  control a servo wirelessly
+draft: false
+gallery:
+- /blog/pi-zero-w-rover-setup/rover-01.jpg
+- /blog/pi-zero-w-rover-setup/rover-02.jpg
+- /blog/pi-zero-w-rover-setup/rover-03.jpg
+- /blog/pi-zero-w-rover-setup/rover-04.jpg
+- /blog/pi-zero-w-rover-setup/rover-05.jpg
+- /blog/pi-zero-w-rover-setup/rover-06.jpg
+slug: pi-zero-w-rover-setup
+tags:
+- linux
+- robot
+- serial
+- raspberry-pi
+- pwm
+title: Pi Zero W Rover Setup
+---
 
 The raspberry pi zero w has just been released and I managed to get my hands on
 one before they sold out. This has sparked me to restart one of my old project
