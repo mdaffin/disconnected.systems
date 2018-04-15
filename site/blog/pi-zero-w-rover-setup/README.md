@@ -36,7 +36,7 @@ those that want to follow along with arch you should first follow my
 [customisation stage]. You can also follow along from a running pi if you have
 raspbian.
 
-{{ gallery(gallery="/blog/pi-zero-w-rover-setup/rover-01.jpg|/blog/pi-zero-w-rover-setup/rover-02.jpg|/blog/pi-zero-w-rover-setup/rover-03.jpg|/blog/pi-zero-w-rover-setup/rover-04.jpg|/blog/pi-zero-w-rover-setup/rover-05.jpg|/blog/pi-zero-w-rover-setup/rover-06.jpg") }}
+<gallery(gallery="/blog/pi-zero-w-rover-setup/rover-01.jpg|/blog/pi-zero-w-rover-setup/rover-02.jpg|/blog/pi-zero-w-rover-setup/rover-03.jpg|/blog/pi-zero-w-rover-setup/rover-04.jpg|/blog/pi-zero-w-rover-setup/rover-05.jpg|/blog/pi-zero-w-rover-setup/rover-06.jpg")>
 
 [archlinux arm]: https://archlinuxarm.org/
 [archlinuxarm setup guide]: /blog/raspberry-pi-archlinuxarm-setup
@@ -53,7 +53,7 @@ The wiring is straight forward, connect both grounds of the servos to one of
 the [ground pins] on the pi and both the power pins to one of the [5V pins].
 Then connect one of the signal wires to [GPIO12] and the other to [GPIO13].
 
-{{ image(src="/blog/pi-zero-w-rover-setup/rpizw-rover-servos.png", height="400px", title="Servos connected to the pi") }}
+![Servos connected to the pi](/blog/pi-zero-w-rover-setup/rpizw-rover-servos.png) TODO height="400px"
 
 You should note that the servos can draw quite quite allot of power when
 running, the pi is fine with this as long as your power supply is able to supply
@@ -90,7 +90,7 @@ config.txt and ensure the `g_serial` module is loaded during boot. Then ensure a
 getty is listening to the serial port. All of which can be done by running the
 following commands.
 
-```sh
+```bash
 grep 'dtoverlay=dwc2' /boot/config.txt >/dev/null || echo 'dtoverlay=dwc2' >> /boot/config.txt
 grep 'modules-load=dwc2,g_serial' /boot/config.txt >/dev/null || sed 's/.*/& modules-load=dwc2,g_serial' >> /boot/config.txt
 
@@ -107,7 +107,7 @@ We want to be able to control two servos from the pi, luckily the pi contains
 two hardware pwm pins which makes this much simpler. All we need to do is enable
 them with the following.
 
-```sh
+```bash
 grep 'dtoverlay=pwm-2chan,pin=12,func=4,pin2=13,func2=4' /boot/config.txt >/dev/null || echo 'dtoverlay=pwm-2chan,pin=12,func=4,pin2=13,func2=4' >> /boot/config.txt
 ```
 Note that you can configure each pwm channel on one of 2 different pins. For
@@ -119,7 +119,7 @@ read more about the hardware pwms
 Lastly we want to configure the wireless so we dont need a cable attached in
 order to interact with our robot.
 
-```sh
+```bash
 # Enable wireless, actual connection details will be configured by the user, likely over usb-serial
 ln -sf /usr/lib/systemd/system/wpa_supplicant@.service /etc/systemd/system/multi-user.target.wants/wpa_supplicant@wlan0.service
 
@@ -159,7 +159,7 @@ The hardware pwm pins are controlled by the sys filesystem located at
 channels, this can be done by writing the channel we want to enable to the
 `export` file. Enable both channels with
 
-```sh
+```bash
 echo 0 > /sys/class/pwm/pwmchip0/export
 echo 1 > /sys/class/pwm/pwmchip0/export
 ```
@@ -171,7 +171,7 @@ three files, `period`, `duty_cycle` and `enable`.
 The period is how often we send a pulse in nano seconds. A servo typically expects a pulse
 every 20ms so we set the period to 20000000ns.
 
-```sh
+```bash
 echo 20000000 > /sys/class/pwm/pwmchip0/pwm0/period
 echo 20000000 > /sys/class/pwm/pwmchip0/pwm1/period
 ```
@@ -179,14 +179,14 @@ echo 20000000 > /sys/class/pwm/pwmchip0/pwm1/period
 Servos move to their neutral point, stopped for continuous servos, when they
 receive a pulse of 1.5ms, so we can set the duty cycle to this.
 
-```sh
+```bash
 echo 1500000 > /sys/class/pwm/pwmchip0/pwm0/duty_cycle
 echo 1500000 > /sys/class/pwm/pwmchip0/pwm1/duty_cycle
 ```
 
 Finally we can enable the servos.
 
-```sh
+```bash
 echo 1 > /sys/class/pwm/pwmchip0/pwm0/enable
 echo 1 > /sys/class/pwm/pwmchip0/pwm1/enable
 ```
@@ -194,7 +194,7 @@ echo 1 > /sys/class/pwm/pwmchip0/pwm1/enable
 At this point the servos should be enable, and not moving. So lets make it drive
 forward by setting one servo to go full forward and the other to go full reverse.
 
-```sh
+```bash
 echo 1000000 > /sys/class/pwm/pwmchip0/pwm0/duty_cycle
 echo 2000000 > /sys/class/pwm/pwmchip0/pwm1/duty_cycle
 sleep 1
@@ -216,7 +216,7 @@ program the rover to move in a set path, not much else but enough to get
 started.
 
 #### rover-test.sh
-```sh
+```bash
 #!/bin/bash
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
@@ -286,7 +286,7 @@ done
 
 Save it to `rover-test.sh` then run it with
 
-```sh
+```bash
 chmod +x rover-test.sh
 sudo ./rover-test.sh
 ```

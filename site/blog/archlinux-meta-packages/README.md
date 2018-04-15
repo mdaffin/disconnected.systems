@@ -48,7 +48,7 @@ a system to sync all the configs from a master set. In this post, I will show
 you how I solved this second goal using the repo I set up in my [last post]
 with a set of custom [meta-packages].
 
-[dotfile managers]: https://wiki.archlinux.org/index.php/Dotfiles 
+[dotfile managers]: https://wiki.archlinux.org/index.php/Dotfiles
 [SaltStack]: https://saltstack.com/
 [salt-arch]: https://github.com/mdaffin/salt-arch
 [last post]: /blog/archlinux-repo-in-aws-bucket/
@@ -304,7 +304,7 @@ post_install() {
 }
 
 post_upgrade() {
-    cp /etc/i3/mdaffin-desktop-config /etc/i3/config 
+    cp /etc/i3/mdaffin-desktop-config /etc/i3/config
 }
 ```
 

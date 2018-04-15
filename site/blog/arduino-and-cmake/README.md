@@ -57,7 +57,7 @@ appropriate values for your project.
 
 Then to build the program simply run
 
-```sh
+```bash
 mkdir build
 cd build
 cmake ..
@@ -66,7 +66,7 @@ make
 
 and to upload exe_name to the arduino run
 
-```sh
+```bash
 make exe_name-upload
 ```
 

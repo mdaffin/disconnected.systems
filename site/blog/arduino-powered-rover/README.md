@@ -65,7 +65,7 @@ pins. The left servo to pin 5 on the Arduinos digital pins and the right servo
 to pin 6.
 
 
-{{ image(src="/blog/arduino-powered-rover/Rover-servos.png", width=288, height=300, title="Rover Servo") }}
+![Rover Servo](/blog/arduino-powered-rover/Rover-servos.png) !!!! TODO width=288, height=300, 
 
 ### The Bumpers and Switch
 
@@ -74,7 +74,7 @@ avoidance. One end of the switch and bumpers should be connected to the
 ardunio's +5v pin and the other end to the Arduinos digital pins 2 (switch), 3
 (left bumper) or 4 (right bumper) as well as through a 1k resistor to ground.
 
-{{ image(src="/blog/arduino-powered-rover/Rover-bumpers.png", width=198, height=300, title="The bumpers and switch") }} 
+![The bumpers and switch](/blog/arduino-powered-rover/Rover-bumpers.png) !!!! TODO width=198, height=300,  
 
 ### The Range Finders
 
@@ -92,7 +92,7 @@ The power pins should be connected to the Arduinos +5v pins and the ground to
 the ground pins. The left range finder to the digital pin 7 and the right one to
 digital pin 8.
 
-{{ image(src="/blog/2012-10-24-arduino-powered-rover/Rover-Range.png", width=300, height=295, title="Range finders") }}
+![Range finders](/blog/2012-10-24-arduino-powered-rover/Rover-Range.png) !!!! TODO width=300, height=295, 
 
 ### The Potentiometer
 
@@ -101,7 +101,7 @@ be directly connected to the arduinos ground and +5v power supply and the
 central pin to the Arduinos analog pin 0.
 
 
-{{ image(src="/blog/arduino-powered-rover/Rover-Potentiometer.png", width=296, height=300, title="Potentiometer circuit") }}
+![Potentiometer circuit](/blog/arduino-powered-rover/Rover-Potentiometer.png) !!!! TODO width=296, height=300, 
 
 ### The LEDs
 
@@ -114,7 +114,7 @@ not. The 12th pin is mostly used for debugging so is not needed.
 The code for this project is available on [my github
 account](https://github.com/mdaffin/ArduinoRover). And can easily be built with
 
-```sh
+```bash
 mkdir build
 cd build
 cmake ..

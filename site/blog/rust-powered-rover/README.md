@@ -27,9 +27,9 @@ binary in the image.
 
 I am going to continue with the repo we created in the last blog post, if you
 dont want to follow on from that, or if you want to start from the same base you
-can clone it by running 
+can clone it by running the following.
 
-```sh
+```bash
 git clone https://github.com/mdaffin/rpizw-rover.git -b v0.1
 cd ripzw-rover
 ```
@@ -38,7 +38,7 @@ cd ripzw-rover
 
 To cross compile to arm on rust we require the arm linker which can by running
 
-```sh
+```bash
 apt-get install -qq gcc-arm-linux-gnueabihf libc6-armhf-cross libc6-dev-armhf-cross
 ```
 
@@ -47,7 +47,7 @@ on ubuntu or from the aur package
 
 Once installed we also need to install rust and the arm target for rust.
 
-```sh
+```bash
 curl https://sh.rustup.rs -sSf | sh # Or install from your package manager
 rustup default stable
 rustup target add arm-unknown-linux-gnueabihf
@@ -61,7 +61,7 @@ We need to tell rust about the linker we want to use for the
 `arm-unknown-linux-gnueabihf` target. This can be done by creating
 `.cargo/config` in the root of our project with the following contents.
 
-```sh
+```bash
 [target.arm-unknown-linux-gnueabihf]
 linker = "arm-linux-gnueabihf-gcc"
 ```
@@ -90,7 +90,7 @@ fn main() {
 You can compile it natively and run it locally with to ensure rust is installed
 correctly.
 
-```sh
+```bash
 cargo run
 #    Compiling rpizw-rover v0.1.0 (file:///home/mdaffin/projects/test)
 #     Finished debug [unoptimized + debuginfo] target(s) in 0.38 secs
@@ -100,7 +100,7 @@ cargo run
 
 And cross compile and upload it to then run it on the pi with.
 
-```sh
+```bash
 cargo build --target=arm-unknown-linux-gnueabihf
 #    Compiling rpizw-rover v0.2.0 (file:///home/mdaffin/projects/test)
 #     Finished debug [unoptimized + debuginfo] target(s) in 0.43 secs
@@ -115,7 +115,7 @@ rust](https://github.com/japaric/rust-cross). Alternatively you can install rust
 on the pi and compile it natively, however this tends to be much slower for
 larger projects.
 
-Congratulations you can now cross compile for the raspberry pi in rust. 
+Congratulations you can now cross compile for the raspberry pi in rust.
 
 ## Dependencies
 
@@ -413,7 +413,7 @@ fn run() -> Result<()> {
 
 Now we can build and upload it to the pi by running:
 
-```sh
+```bash
 cargo build --target=arm-unknown-linux-gnueabihf
 scp target/arm-unknown-linux-gnueabihf/debug/rpizw-rover alarm@rpizw-rover.local:
 ```
@@ -421,7 +421,7 @@ scp target/arm-unknown-linux-gnueabihf/debug/rpizw-rover alarm@rpizw-rover.local
 Then ssh to the pi and try out the command. Note that the `--` is necessary to
 stop clap from interpreting negative numbers as flags.
 
-```sh
+```bash
 sudo ./rpizw-rover speed 100 100
 sleep 1
 sudo ./rpizw-rover speed -- -100 -100
@@ -448,7 +448,7 @@ to build our program as root. So lets add a check to bail out early if it has
 not already been build. In `create-image`, around line 18 add the following just
 before the cleanup function.
 
-```sh
+```bash
 ...
 
 rpi_tar="ArchLinuxARM-rpi-latest.tar.gz"
@@ -470,7 +470,7 @@ cleanup() {
 
 Then add the following install command just after we install the script
 
-```sh
+```bash
 ...
 
 # Copy our installation script and other artifacts
@@ -488,7 +488,7 @@ While we are at it we can remove our old `rover-test.sh` from the image and
 repo. Remove the following line from `create-image` then delete the
 `rover-test.sh` script from the repo.
 
-```sh
+```bash
 cp rover-test.sh ${mount}/home/alarm/rover-test.sh
 ```
 

@@ -99,21 +99,21 @@ and [fairly cheap][amazon pricing] after that.
 
 Click on the create bucket button.
 
-{{ smallimage(src="/blog/archlinux-repo-in-aws-bucket/01-create-bucket.png", title="Create Bucket") }}
+![Create Bucket](/blog/archlinux-repo-in-aws-bucket/01-create-bucket.png) !!!! TODO smallimage
 
 Name your bucket and select the region you want to host it in.
 
-{{ image(src="/blog/archlinux-repo-in-aws-bucket/02-name-bucket.png", title="Name the Bucket") }}
+![Name the Bucket](/blog/archlinux-repo-in-aws-bucket/02-name-bucket.png)
 
 Then click on Next twice to get to (3) Set permissions and make the bucket
 public. This will allow anyone in the world to read the bucket and thus allows
 Pacman to download the packages anonymously.
 
-{{ image(src="/blog/archlinux-repo-in-aws-bucket/03-public-bucket.png", title="Public Bucket") }}
+![Public Bucket](/blog/archlinux-repo-in-aws-bucket/03-public-bucket.png)
 
 After you should have one public bucket listed like so.
 
-{{ image(src="/blog/archlinux-repo-in-aws-bucket/04-bucket-list.png", title="Bucket List") }}
+![Bucket List](/blog/archlinux-repo-in-aws-bucket/04-bucket-list.png)
 
 
 [Amazon S3]: https://s3.console.aws.amazon.com/s3/home?region=us-east-1
@@ -128,24 +128,24 @@ Amazon S3 buckets.
 Head over to the [AWS IAM management console] and add a new user. Then enter
 the username and ensure *Programmatic access* check box is selected.
 
-{{ image(src="/blog/archlinux-repo-in-aws-bucket/05-create-user.png", title="Account Name") }}
+![Account Name](/blog/archlinux-repo-in-aws-bucket/05-create-user.png)
 
 Click Next to head to the permission page then *Attach existing policies
 directly*. Search for *S3* and check *AmazonS3FullAccess*.
 
-{{ image(src="/blog/archlinux-repo-in-aws-bucket/06-permissions.png", title="Account Permissions") }}
+![Account Permissions](/blog/archlinux-repo-in-aws-bucket/06-permissions.png)
 
 Click *Next* and on the review page double check it has *Programmatic access*
 and *AmazonS3FullAccess*.
 
-{{ image(src="/blog/archlinux-repo-in-aws-bucket/07-review.png", title="Account Review") }}
+![Account Review](/blog/archlinux-repo-in-aws-bucket/07-review.png)
 
 Click *Create User* to get the access key. Take note of the *Access key ID* as
 well as the *Secret access key*. Ensure you save these somewhere, once you
 leave this page you will not have access to the secret key through the AWS
 console and will have to regenerate a new key.
 
-{{ image(src="/blog/archlinux-repo-in-aws-bucket/08-access-key.png", title="Account Secret") }}
+![Account Secret](/blog/archlinux-repo-in-aws-bucket/08-access-key.png)
 
 Keep this key secret as it will give anyone with it the ability to
 create/modify your buckets. If you lose the key or no longer require it then
@@ -181,7 +181,7 @@ s3fs "${BUCKET}" "bucket" -o "nosuid,nodev,default_acl=public-read"
 
 Be aware that operations inside the `repo` can be slow as they require network
 calls. Also, note that actions inside this directory will count towards your
-usage limits so avoid doing crazy things like compiling packages inside it. 
+usage limits so avoid doing crazy things like compiling packages inside it.
 
 We have mounted the directory with the `public-read`. This ensures that
 anything we upload to the bucket is readable by everyone. This is so that

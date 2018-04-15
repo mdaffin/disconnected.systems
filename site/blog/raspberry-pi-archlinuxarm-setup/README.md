@@ -61,7 +61,7 @@ end
 ## Create an image file
 
 If you want to write directly to an sd-card skip this step and head to [Format
-and Mount the Device](/raspberry-pi-archlinuxarm-setup/#format-and-mount-the-device). Remember to substitute
+and Mount the Device](#format-and-mount-the-device). Remember to substitute
 `/dev/loop0` with the device you want to write to, typically `/dev/mmblkX` or
 `/dev/sdX` for sd-cards.
 
@@ -69,7 +69,7 @@ Creating an image file is simple, just create an empty file large enough to
 store everything we want to install. A simple way to do this is with `fallocate`
 to create a 2 gigibyte file run the following.
 
-```sh
+```bash
 fallocate -l 2G "custom-pi.img"
 ```
 
@@ -83,7 +83,7 @@ Now setup the image as a loopback device so we can format and mount it as any
 physical disk. Note the device that this command returns, we will need it later -
 in the example below its `/dev/loop0`.
 
-```sh
+```bash
 sudo losetup --find --show "custom-pi.img"
 > /dev/loop0
 ```
@@ -93,7 +93,7 @@ sudo losetup --find --show "custom-pi.img"
 Here we create the partitions the first one, 100M in size, for the boot files
 and the second one for the rest of the system.
 
-```sh
+```bash
 sudo parted --script /dev/loop0 mklabel msdos
 sudo parted --script /dev/loop0 mkpart primary fat32 0% 100M
 sudo parted --script /dev/loop0 mkpart primary ext4 100M 100%
@@ -103,14 +103,14 @@ This will create two new devices `/dev/loop0p1` and `/dev/loop0p2` which you can
 see by running `ls /dev/loop0?*`. We can now format these partitions with vfat
 (required for the boot partition) and ext4 respectively.
 
-```sh
+```bash
 sudo mkfs.vfat -F32 /dev/loop0p1
 sudo mkfs.ext4 -F /dev/loop0p2
 ```
 
 Before we can install archlinuxarm we must mount the partition.
 
-```sh
+```bash
 sudo mount /dev/loop0p2 /mnt
 sudo mkdir /mnt/boot
 sudo mount /dev/loop0p1 /mnt/boot
@@ -120,19 +120,19 @@ sudo mount /dev/loop0p1 /mnt/boot
 
 Now download the archlinuxarm tar for your pi. For the raspberry pi 2/3
 
-```sh
+```bash
 wget http://archlinuxarm.org/os/ArchLinuxARM-rpi-2-latest.tar.gz
 ```
 
 Or for the raspberry pi 1.
 
-```sh
+```bash
 wget http://archlinuxarm.org/os/ArchLinuxARM-rpi-latest.tar.gz
 ```
 
 And extract it to the mounted image.
 
-```sh
+```bash
 sudo tar -xpf "ArchLinuxARM-rpi-2-latest.tar.gz" -C /mnt
 ```
 
@@ -145,7 +145,7 @@ tar: Ignoring unknown extended header keyword 'SCHILY.fflags'
 These are safe to ignore.
 
 You should now have a fully working raspberry pi image and can skip to the
-[cleanup step](raspberry-pi-archlinuxarm-setup/#cleaning-up) below if you do not want to make any customizations
+[cleanup step](#cleaning-up) below if you do not want to make any customizations
 to the image.
 
 ## Chroot into the image
@@ -153,7 +153,7 @@ to the image.
 There are a few system directories that need mounting to
 create a successful chroot environment.
 
-```sh
+```bash
 sudo mount -t proc none /mnt/proc
 sudo mount -t sysfs none /mnt/sys
 sudo mount -o bind /dev /mnt/dev
@@ -162,7 +162,7 @@ sudo mount -o bind /dev /mnt/dev
 Then to get a working network inside the chroot we need to fix the `resolv.conf`
 file.
 
-```sh
+```bash
 sudo mv /mnt/etc/resolv.conf /mnt/etc/resolv.conf.bak
 sudo cp /etc/resolv.conf /mnt/etc/resolv.conf
 ```
@@ -170,13 +170,13 @@ sudo cp /etc/resolv.conf /mnt/etc/resolv.conf
 And now for the bit that allows us to execute arm executables on a x86 or x86_64
 system.
 
-```sh
+```bash
 sudo cp /usr/bin/qemu-arm-static /mnt/usr/bin/
 ```
 
 We should now be able to chroot into our raspberry pi image.
 
-```sh
+```bash
 sudo chroot /mnt /usr/bin/bash
 ```
 
@@ -199,13 +199,13 @@ your self `ln -sf /usr/lib/systemd/system/SOMESERVICE.service
 First thing we should do to our image is update it and install any extra
 packages we want.
 
-```sh
+```bash
 pacman -Syu vim bash-completion
 ```
 
 You can change the hostname and rename the default user with the following.
 
-```sh
+```bash
 echo custom-pi > /etc/hostname
 
 sed -i "s/alarm/pi/g" /etc/passwd /etc/group /etc/shadow
@@ -215,14 +215,14 @@ echo -e "secret\nsecret" | passwd "pi"
 
 Install and enable sudo for our new user with.
 
-```sh
+```bash
 pacman -S --noconfirm sudo
 echo '%wheel ALL=(ALL) ALL' >> /etc/sudoers.d/wheel
 ```
 
 To enable the raspberry pi camera do.
 
-```sh
+```bash
 sed -i 's/gpu_mem=.*/gpu_mem=128/' /boot/config.txt
 grep 'start_file=start_x.elf' /boot/config.txt >/dev/null || echo 'start_file=start_x.elf' >> /boot/config.txt
 grep 'fixup_file=fixup_x.dat' /boot/config.txt >/dev/null || echo 'fixup_file=fixup_x.dat' >> /boot/config.txt
@@ -234,7 +234,7 @@ roams within range of the network). Remember to replace the `SSID` and
 wireless networks and the pi will connect to any that it can see allowing you to
 move your pi between locations.
 
-```sh
+```bash
 pacman -S --noconfirm wpa_supplicant wpa_actiond ifplugd crda dialog
 ln -sf /usr/lib/systemd/system/netctl-auto@.service /etc/systemd/system/multi-user.target.wants/netctl-auto@wlan0.service
 ln -sf /usr/lib/systemd/system/netctl-ifplugd@.service /etc/systemd/system/multi-user.target.wants/netctl-ifplugd@eth0.service
@@ -253,7 +253,7 @@ EOF
 Enable zero-conf networking (aka avahi or Bonjour) to make discovering your pi
 on the network easier, if your system supports it.
 
-```sh
+```bash
 pacman -S --noconfirm avahi nss-mdns
 sed -i '/^hosts: /s/files dns/files mdns dns/' /etc/nsswitch.conf
 ln -sf /usr/lib/systemd/system/avahi-daemon.service /etc/systemd/system/multi-user.target.wants/avahi-daemon.service
@@ -266,7 +266,7 @@ some stuff. First exit the chroot by running `exit` or pressing `ctrl+d`. Then
 we start to unwind some of the setup steps, starting with restoring the
 resolve.conf, and unmounting the system folders needed by the chroot.
 
-```sh
+```bash
 sudo rm /mnt/etc/resolv.conf
 sudo mv /mnt/etc/resolv.conf.bak /mnt/etc/resolv.conf
 sudo rm /mnt/usr/bin/qemu-arm-static
@@ -278,7 +278,7 @@ sudo umount /mnt/sys
 
 Now we can unmount the partitions and detach the loopback device.
 
-```sh
+```bash
 sudo umount /mnt/boot
 sudo umount /mnt
 sudo losetup --detach "/dev/loop0"
@@ -289,7 +289,7 @@ sudo losetup --detach "/dev/loop0"
 We are now ready to flash the image, which can be done with `dd`. Remember to
 replace `/dev/mmblk0` with the device for your sd-card.
 
-```sh
+```bash
 sudo dd if=custom-pi.img of=/dev/mmblk0 bs=1M
 ```
 

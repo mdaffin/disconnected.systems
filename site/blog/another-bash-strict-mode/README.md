@@ -12,6 +12,8 @@ tags:
 title: Another Bash Strict Mode
 ---
 
+# TODO
+
 I have been using [Aaron Maxwell's Unofficial Bash Strict
 Mode](http://redsymbol.net/articles/unofficial-bash-strict-mode/) for many years
 now and it has saved my loads of time if finding and fixing buggy bash scripts.
@@ -19,7 +21,7 @@ The main problem I now encounter is scripts that fail silently (or far from the
 last command that output anything). To solve this I have started to use the
 following variant.
 
-```sh
+```bash
 #!/bin/bash
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
