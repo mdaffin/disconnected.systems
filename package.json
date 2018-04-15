@@ -2,25 +2,15 @@
   "name": "disconnected.systems",
   "version": "1.0.0",
   "description": "Programming, Linux and all things Open Source",
-  "main": "index.js",
   "repository": "git@github.com:mdaffin/disconnected.systems.git",
   "author": "Michael Daffin <michael@daffin.io>",
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "nuxt",
-    "generate": "nuxt generate"
+    "dev": "vuepress dev site",
+    "generate": "vuepress build site"
   },
-  "dependencies": {
-    "axios": "^0.18.0",
-    "express": "^4.16.3",
-    "express-graphql": "^0.6.12",
-    "graphql": "^0.13.2",
-    "gray-matter": "^4.0.1",
-    "nuxt": "^1.4.0",
-    "nuxt-netlify-cms": "^2.0.1",
-    "toml": "^2.3.3",
-    "typescript": "^2.8.1",
-    "yamljs": "^0.3.0"
+  "devDependencies": {
+    "vuepress": "^0.3.1"
   }
 }
