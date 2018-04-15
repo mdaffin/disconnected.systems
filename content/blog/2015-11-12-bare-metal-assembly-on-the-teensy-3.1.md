@@ -1,14 +1,17 @@
-+++
-title = "Bare Metal Assembly on the Teensy 3.1"
-description = "A look at bare metal programming in assembly on the teensy 3.1 with out external dependencies."
-slug = "bare-metal-assembly-on-the-teensy-3.1"
-date = "2015-11-12T00:00:00Z"
-tags = [ "assembly", "teensy", "arm" ]
-aliases = [
-    "/bare-metal-assembly-on-the-teensy-3.1/",
-    "/posts/bare-metal-assembly-on-the-teensy-3.1/",
-]
-+++
+---
+aliases:
+- /bare-metal-assembly-on-the-teensy-3.1/
+- /posts/bare-metal-assembly-on-the-teensy-3.1/
+date: '2015-11-12T00:00:00Z'
+description: A look at bare metal programming in assembly on the teensy 3.1 with out
+  external dependencies.
+slug: bare-metal-assembly-on-the-teensy-3.1
+tags:
+- assembly
+- teensy
+- arm
+title: Bare Metal Assembly on the Teensy 3.1
+---
 
 I started to look at bare metal programming on the Teensy 3.1 and found quite a
 few examples mainly based off the work of [Karl

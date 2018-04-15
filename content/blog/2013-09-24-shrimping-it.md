@@ -1,14 +1,16 @@
-+++
-title = "Shrimping it"
-description = "A quick tutorial on assembling a minimal DIY arduino known as the shrimp."
-slug = "shrimping-it"
-date = "2013-09-24T00:00:00Z"
-tags = [ "shrimp", "arduino", "atmega328p" ]
-aliases = [
-    "/shrimping-it/",
-    "/posts/shrimping-it/",
-]
-+++
+---
+aliases:
+- /shrimping-it/
+- /posts/shrimping-it/
+date: '2013-09-24T00:00:00Z'
+description: A quick tutorial on assembling a minimal DIY arduino known as the shrimp.
+slug: shrimping-it
+tags:
+- shrimp
+- arduino
+- atmega328p
+title: Shrimping it
+---
 
 The arduino platform is a great platform to work with, it is easy to code for
 and has a nice learning curve. However, after you have finished playing with

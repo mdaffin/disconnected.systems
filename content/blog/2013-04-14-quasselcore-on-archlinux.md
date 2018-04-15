@@ -1,14 +1,15 @@
-+++
-title = "QuasselCore on Archlinux"
-description = "A guide to setting up a quassel server on an Arch Linux server."
-slug = "quasselcore-on-archlinux"
-date = "2013-04-14T00:00:00Z"
-tags = [ "archlinux", "linux" ]
-aliases = [
-    "/quasselcore-on-archlinux/",
-    "/posts/quasselcore-on-archlinux/",
-]
-+++
+---
+aliases:
+- /quasselcore-on-archlinux/
+- /posts/quasselcore-on-archlinux/
+date: '2013-04-14T00:00:00Z'
+description: A guide to setting up a quassel server on an Arch Linux server.
+slug: quasselcore-on-archlinux
+tags:
+- archlinux
+- linux
+title: QuasselCore on Archlinux
+---
 
 I just set up a quassel server on an Arch Linux box. There is a serious lack of documentation around
 it, though it is simple enough to set up I stumbled around a bit wondering why I could not connect

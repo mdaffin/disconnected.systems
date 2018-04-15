@@ -1,11 +1,16 @@
-+++
-date = "2017-04-03T19:19:41Z"
-title = "Web Interface To Control The Rover"
-draft = false
-description = "Looks at how to build a web interface using vue.js and webpack to control the raspberry pi rover"
-slug = "rover-web-ui"
-tags = ["javascript", "raspberry-pi", "vue.js", "webpack"]
-+++
+---
+date: '2017-04-03T19:19:41Z'
+description: Looks at how to build a web interface using vue.js and webpack to control
+  the raspberry pi rover
+draft: false
+slug: rover-web-ui
+tags:
+- javascript
+- raspberry-pi
+- vue.js
+- webpack
+title: Web Interface To Control The Rover
+---
 
 Over the past few weeks I have been building a raspberry pi zero w based rover.
 This post follows on from the previous posts which you can checkout below.

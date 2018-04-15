@@ -1,11 +1,14 @@
-+++
-date = "2017-03-18T21:45:01Z"
-title = "Small Refactor To Prepare For Writing The Rest API"
-draft = false
-description = "Small tweaks to the rovers code and overall project layout in preparation for adding a webserver that can control the rover."
-slug = "rover-refactor"
-tags = ["rust", "raspberry-pi"]
-+++
+---
+date: '2017-03-18T21:45:01Z'
+description: Small tweaks to the rovers code and overall project layout in preparation
+  for adding a webserver that can control the rover.
+draft: false
+slug: rover-refactor
+tags:
+- rust
+- raspberry-pi
+title: Small Refactor To Prepare For Writing The Rest API
+---
 
 Over the past few weeks I have been starting to build a raspberry pi zero w
 based rover.

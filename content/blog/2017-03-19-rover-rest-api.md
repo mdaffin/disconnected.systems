@@ -1,11 +1,16 @@
-+++
-date = "2017-03-19T17:20:50Z"
-title = "Writing A Rest API For The Pi Rover"
-draft = false
-description = "Using the iron web framework to build a simple rest api for the raspberry pi zero w rover"
-slug = "rover-rest-api"
-tags = ["rust", "raspberry-pi", "iron", "rest"]
-+++
+---
+date: '2017-03-19T17:20:50Z'
+description: Using the iron web framework to build a simple rest api for the raspberry
+  pi zero w rover
+draft: false
+slug: rover-rest-api
+tags:
+- rust
+- raspberry-pi
+- iron
+- rest
+title: Writing A Rest API For The Pi Rover
+---
 
 *Updated on 2017-03-25: added a static file server and set cors headers*
 

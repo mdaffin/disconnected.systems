@@ -1,14 +1,16 @@
-+++
-title = "Bare Metal Rust on the Teensy 3.1"
-description = "A bare metal example of blink written in rust for the teensy 3.1"
-slug = "bare-metal-rust-on-the-teensy-3.1"
-date = "2016-01-24T00:00:00Z"
-tags = ["rust", "teensy", "arm"]
-aliases = [
-    "/bare-metal-rust-on-the-teensy-3.1/",
-    "/posts/bare-metal-rust-on-the-teensy-3.1/",
-]
-+++
+---
+aliases:
+- /bare-metal-rust-on-the-teensy-3.1/
+- /posts/bare-metal-rust-on-the-teensy-3.1/
+date: '2016-01-24T00:00:00Z'
+description: A bare metal example of blink written in rust for the teensy 3.1
+slug: bare-metal-rust-on-the-teensy-3.1
+tags:
+- rust
+- teensy
+- arm
+title: Bare Metal Rust on the Teensy 3.1
+---
 
 Now that we have a good understanding of basic bare metal programming using the
 traditional languages I wanted to look at [rust](https://www.rust-lang.org/). In

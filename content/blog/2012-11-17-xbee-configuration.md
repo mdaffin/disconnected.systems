@@ -1,14 +1,14 @@
-+++
-title = "XBee Configuration"
-description = "A beginners guide on configuring and communicating over two xbees."
-slug = "xbee-configuration"
-date = "2012-11-17T00:00:00Z"
-tags = [ "xbee" ]
-aliases = [
-    "/xbee-configuration/",
-    "/posts/xbee-configuration/",
-]
-+++
+---
+aliases:
+- /xbee-configuration/
+- /posts/xbee-configuration/
+date: '2012-11-17T00:00:00Z'
+description: A beginners guide on configuring and communicating over two xbees.
+slug: xbee-configuration
+tags:
+- xbee
+title: XBee Configuration
+---
 
 For my third year project I will be using a bunch of XBee connected to various
 devices, this post will talk about how to set up the XBee and what the various

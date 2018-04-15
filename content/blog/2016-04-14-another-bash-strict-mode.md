@@ -1,14 +1,16 @@
-+++
-title = "Another Bash Strict Mode"
-description = "Cause bash scripts to fail fast and loud to aid debugging."
-slug = "another-bash-strict-mode"
-date = "2016-04-14T00:00:00Z"
-tags = ["linux", "bash", "shell"]
-aliases = [
-    "/another-bash-strict-mode/",
-    "/posts/another-bash-strict-mode/",
-]
-+++
+---
+aliases:
+- /another-bash-strict-mode/
+- /posts/another-bash-strict-mode/
+date: '2016-04-14T00:00:00Z'
+description: Cause bash scripts to fail fast and loud to aid debugging.
+slug: another-bash-strict-mode
+tags:
+- linux
+- bash
+- shell
+title: Another Bash Strict Mode
+---
 
 I have been using [Aaron Maxwell's Unofficial Bash Strict
 Mode](http://redsymbol.net/articles/unofficial-bash-strict-mode/) for many years

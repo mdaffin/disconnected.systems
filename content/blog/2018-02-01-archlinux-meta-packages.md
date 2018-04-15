@@ -1,10 +1,13 @@
-+++
-date = "2018-02-01T09:00:00Z"
-title = "Automating Arch Linux Part 2: Managing Arch Linux with Meta Packages"
-description = "Show how you can use meta package to manage multiple arch linux systems"
-slug = "archlinux-meta-packages"
-tags = ["linux", "automation", "archlinux"]
-+++
+---
+date: '2018-02-01T09:00:00Z'
+description: Show how you can use meta package to manage multiple arch linux systems
+slug: archlinux-meta-packages
+tags:
+- linux
+- automation
+- archlinux
+title: 'Automating Arch Linux Part 2: Managing Arch Linux with Meta Packages'
+---
 
 In this three-part series, I will show you one way to simplify and manage
 multiple Arch Linux systems using a custom repo, a set of meta-packages and a
