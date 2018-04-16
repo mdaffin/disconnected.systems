@@ -8,9 +8,9 @@
   "private": true,
   "scripts": {
     "dev": "vuepress dev site",
-    "generate": "vuepress build site"
+    "build": "vuepress build site"
   },
   "devDependencies": {
-    "vuepress": "^0.3.1"
+    "vuepress": "^0.4.1"
   }
 }

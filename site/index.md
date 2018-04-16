@@ -3,6 +3,7 @@ home: true
 ---
 <PostItem 
   v-for="post in posts"
+  :key="post.date"
   v-bind:title="post.title"
   v-bind:to="post.path"
   v-bind:date="post.date"
