@@ -1,11 +1,13 @@
 ---
 home: true
 ---
-# A title
-
-<div v-for="post in posts">
-  <h3>{{ post.title }}</h3>
-</div>
+<PostItem 
+  v-for="post in posts"
+  v-bind:title="post.title"
+  v-bind:to="post.path"
+  v-bind:date="post.date"
+  v-bind:description="post.description"
+/>
 
 <script>
 export default {
