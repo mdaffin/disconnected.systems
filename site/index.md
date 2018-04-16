@@ -1,7 +1,10 @@
+---
+home: true
+---
 # A title
 
 <div v-for="post in posts">
-    <h3>{{ post.title }}</h3>
+  <h3>{{ post.title }}</h3>
 </div>
 
 <script>
@@ -16,7 +19,8 @@ export default {
                 date: new Date(page.frontmatter.date),
                 description: page.frontmatter.description,
                 tags: page.frontmatter.tags,
-            })).sort((a, b) => b.date - a.date);
+            }))
+            .sort((a, b) => b.date - a.date);
         }
     }
 }
