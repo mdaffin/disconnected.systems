@@ -2,6 +2,7 @@
 /build/
 /public/
 
+dist/
 .nuxt/
 node_modules/
 *.log
