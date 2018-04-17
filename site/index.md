@@ -2,29 +2,26 @@
 home: true
 ---
 <PostItem 
-  v-for="post in posts"
-  :key="post.date"
+  v-for="post in posts()"
+  :key="post.frontmatter.date"
   v-bind:title="post.title"
   v-bind:to="post.path"
-  v-bind:date="post.date"
-  v-bind:description="post.description"
+  v-bind:date="new Date(post.frontmatter.date)"
+  v-bind:description="post.frontmatter.description"
 />
 
 <script>
 export default {
-    computed: {
+    methods: {
+        posts_with_tag(tag) {
+            return this.$site.pages
+            .filter((page) => page.frontmatter.tags)
+            .filter((page) => page.frontmatter.tags.includes(tag));
+        },
         posts() {
             return this.$site.pages
-            .filter((page) => page.path.startsWith("/blog/"))
-            .map((page) => ({
-                title: page.title,
-                path: page.path,
-                date: new Date(page.frontmatter.date),
-                description: page.frontmatter.description,
-                tags: page.frontmatter.tags,
-            }))
-            .sort((a, b) => b.date - a.date);
+            .filter((page) => page.path.startsWith("/blog/"));
         }
-    }
+    },
 }
 </script>
