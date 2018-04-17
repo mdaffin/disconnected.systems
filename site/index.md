@@ -15,12 +15,12 @@ export default {
     methods: {
         posts_with_tag(tag) {
             return this.$site.pages
-            .filter((page) => page.frontmatter.tags)
-            .filter((page) => page.frontmatter.tags.includes(tag));
+                .filter((page) => page.frontmatter.tags)
+                .filter((page) => page.frontmatter.tags.includes(tag));
         },
         posts() {
             return this.$site.pages
-            .filter((page) => page.path.startsWith("/blog/"));
+                .filter((page) => page.path.startsWith("/blog/"));
         }
     },
 }
