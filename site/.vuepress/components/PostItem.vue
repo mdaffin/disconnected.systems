@@ -2,7 +2,7 @@
   <router-link :to="to">
     <article>
       <div class="title">{{ title }}</div>
-      <div class="date">{{ date.toLocaleDateString() }}</div>
+      <div class="date">{{ date.getFullYear() }}/{{ date.getMonth() + 1 }}/{{ date.getDate() }}</div>
       <div class="description">{{ description }}</div>
     </article>
   </router-link>
@@ -12,15 +12,14 @@
 article {
     color: #2c3e50;
     padding: 16px;
-    border-bottom: 1px solid #fff;
-    border-top: 1px solid #fff;
+    /*border-bottom: 1px solid #eaecef;*/
+    border-top: 1px solid #eaecef;
 }
 
 article:hover {
-    border-bottom: 1px solid #eaecef;
-    border-top: 1px solid #eaecef;
-
+    color: #3eaf7c;
 }
+
 .title {
     font-weight: bold;
     margin-bottom: 8px
