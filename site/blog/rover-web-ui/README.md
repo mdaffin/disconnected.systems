@@ -9,8 +9,9 @@ tags:
 - raspberry-pi
 - vue.js
 - webpack
-title: Web Interface To Control The Rover
 ---
+
+# Web Interface To Control The Rover
 
 Over the past few weeks I have been building a raspberry pi zero w based rover.
 This post follows on from the previous posts which you can checkout below.

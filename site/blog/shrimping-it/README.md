@@ -9,8 +9,9 @@ tags:
 - shrimp
 - arduino
 - atmega328p
-title: Shrimping it
 ---
+
+# Shrimping it
 
 The arduino platform is a great platform to work with, it is easy to code for
 and has a nice learning curve. However, after you have finished playing with

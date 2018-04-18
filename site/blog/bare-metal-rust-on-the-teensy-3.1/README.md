@@ -9,8 +9,9 @@ tags:
 - rust
 - teensy
 - arm
-title: Bare Metal Rust on the Teensy 3.1
 ---
+
+# Bare Metal Rust on the Teensy 3.1
 
 Now that we have a good understanding of basic bare metal programming using the
 traditional languages I wanted to look at [rust](https://www.rust-lang.org/). In

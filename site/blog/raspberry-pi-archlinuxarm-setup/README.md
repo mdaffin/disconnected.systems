@@ -11,8 +11,9 @@ tags:
 - archlinuxarm
 - arm
 - chroot
-title: Create Custom ArchlinuxArm Images for the Raspberry Pi
 ---
+
+# Create Custom ArchlinuxArm Images for the Raspberry Pi
 
 I generally work with headless Raspberry Pis either by running them as
 lightweight servers or embedding them into projects. It is very anoying having

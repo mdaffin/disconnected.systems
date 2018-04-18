@@ -7,9 +7,9 @@ tags:
 - linux
 - automation
 - archlinux
-title: 'Automating Arch Linux Part 1b: Hosting an Arch Linux Repo in a Hosted Git
-  Repository'
 ---
+
+# Automating Arch Linux Part 1b: Hosting an Arch Linux Repo in a Hosted Git Repository
 
 In this three-part series, I will show you one way to simplify and manage
 multiple Arch Linux systems using a custom repo, a set of meta-packages and a

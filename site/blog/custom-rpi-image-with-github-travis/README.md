@@ -10,8 +10,9 @@ tags:
 - raspberry-pi
 - github
 - travis
-title: Customising Raspberry Pi Images with Github and Travis
 ---
+
+# Customising Raspberry Pi Images with Github and Travis
 
 Over the coming months I am goring to be building upon my [raspberry pi
 rover](/blog/pi-zero-w-rover-setup) and over this

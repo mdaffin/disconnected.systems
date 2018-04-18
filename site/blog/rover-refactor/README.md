@@ -7,8 +7,9 @@ slug: rover-refactor
 tags:
 - rust
 - raspberry-pi
-title: Small Refactor To Prepare For Writing The Rest API
 ---
+
+# Small Refactor To Prepare For Writing The Rest API
 
 Over the past few weeks I have been starting to build a raspberry pi zero w
 based rover.
