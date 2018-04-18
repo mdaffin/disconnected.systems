@@ -12,7 +12,6 @@
 article {
     color: #2c3e50;
     padding: 16px;
-    /*border-bottom: 1px solid #eaecef;*/
     border-top: 1px solid #eaecef;
 }
 

@@ -12,6 +12,10 @@ footer: This work is licensed under a Creative Commons Attribution-ShareAlike 4.
   v-bind:description="post.frontmatter.description"
 />
 
+---
+
+Found an issue? Report it <a href="https://github.com/mdaffin/disconnected.systems/issues">here</a>.
+
 <script>
 export default {
     methods: {
