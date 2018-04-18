@@ -33,7 +33,7 @@ C places all `const` variables inside a section called `.rodata`, which we place
 after the code section with by adding the following to the end of the `.text`
 section in the `SECTIONS` block.
 
-###### [layout.ld](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/layout.ld#L36-L46)
+#### [layout.ld](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/layout.ld#L36-L46)
 
 ```
 SECTIONS {
@@ -52,7 +52,7 @@ SECTIONS {
 Next we define the `.data` section. This is where C will place all initialized
 global variables, which can be modified so should be placed in `RAM`.
 
-###### [layout.ld](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/layout.ld#L48-L55)
+#### [layout.ld](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/layout.ld#L48-L55)
 
 ```
     .data : {
@@ -77,7 +77,7 @@ need to know where the data starts in `FLASH`, which we obtain using `LOADADDR`
 and store in `_sflashdata`. This references the whole data block so much be
 located outside of it, we just place it at the top for convenience.
 
-###### [layout.ld](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/layout.ld#L29)
+#### [layout.ld](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/layout.ld#L29)
 
 ```
 _sflashdata = LOADADDR(.data);
@@ -91,7 +91,7 @@ The uninitialized variables are easier to deal with as we don't need to worry
 about copying them from `FLASH`. C stores them in a section called `.bss`. So we
 create that next, again storing the start and end in `_sbss` and `_ebss`.
 
-###### [layout.ld](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/layout.ld#L57-L64)
+#### [layout.ld](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/layout.ld#L57-L64)
 
 ```
     .bss : {
@@ -113,7 +113,7 @@ loop and functions for turning the led on/off and a simple delay.
 We start with some macros definitions that will allow us to write to various
 memory locations by name rather then their actual address.
 
-###### [blink.c](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/blink.c#L30-L35)
+#### [blink.c](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/blink.c#L30-L35)
 
 ```c
 #define WDOG_UNLOCK  (*(volatile unsigned short *)0x4005200E) // Watchdog Unlock register
@@ -130,7 +130,7 @@ definitions can be reused and to make the code easier to read.
 
 Then we declare the linker script variables and the functions we will use later.
 
-###### [blink.c](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/blink.c#L37-L53)
+#### [blink.c](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/blink.c#L37-L53)
 
 ```c
 extern unsigned long _sflashdata;
@@ -158,7 +158,7 @@ example we need to tell gcc that this code should be placed in the `.vectors`
 section which is done with the attribute flag. The `used` attribute flag tells
 gcc the the code is used and to not remove it during the optimization process.
 
-###### [blink.c](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/blink.c#L55-L64)
+#### [blink.c](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/blink.c#L55-L64)
 
 ```c
 __attribute__ ((section(".vectors"), used))
@@ -176,7 +176,7 @@ void (* const _vectors[7])(void) = {
 We then do something similar for the `.flashconfig` section using an array of
 unsigned chars.
 
-###### [blink.c](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/blink.c#L66-L70)
+#### [blink.c](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/blink.c#L66-L70)
 
 ```c
 __attribute__ ((section(".flashconfig"), used))
@@ -194,7 +194,7 @@ The startup code expands upon the assembly example, it now also initializes the
 global variables in ram for the rest of the program to use. But like in the
 assembly we first need to unlock and disable the watchdog.
 
-###### [blink.c](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/blink.c#L72-L76)
+#### [blink.c](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/blink.c#L72-L76)
 
 ```c
 __attribute__ ((section(".startup")))
@@ -208,7 +208,7 @@ Then we immediately setup the global variables before anything else attempts to
 use them. This is simply done by copying the `.data` location in `FLASH` to its
 location in `RAM`, then zeroing the `.bss` section in `RAM`.
 
-###### [blink.c](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/blink.c#L78-L83)
+#### [blink.c](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/blink.c#L78-L83)
 
 
 ```c
@@ -223,7 +223,7 @@ location in `RAM`, then zeroing the `.bss` section in `RAM`.
 And the rest of startup simply configures the gpio pins as we did in the
 assembly example before jumping into the loop.
 
-###### [blink.c](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/blink.c#L85-L93)
+#### [blink.c](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/blink.c#L85-L93)
 
 ```c
   // Enable system clock on all GPIO ports - page 254
@@ -241,7 +241,7 @@ Our loop is also very similar to the assembly example, the major difference is
 we initialize a variable to pass to delay. This is done simply to verify that
 the `.data` section is initialize correctly by our startup code.
 
-###### [blink.c](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/blink.c#L95-L103)
+#### [blink.c](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/blink.c#L95-L103)
 
 ```c
 int n = 1000; // Used to test if the data section is copied correctly
@@ -257,7 +257,7 @@ void loop() {
 
 The rest of the functions do the same thing as they did in the assembly example.
 
-###### [blink.c](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/blink.c#L105-L116)
+#### [blink.c](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/blink.c#L105-L116)
 
 ```c
 void led_on() {
@@ -277,7 +277,7 @@ void delay(int ms) {
 Finally all of the exception handlers are defined to simply lockup the cpu by
 busy looping.
 
-###### [blink.c](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/blink.c#L118-L122)
+#### [blink.c](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/blink.c#L118-L122)
 
 ```c
 void nim_handler() { while (1); }

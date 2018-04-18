@@ -54,7 +54,7 @@ The wiring is straight forward, connect both grounds of the servos to one of
 the [ground pins] on the pi and both the power pins to one of the [5V pins].
 Then connect one of the signal wires to [GPIO12] and the other to [GPIO13].
 
-![Servos connected to the pi](/blog/pi-zero-w-rover-setup/rpizw-rover-servos.png) TODO height="400px"
+![Servos connected to the pi](./rpizw-rover-servos.png) TODO height="400px"
 
 You should note that the servos can draw quite quite allot of power when
 running, the pi is fine with this as long as your power supply is able to supply

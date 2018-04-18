@@ -20,9 +20,9 @@ different part of the problem.
 - **Part 2:** [Managing Arch Linux with Meta Packages]
 - **Part 3:** *Creating a Custom Arch Linux Installer*
 
-[Amazon S3 Bucket]: /blog/archlinux-repo-in-aws-bucket
+[Amazon S3 Bucket]: /blog/archlinux-repo-in-aws-bucket/
 [Hosted Git Repository]: /blog/archlinux-repo-in-a-git-repo/
-[Managing Arch Linux with Meta Packages]: /blog/archlinux-meta-packages
+[Managing Arch Linux with Meta Packages]: /blog/archlinux-meta-packages/
 
 The Arch Linux install process can be quite daunting to new users, but once you
 understand it, it becomes quite elegant in its simplicity. The best part is

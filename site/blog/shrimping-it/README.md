@@ -43,7 +43,7 @@ cheaply and are readily available.
 * 1x Switch (Optional)
 * Some wire
 
-&#42; The ATMEGA328P is one of the most expensive part of the shrimp, typically
+_&#42; The ATMEGA328P is one of the most expensive part of the shrimp, typically
 you can get them for £2-£5 depending on the quantity you want and if they are
 preprogrammed with the Arduino bootloader.  This guide assumes you have a chip
 with the bootloader preprogrammed, if you get a chip without the bootloader you
@@ -52,22 +52,22 @@ Arduino/Shrimp or an AVR programmer. Flashing the bootloader is not covered in
 this article. Also watch out for the ATMEGA328 chips, they are almost identical
 to the ATMEGA328P chips except they do not have a low power mode and will not
 work out of the box with the Arduino tool kits. It is fairly easy to get them
-to work, but doing so is outside the scope of this article.
+to work, but doing so is outside the scope of this article._
 
-&#42;&#42; You should be able to use any FTDI based board for this, however
+_&#42;&#42; You should be able to use any FTDI based board for this, however
 these tend to be fairly expensive (~£10), you can also use a UART based chip
 which you can find on ebay quite cheap (~£2) however not all of these boards
 break out the required pins. Make sure you get one that has the following pins
 broken out: DTR TX RX +5V/+3V Ground (the order is not important). The UART
 chips can require you to solder on an extra pin to expose the DTR line, but
-this is not hard to do.
+this is not hard to do._
 
-&#42;&#42;&#42; Make sure you get a resistor value to match the LED you are
+_&#42;&#42;&#42; Make sure you get a resistor value to match the LED you are
 buying. See
 [this](http://www.instructables.com/id/Choosing-The-Resistor-To-Use-With-LEDs/)
 for more information, typically the values are around 100-330Ohms, to low and
 you risk burning out the LED, to high the LED wont be as bright so it is better
-to overshoot the value slightly.
+to overshoot the value slightly._
 
 ## Building The Shrimp
 
@@ -82,7 +82,7 @@ that can be used for I2C communication and three for SPI communication allowing
 the chip to talk to a wide range of devices and other chips. Below is a
 complete breakout of the ATMEGA328P chip:
 
-![](/blog/shrimping-it/arduino-atmega328.jpg)
+![Atmega328](./arduino-atmega328.jpg)
 
 *Image from http://www.pighixxx.com/*
 
@@ -102,7 +102,7 @@ the scope of this article. The crystal is connected to XTAL1 (pin 9) and XTAL2
 of the crystal pins are connected to ground through a couple of 22pF capacitors
 and help to stabilize the crystals signal.
 
-![](/blog/shrimping-it/shrimpingit-1.png)
+![](./shrimpingit-1.png)
 
 The ATMEGA328 has two ground pins and two VCC pins. The ground pins (pins 8 and
 22) are connected internally, so you only need to wire one up. The VCC pins
@@ -116,7 +116,7 @@ so you can just short it to pin 7. Lastly, we should connect the reset pin to
 VCC, this keeps the reset pin high and stops the chip from randomly resetting.
 If you wish to reset the chip, just short this pin to ground.
 
-![](/blog/shrimping-it/shrimpingit-3.png)
+![](./shrimpingit-3.png)
 
 And that is it! You have a fully functional shrimp, however it won't do much
 without some inputs or output so lets connect an LED to see it do something.
@@ -132,7 +132,7 @@ then you have to reverse the logic in your program as setting digital pin 13 to
 HIGH will turn _off_ the led and vice versa. We have chosen to connect it to
 ground so we don't have to worry about reversing the logic.
 
-![](/blog/shrimping-it/shrimpingit-5.png)
+![](./shrimpingit-5.png)
 
 If your ATMEGA328 has the blink sketch uploaded to it then you can power it up
 and the LED will start blinking at you.
@@ -147,7 +147,7 @@ the VCC pin. We also add a 10uF electrolytic capacitor across one of the VCC
 pins to ground (note that electrolytic capacitors are polar devices so make
 sure you connect the side with the strip to ground).
 
-![](/blog/shrimping-it/shrimpingit-6.png)
+![](./shrimpingit-6.png)
 
 Right, now our chip is more stable it is time to program it! For this we need
 one more 100nF capacitor to sit between the DTR pin on the UART chip and the
@@ -165,7 +165,7 @@ harm in connecting them in reverse, you just wont be able to upload sketches,
 or communicate over the serial port if you do, so if you are having trouble
 uploading sketches try reversing the RX and TX connections.
 
-![](/blog/shrimping-it/shrimpingit-7.png)
+![](./shrimpingit-7.png)
 
 Now you can try uploading sketches to the ATMEGA328.
 
@@ -175,7 +175,7 @@ analogue to digital converter and you can add a switch between the reset pin
 and ground to allow you to reset the ATMEGA328 whenever you want without having
 to manually short it to ground.
 
-![](/blog/shrimping-it/shrimpingit-9.png)
+![](./shrimpingit-9.png)
 
 That's it! You now have a fully functional shrimp equivalent to the Arduino
 Uno. You should now try experimenting with the sketches, see if you can make

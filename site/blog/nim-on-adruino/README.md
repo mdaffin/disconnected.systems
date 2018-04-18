@@ -21,7 +21,7 @@ This post I will look at nim in an attempt to get it running on an Arduino UNO.
 
 After installing the latest version of [nim](http://nim-lang.org/download.html) (0.12.0 at the time of writing) it was trivial to get an example program up and running:
 
-###### example.nim
+#### example.nim
 
 ```nim
 # This is a comment
@@ -40,7 +40,7 @@ There are quite a few tutorials on how to program in nim, so I will skip on to t
 
 Before we start to look at how to compile and upload a nim program to and avr chip we first need to see how this works without the Arduino SDK. Fortunately this process is quite easy and the example below where adapted from [Balau's blog](https://balau82.wordpress.com/2011/03/29/programming-arduino-uno-in-pure-c/) on the subject. I recommend reading his blog post for more details about the process.
 
-###### led.c
+#### led.c
 
 ```c
 #include <avr/io.h>
@@ -83,13 +83,13 @@ The only working example I could find of how to compile a nim program for avr wa
 
 So let us try it out
 
-###### hello.nim
+#### hello.nim
 
 ```nim
 echo "Hello, world!"
 ```
 
-###### panicoverride.nim
+#### panicoverride.nim
 
 ```nim
 proc printf(frmt: cstring) {.varargs, importc, header: "<stdio.h>", cdecl.}
@@ -127,7 +127,7 @@ And the led stops blinking - progress, but nim is able to directly compile to av
 
 First I noticed it was using `gcc` not `gcc-avr`. This was fixed by adding the following
 
-###### nim.cfg
+#### nim.cfg
 
 ```ini
 avr.standalone.gcc.path = "/usr/bin"
@@ -137,7 +137,7 @@ avr.standalone.gcc.linkerexe = "avr-gcc"
 
 I then noticed some of the flags where missing from the compiler and linker. This was fixed by adding the following to the config
 
-###### nim.cfg
+#### nim.cfg
 
 ```ini
 passC = "-Os"
@@ -148,7 +148,7 @@ passL = "-mmcu=atmega328p"
 
 Finally I added a couple more options for convenience
 
-###### nim.cfg
+#### nim.cfg
 
 ```ini
 cpu = "avr"
@@ -169,7 +169,7 @@ avrdude -F -V -c arduino -p ATMEGA328P -P /dev/ttyACM0 -b 115200 -U flash:w:hell
 
 Now its time to get nim to blink the led. We will only need the `nim.cfg` and `panicoverride.nim` files from the previous steps. Then we need to create a small c library to talk to the Arduino that we can wrap with nim. This is just the c example above split into separate functions.
 
-###### led.c
+#### led.c
 
 ```c
 #include <avr/io.h>
@@ -197,7 +197,7 @@ void delay(int ms) {
 
 And now for the nim version of blink.
 
-###### blink.nim
+#### blink.nim
 
 ```nim
 {.compile: "led.c".}

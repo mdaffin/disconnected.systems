@@ -66,7 +66,7 @@ pins. The left servo to pin 5 on the Arduinos digital pins and the right servo
 to pin 6.
 
 
-![Rover Servo](/blog/arduino-powered-rover/Rover-servos.png) !!!! TODO width=288, height=300, 
+![Rover Servo](./Rover-servos.png) <!-- TODO width=288, height=300,  -->
 
 ### The Bumpers and Switch
 
@@ -75,7 +75,7 @@ avoidance. One end of the switch and bumpers should be connected to the
 ardunio's +5v pin and the other end to the Arduinos digital pins 2 (switch), 3
 (left bumper) or 4 (right bumper) as well as through a 1k resistor to ground.
 
-![The bumpers and switch](/blog/arduino-powered-rover/Rover-bumpers.png) !!!! TODO width=198, height=300,  
+![The bumpers and switch](./Rover-bumpers.png) <!-- TODO width=198, height=300,   -->
 
 ### The Range Finders
 
@@ -93,7 +93,7 @@ The power pins should be connected to the Arduinos +5v pins and the ground to
 the ground pins. The left range finder to the digital pin 7 and the right one to
 digital pin 8.
 
-![Range finders](/blog/2012-10-24-arduino-powered-rover/Rover-Range.png) !!!! TODO width=300, height=295, 
+![Range finders](./Rover-Range.png) <!-- TODO width=300, height=295,  -->
 
 ### The Potentiometer
 
@@ -102,7 +102,7 @@ be directly connected to the arduinos ground and +5v power supply and the
 central pin to the Arduinos analog pin 0.
 
 
-![Potentiometer circuit](/blog/arduino-powered-rover/Rover-Potentiometer.png) !!!! TODO width=296, height=300, 
+![Potentiometer circuit](./Rover-Potentiometer.png) <!-- TODO width=296, height=300,  -->
 
 ### The LEDs
 
