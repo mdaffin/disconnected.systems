@@ -100,21 +100,21 @@ and [fairly cheap][amazon pricing] after that.
 
 Click on the create bucket button.
 
-![Create Bucket](/blog/archlinux-repo-in-aws-bucket/01-create-bucket.png) !!!! TODO smallimage
+![Create Bucket](./01-create-bucket.png) <!-- TODO smallimage -->
 
 Name your bucket and select the region you want to host it in.
 
-![Name the Bucket](/blog/archlinux-repo-in-aws-bucket/02-name-bucket.png)
+![Name the Bucket](./02-name-bucket.png)
 
 Then click on Next twice to get to (3) Set permissions and make the bucket
 public. This will allow anyone in the world to read the bucket and thus allows
 Pacman to download the packages anonymously.
 
-![Public Bucket](/blog/archlinux-repo-in-aws-bucket/03-public-bucket.png)
+![Public Bucket](./03-public-bucket.png)
 
 After you should have one public bucket listed like so.
 
-![Bucket List](/blog/archlinux-repo-in-aws-bucket/04-bucket-list.png)
+![Bucket List](./04-bucket-list.png)
 
 
 [Amazon S3]: https://s3.console.aws.amazon.com/s3/home?region=us-east-1
@@ -129,24 +129,24 @@ Amazon S3 buckets.
 Head over to the [AWS IAM management console] and add a new user. Then enter
 the username and ensure *Programmatic access* check box is selected.
 
-![Account Name](/blog/archlinux-repo-in-aws-bucket/05-create-user.png)
+![Account Name](./05-create-user.png)
 
 Click Next to head to the permission page then *Attach existing policies
 directly*. Search for *S3* and check *AmazonS3FullAccess*.
 
-![Account Permissions](/blog/archlinux-repo-in-aws-bucket/06-permissions.png)
+![Account Permissions](./06-permissions.png)
 
 Click *Next* and on the review page double check it has *Programmatic access*
 and *AmazonS3FullAccess*.
 
-![Account Review](/blog/archlinux-repo-in-aws-bucket/07-review.png)
+![Account Review](./07-review.png)
 
 Click *Create User* to get the access key. Take note of the *Access key ID* as
 well as the *Secret access key*. Ensure you save these somewhere, once you
 leave this page you will not have access to the secret key through the AWS
 console and will have to regenerate a new key.
 
-![Account Secret](/blog/archlinux-repo-in-aws-bucket/08-access-key.png)
+![Account Secret](./08-access-key.png)
 
 Keep this key secret as it will give anyone with it the ability to
 create/modify your buckets. If you lose the key or no longer require it then

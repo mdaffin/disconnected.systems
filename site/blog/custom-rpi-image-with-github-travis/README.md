@@ -43,7 +43,7 @@ the "add a readme" checkbox to create a non empty repo, this will allow you to
 create/edit files directly on github. You can also optionally add a license and
 a gitignore file for the language you want might want to use.
 
-![Creating new github repo](/blog/custom-rpi-image-with-github-travis/01-new-repo.png)
+![Creating new github repo](./01-new-repo.png)
 
 ## First stage script: `create-image`
 
@@ -139,7 +139,7 @@ chroot ${mount}  "/tmp/${script}"
 
 Then commit the new file.
 
-![Create and commit the create-image script](/blog/custom-rpi-image-with-github-travis/02-create-image.png)
+![Create and commit the create-image script](./02-create-image.png)
 
 You can later modify the script to copy any other resources (such as additional
 binaries or configs) to the image in the same way we copied the script to the
@@ -202,7 +202,7 @@ This is the script used to setup my [pi rover](/blog/pi-zero-w-rover-setup) and
 you should customise it to suit your application. When you are done commit the
 new file.
 
-![Create and commit the setup script](/blog/custom-rpi-image-with-github-travis/03-setup.png)
+![Create and commit the setup script](./03-setup.png)
 
 You can test run these scripts locally if you are running linux, or by using
 [Vagrant](https://www.vagrantup.com/) as mentioned in my [previous
@@ -217,7 +217,7 @@ github account then enable your repo in the account settings. You can read more
 about getting started with travis
 [here](https://docs.travis-ci.com/user/for-beginners).
 
-![Enable travis for our repo](/blog/custom-rpi-image-with-github-travis/04-travis-enable.png)
+![Enable travis for our repo](./04-travis-enable.png)
 
 Now head back to github and create a travis yaml file in the root of your repo
 called `.travis.yml` (the leading dot `.` is important, do not miss it off).
@@ -241,7 +241,7 @@ script:
 - zip rpizw-rover.img.zip rpizw-rover.img
 ```
 
-![Create .travis.yml to start the build](/blog/custom-rpi-image-with-github-travis/05-travis-yml.png)
+![Create .travis.yml to start the build](./05-travis-yml.png)
 
 Once you have saved, committed and push (if you have a local clone) travis will
 automatically start building your image. You can follow the build on the travis
@@ -254,7 +254,7 @@ need to download at the cost of taking a bit longer to build. It is compress it
 to two different formats, `xz` which produces smaller images and `zip` which is
 more portable (ie for windows users).
 
-![Successful build on travis](/blog/custom-rpi-image-with-github-travis/06-travis-built.png)
+![Successful build on travis](./06-travis-built.png)
 
 Now that we are able to build an image we must tell travis to upload the it back
 to github as a release. To do this we need to create an api key and encrypt it
@@ -323,17 +323,17 @@ Commit and push these changes and travis will start another build, but still
 wont upload our images. To do this final step simply create a release on github,
 give the relase a name (a version number is often a good idea).
 
-![Tag a release in github](/blog/custom-rpi-image-with-github-travis/07-tag-release.png)
+![Tag a release in github](./07-tag-release.png)
 
 This will trigger another build on travis agiesnt the tag. Again, this build can take more then 10 minutes to complete.
 
-![Successful build of the taged release](/blog/custom-rpi-image-with-github-travis/08-travis-tag-build.png)
+![Successful build of the taged release](./08-travis-tag-build.png)
 
 When you have a successful build the images will be avaiable to download on the
 releases page in your github repo. Ready to download, extract and flash to an sd
 card.
 
-![Github release](/blog/custom-rpi-image-with-github-travis/09-github-release.png)
+![Github release](./09-github-release.png)
 
 ## Conclusion
 

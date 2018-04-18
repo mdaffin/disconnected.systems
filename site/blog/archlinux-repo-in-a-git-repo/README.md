@@ -93,16 +93,16 @@ the database which do not always work inside raw links to repos.*
 
 Head over to [Gitlab] and create a new repository.
 
-![New Repo](/blog/archlinux-repo-in-a-git-repo/01-new-repo.png) !!!! TODO smallimage
+![New Repo](./01-new-repo.png) <!-- TODO smallimage -->
 
 Give it an name and ensure that it is public. It needs to be public to allow
 pacman to download packages from it without any kind of authentication.
 
-![Create Repo](/blog/archlinux-repo-in-a-git-repo/02-create-repo.png)
+![Create Repo](./02-create-repo.png)
 
 And finally grab the clone URL for your new repository.
 
-![Clone URL](/blog/archlinux-repo-in-a-git-repo/03-clone-url.png)
+![Clone URL](./03-clone-url.png)
 
 And clone it locally and create a directory to house your Arch Linux repo such
 as `x86_64` - It is convention to separate Arch Linux repos via the

@@ -67,7 +67,7 @@ We then disable the standard library with `#![no_std]`. Then tell rust we want a
 statically linked executable `#![crate_type="staticlib"]` and declare we want to
 use `volatile_store` from `core::intrinsics`.
 
-###### [src/main.rs](https://github.com/mdaffin/teensy-3-rust/blob/master/src/main.rs#L1-L5)
+#### [src/main.rs](https://github.com/mdaffin/teensy-3-rust/blob/master/src/main.rs#L1-L5)
 
 ```rust
 #![feature(lang_items,no_std,core_intrinsics,asm,start)]
@@ -79,7 +79,7 @@ use core::intrinsics::{volatile_store};
 
 And now some required language functions which just cause the code to halt if we encounter an error.
 
-###### [src/main.rs](https://github.com/mdaffin/teensy-3-rust/blob/master/src/main.rs#L7-L26)
+#### [src/main.rs](https://github.com/mdaffin/teensy-3-rust/blob/master/src/main.rs#L7-L26)
 
 ```rust
 #[lang="stack_exhausted"] extern fn stack_exhausted() {}
@@ -110,7 +110,7 @@ the teensy 3. In this example it is the `startup` function, which unfortunately
 needs a different signature then the one rust expects. Instead we create a
 simple wrapper to satisfy the compiler.
 
-###### [src/main.rs](https://github.com/mdaffin/teensy-3-rust/blob/master/src/main.rs#L137-L143)
+#### [src/main.rs](https://github.com/mdaffin/teensy-3-rust/blob/master/src/main.rs#L137-L143)
 
 ```rust
 #[start]

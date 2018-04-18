@@ -46,7 +46,7 @@ distribution's package managers or from inside a Arduino SDK's tools directory:
 
 ## The Linker script
 
-###### layout.ld
+#### layout.ld
 
 ```
 MEMORY {
@@ -139,7 +139,7 @@ we well the assembler we are using a mix of the instruction sets.
 First thing to do is set the instruction set we wish to use, for modern `ARM
 THUMB` we use the `unified` syntax.
 
-###### blink.s
+#### blink.s
 
 ```asm
     .syntax unified
@@ -147,7 +147,7 @@ THUMB` we use the `unified` syntax.
 
 Then as we discussed above, we need to define the exception vectors:
 
-###### blink.s
+#### blink.s
 
 ```asm
     .section ".vectors"
@@ -185,7 +185,7 @@ to our linker script described in the last section. This address and the values
 are described in the programmers manual on page 569 but we are not making any
 real use of these features in this example.
 
-###### blink.s
+#### blink.s
 
 ```asm
     .section ".flashconfig"
@@ -199,7 +199,7 @@ Now we move on to the setup code. This will be placed after the `.flashconfig`
 as we defined in the linker script. `_startup:` is the label that the arm chip
 will jump to when it resets as we defined in the exception vectors above.
 
-###### blink.s
+#### blink.s
 
 ```asm
     .section ".startup","x",%progbits
@@ -211,7 +211,7 @@ _startup:
 There are a few things we need to do to setup the arm chip, first we reset all
 the registers to 0.
 
-###### blink.s
+#### blink.s
 
 ```asm
     mov     r0,#0
@@ -236,7 +236,7 @@ disabling interrupts, unlocking the watchdog (so it can be configured) then
 disable it before enabling interrupts again. You can read more about how to
 configure the watchdog on page 463 of the programmers manual.
 
-###### blink.s
+#### blink.s
 
 ```asm
     cpsid i // Disable interrupts
@@ -262,7 +262,7 @@ the parts of the chip we want to use and start running our application loop. In
 this example that means to enable and set as an `OUTPUT` the GPIO pin the led
 is connected to.
 
-###### blink.s
+#### blink.s
 
 ```asm
     // Enable system clock on all GPIO ports - page 254
@@ -291,7 +291,7 @@ Our logic is very simple:
 
 Which is done by the following loop.
 
-###### blink.s
+#### blink.s
 
 ```asm
 loop:
@@ -306,7 +306,7 @@ Rather then embedding logic in the loop above we have moved it into separate
 functions to mimic an actual application closer. The two functions to turn the
 led on and off are as follows.
 
-###### blink.s
+#### blink.s
 
 ```asm
     // Function to turn the led off
@@ -331,7 +331,7 @@ led_on:
 And the last function just causes the processor to busy wait for a reasonable
 amount of time by counting down from a fairly large number.
 
-###### blink.s
+#### blink.s
 
 ```asm
     // Uncalibrated busy wait
@@ -349,7 +349,7 @@ delay_loop:
 Finally we have the busy wait which will cause the chip to lockup in cause any
 of the interrupts we defined at the start trigger.
 
-###### blink.s
+#### blink.s
 
 ```asm
 _halt: b _halt
