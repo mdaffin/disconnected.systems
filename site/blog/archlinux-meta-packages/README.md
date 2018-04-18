@@ -20,10 +20,10 @@ different part of the problem.
 - **Part 2:** *Managing Arch Linux with Meta Packages*
 - **Part 3:** [Creating a Custom Arch Linux Installer]
 
-[Amazon S3 Bucket]: /blog/archlinux-repo-in-aws-bucket
+[Amazon S3 Bucket]: /blog/archlinux-repo-in-aws-bucket/
 [Hosted Git Repository]: /blog/archlinux-repo-in-a-git-repo/
-[Hosting an Arch Linux Repo in an Amazon S3 Bucket]: /blog/archlinux-repo-in-aws-bucket
-[Creating a Custom Arch Linux Installer]: /blog/archlinux-installer
+[Hosting an Arch Linux Repo in an Amazon S3 Bucket]: /blog/archlinux-repo-in-aws-bucket/
+[Creating a Custom Arch Linux Installer]: /blog/archlinux-installer/
 
 I really enjoy Arch Linux for its customisation - you can truly make it *your*
 own. But while crafting your system exactly how you want it once can be a fun

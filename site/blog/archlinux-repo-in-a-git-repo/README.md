@@ -21,7 +21,7 @@ different part of the problem.
 - **Part 2:** [Managing Arch Linux with Meta Packages]
 - **Part 3:** [Creating a Custom Arch Linux Installer]
 
-[Amazon S3 Bucket]: /blog/archlinux-repo-in-aws-bucket
+[Amazon S3 Bucket]: /blog/archlinux-repo-in-aws-bucket/
 [Managing Arch Linux with Meta Packages]: /blog/archlinux-meta-packages/
 [Creating a Custom Arch Linux Installer]: /blog/archlinux-installer/
 
