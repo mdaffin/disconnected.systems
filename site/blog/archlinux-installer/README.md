@@ -6,8 +6,9 @@ tags:
 - linux
 - automation
 - archlinux
-title: 'Automating Arch Linux Part 3: Creating a Custom Arch Linux Installer'
 ---
+
+# Automating Arch Linux Part 3: Creating a Custom Arch Linux Installer
 
 In this three-part series, I will show you one way to simplify and manage
 multiple Arch Linux systems using a custom repo, a set of meta-packages and a
