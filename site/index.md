@@ -2,12 +2,13 @@
 home: true
 footer: This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
 ---
+
 <PostItem 
   v-for="post in posts()"
-  :key="post.frontmatter.date"
+  :key="post.title"
   v-bind:title="post.title"
   v-bind:to="post.path"
-  v-bind:date="new Date(post.frontmatter.date)"
+  v-bind:date="post.date"
   v-bind:description="post.frontmatter.description"
 />
 
@@ -17,11 +18,15 @@ export default {
         posts_with_tag(tag) {
             return this.$site.pages
                 .filter((page) => page.frontmatter.tags)
-                .filter((page) => page.frontmatter.tags.includes(tag));
+                .filter((page) => page.frontmatter.tags.includes(tag))
+                .map((page) => ({date: new Date(page.frontmatter.date)}))
+                .sort((a, b) => b.date - a.date);
         },
         posts() {
             return this.$site.pages
-                .filter((page) => page.path.startsWith("/blog/"));
+                .filter((page) => page.path.startsWith("/blog/"))
+                .map((page) => ({...page, date: new Date(page.frontmatter.date)}))
+                .sort((a, b) => b.date - a.date);
         }
     },
 }
