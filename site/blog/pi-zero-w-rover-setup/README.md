@@ -37,7 +37,8 @@ those that want to follow along with arch you should first follow my
 [customisation stage]. You can also follow along from a running pi if you have
 raspbian.
 
-<gallery(gallery="/blog/pi-zero-w-rover-setup/rover-01.jpg|/blog/pi-zero-w-rover-setup/rover-02.jpg|/blog/pi-zero-w-rover-setup/rover-03.jpg|/blog/pi-zero-w-rover-setup/rover-04.jpg|/blog/pi-zero-w-rover-setup/rover-05.jpg|/blog/pi-zero-w-rover-setup/rover-06.jpg")>
+![Rover](./rover-01.jpg)
+<!-- gallery(gallery="/blog/pi-zero-w-rover-setup/rover-01.jpg|/blog/pi-zero-w-rover-setup/rover-02.jpg|/blog/pi-zero-w-rover-setup/rover-03.jpg|/blog/pi-zero-w-rover-setup/rover-04.jpg|/blog/pi-zero-w-rover-setup/rover-05.jpg|/blog/pi-zero-w-rover-setup/rover-06.jpg") -->
 
 [archlinux arm]: https://archlinuxarm.org/
 [archlinuxarm setup guide]: /blog/raspberry-pi-archlinuxarm-setup
@@ -54,7 +55,7 @@ The wiring is straight forward, connect both grounds of the servos to one of
 the [ground pins] on the pi and both the power pins to one of the [5V pins].
 Then connect one of the signal wires to [GPIO12] and the other to [GPIO13].
 
-![Servos connected to the pi](./rpizw-rover-servos.png) TODO height="400px"
+![Servos connected to the pi](./rpizw-rover-servos.png) <!-- TODO height="400px" -->
 
 You should note that the servos can draw quite quite allot of power when
 running, the pi is fine with this as long as your power supply is able to supply
