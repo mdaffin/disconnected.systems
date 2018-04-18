@@ -9,8 +9,9 @@ slug: arduino-and-cmake
 tags:
 - arduino
 - cmake
-title: Arduino and CMake
 ---
+
+# Arduino and CMake
 
 The arduino is a great platform for embedded development and the ide it comes
 with is a good starting point. However, it lacks many features that make it a

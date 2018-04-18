@@ -7,8 +7,9 @@ slug: rust-powered-rover
 tags:
 - rust
 - raspberry-pi
-title: Using Rust to Control a Raspberry Pi Zero W Rover
 ---
+
+# Using Rust to Control a Raspberry Pi Zero W Rover
 
 Over the past few weeks I have been starting to build a raspberry pi zero w
 controlled rover.

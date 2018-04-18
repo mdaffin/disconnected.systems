@@ -8,8 +8,9 @@ slug: arduino-powered-rover
 tags:
 - arduino
 - robotics
-title: Arduino Powered Rover
 ---
+
+# Arduino Powered Rover
 
 Over the past couple of weeks I have been developing an arduino powered
 autonomous rover.

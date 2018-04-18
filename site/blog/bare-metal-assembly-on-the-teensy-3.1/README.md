@@ -10,8 +10,9 @@ tags:
 - assembly
 - teensy
 - arm
-title: Bare Metal Assembly on the Teensy 3.1
 ---
+
+# Bare Metal Assembly on the Teensy 3.1
 
 I started to look at bare metal programming on the Teensy 3.1 and found quite a
 few examples mainly based off the work of [Karl

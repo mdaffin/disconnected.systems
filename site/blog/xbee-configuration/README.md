@@ -7,8 +7,9 @@ description: A beginners guide on configuring and communicating over two xbees.
 slug: xbee-configuration
 tags:
 - xbee
-title: XBee Configuration
 ---
+
+# XBee Configuration
 
 For my third year project I will be using a bunch of XBee connected to various
 devices, this post will talk about how to set up the XBee and what the various

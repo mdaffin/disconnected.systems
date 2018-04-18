@@ -11,8 +11,9 @@ tags:
 - archlinuxarm
 - archlinux
 - linux
-title: Raspberry Powered Wallboard
 ---
+
+# Raspberry Powered Wallboard
 
 Having information displayed on a wall or monitor in an office or other public
 space can be very useful to the people in that area. This post talks about how

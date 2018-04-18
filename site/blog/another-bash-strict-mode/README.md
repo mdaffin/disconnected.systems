@@ -9,10 +9,9 @@ tags:
 - linux
 - bash
 - shell
-title: Another Bash Strict Mode
 ---
 
-# TODO
+# Another Bash Strict Mode
 
 I have been using [Aaron Maxwell's Unofficial Bash Strict
 Mode](http://redsymbol.net/articles/unofficial-bash-strict-mode/) for many years

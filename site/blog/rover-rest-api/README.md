@@ -9,8 +9,9 @@ tags:
 - raspberry-pi
 - iron
 - rest
-title: Writing A Rest API For The Pi Rover
 ---
+
+# Writing A Rest API For The Pi Rover
 
 *Updated on 2017-03-25: added a static file server and set cors headers*
 

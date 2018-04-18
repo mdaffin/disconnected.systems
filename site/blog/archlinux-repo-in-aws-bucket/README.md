@@ -6,8 +6,9 @@ tags:
 - linux
 - automation
 - archlinux
-title: 'Automating Arch Linux Part 1: Hosting an Arch Linux Repo in an Amazon S3 Bucket'
 ---
+
+# Automating Arch Linux Part 1: Hosting an Arch Linux Repo in an Amazon S3 Bucket
 
 In this three-part series, I will show you one way to simplify and manage
 multiple Arch Linux systems using a custom repo, a set of meta-packages and a

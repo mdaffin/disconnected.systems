@@ -20,8 +20,9 @@ tags:
 - serial
 - raspberry-pi
 - pwm
-title: Pi Zero W Rover Setup
 ---
+
+# Pi Zero W Rover Setup
 
 The raspberry pi zero w has just been released and I managed to get my hands on
 one before they sold out. This has sparked me to restart one of my old project
