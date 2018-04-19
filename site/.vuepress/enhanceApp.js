@@ -1,3 +1,9 @@
 export default ({ Vue, router, options }) => {
-    console.log("Hello")
+  console.log(options)
+  router.addRoutes([
+    {
+      path: '/archive',
+      redirect: () => '/',
+    }
+  ])
 }
