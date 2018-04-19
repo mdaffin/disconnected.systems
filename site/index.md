@@ -19,7 +19,7 @@ export default {
             return this.$site.pages
                 .filter((page) => page.frontmatter.tags)
                 .filter((page) => page.frontmatter.tags.includes(tag))
-                .map((page) => ({date: new Date(page.frontmatter.date)}))
+                .map((page) => ({...page, date: new Date(page.frontmatter.date)}))
                 .sort((a, b) => b.date - a.date);
         },
         posts() {
