@@ -11,6 +11,6 @@
     "build": "vuepress build site"
   },
   "devDependencies": {
-    "vuepress": "^0.5.0"
+    "vuepress": "~0"
   }
 }
