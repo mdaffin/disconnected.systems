@@ -8,7 +8,7 @@
   "private": true,
   "scripts": {
     "dev": "vuepress dev site",
-    "build": "vuepress build site && ./bin/render-aliases"
+    "build": "vuepress build site && ./bin/hacky-extensions.js"
   },
   "devDependencies": {
     "vuepress": "~0"
