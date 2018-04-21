@@ -12,5 +12,8 @@
   },
   "devDependencies": {
     "vuepress": "~0"
+  },
+  "dependencies": {
+    "rss": "^1.2.2"
   }
 }
