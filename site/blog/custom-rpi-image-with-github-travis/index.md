@@ -10,6 +10,13 @@ tags:
 - raspberry-pi
 - github
 - travis
+sidebar:
+- /blog/pi-zero-w-rover-setup/
+- /blog/custom-rpi-image-with-github-travis/
+- /blog/rust-powered-rover/
+- /blog/rover-refactor/
+- /blog/rover-rest-api/
+- /blog/rover-web-ui/
 ---
 
 # Customising Raspberry Pi Images with Github and Travis

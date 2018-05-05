@@ -6,6 +6,14 @@ tags:
 - linux
 - automation
 - archlinux
+sidebar:
+- title: 'Hosting an Arch Linux Repo'
+  collapsable: false
+  children:
+  - ['/blog/archlinux-repo-in-aws-bucket/', 'In an Amazon S3 Bucket']
+  - ['/blog/archlinux-repo-in-a-git-repo/', 'In a Hosted Git Repository']
+- ['/blog/archlinux-meta-packages/', 'Managing Arch Linux with Meta Packages']
+- ['/blog/archlinux-installer/', 'Creating a Custom Arch Linux Installer']
 ---
 
 # Automating Arch Linux Part 3: Creating a Custom Arch Linux Installer

@@ -1,12 +1,19 @@
 ---
 date: '2018-02-23T13:43:00Z'
-description: How to host an Arch Linux repository in a Hosted Git Repository with
-  aurutils
+description: How to host an Arch Linux repository in a Hosted Git Repository with aurutils
 slug: archlinux-repo-in-a-git-repo
 tags:
 - linux
 - automation
 - archlinux
+sidebar:
+- title: 'Hosting an Arch Linux Repo'
+  collapsable: false
+  children:
+  - ['/blog/archlinux-repo-in-aws-bucket/', 'In an Amazon S3 Bucket']
+  - ['/blog/archlinux-repo-in-a-git-repo/', 'In a Hosted Git Repository']
+- ['/blog/archlinux-meta-packages/', 'Managing Arch Linux with Meta Packages']
+- ['/blog/archlinux-installer/', 'Creating a Custom Arch Linux Installer']
 ---
 
 # Automating Arch Linux Part 1b: Hosting an Arch Linux Repo in a Hosted Git Repository

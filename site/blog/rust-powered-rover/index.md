@@ -7,6 +7,13 @@ slug: rust-powered-rover
 tags:
 - rust
 - raspberry-pi
+sidebar:
+- /blog/pi-zero-w-rover-setup/
+- /blog/custom-rpi-image-with-github-travis/
+- /blog/rust-powered-rover/
+- /blog/rover-refactor/
+- /blog/rover-rest-api/
+- /blog/rover-web-ui/
 ---
 
 # Using Rust to Control a Raspberry Pi Zero W Rover

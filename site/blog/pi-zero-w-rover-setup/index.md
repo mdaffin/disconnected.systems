@@ -20,6 +20,13 @@ tags:
 - serial
 - raspberry-pi
 - pwm
+sidebar:
+- /blog/pi-zero-w-rover-setup/
+- /blog/custom-rpi-image-with-github-travis/
+- /blog/rust-powered-rover/
+- /blog/rover-refactor/
+- /blog/rover-rest-api/
+- /blog/rover-web-ui/
 ---
 
 # Pi Zero W Rover Setup

@@ -9,6 +9,13 @@ tags:
 - raspberry-pi
 - iron
 - rest
+sidebar:
+- /blog/pi-zero-w-rover-setup/
+- /blog/custom-rpi-image-with-github-travis/
+- /blog/rust-powered-rover/
+- /blog/rover-refactor/
+- /blog/rover-rest-api/
+- /blog/rover-web-ui/
 ---
 
 # Writing A Rest API For The Pi Rover

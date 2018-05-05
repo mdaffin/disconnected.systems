@@ -9,6 +9,13 @@ tags:
 - raspberry-pi
 - vue.js
 - webpack
+sidebar:
+- /blog/pi-zero-w-rover-setup/
+- /blog/custom-rpi-image-with-github-travis/
+- /blog/rust-powered-rover/
+- /blog/rover-refactor/
+- /blog/rover-rest-api/
+- /blog/rover-web-ui/
 ---
 
 # Web Interface To Control The Rover
