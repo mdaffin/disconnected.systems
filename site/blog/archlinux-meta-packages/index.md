@@ -389,15 +389,20 @@ Once done you will end up with a `<package>-<version>.pkg.tar.xz` package in
 the current directory just like with `makepkg`.
 
 For the last step we will install this package into a repo, such as the one I
-showed you how to create in my [last post]. This is done by mounting the repo,
-copying the package into it and running `repose` to update the package
-database.
+showed you how to create in my [last post].
 
 ```bash
-mkdir -p repo
-s3fs mdaffin-arch:/repo "repo" -o "nosuid,nodev,default_acl=public-read"
-cp *.pkg.tar.xz "repo/x86_64/"
-repose --verbose --xz --root="repo/x86_64/" mdaffin
+# Copy the live repo down
+mkdir -p local-repo
+s3cmd sync s3://mdaffin-arch/repo/x86_64/mdaffin.{db,files}.tar.xz local-repo/
+ln -sf local-repo/mdaffin.db.tar.xz local-repo/mdaffin.db
+ln -sf local-repo/mdaffin.files.tar.xz local-repo/mdaffin.files
+# Add the packages to the repo
+repo-add local-repo/mdaffin.db.tar.xz *.pkg.tar.xz
+# Upload the packages as well as the changed repo
+s3cmd sync --follow-symlinks --acl-public *.pkg.tar.xz \
+    local-repo/mdaffin.{db,files}.tar.xz \
+    s3://mdaffin-arch/repo/x86_64/
 ```
 
 You can now install this package like you do any other package with `pacman`,
@@ -479,22 +484,21 @@ uploading the packages very simple. Here is the script in its entirety.
 
 ```bash
 #!/bin/bash
+# Wraps aursync command to mount an amazon s3 bucket which contains a repository
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 
-exit_cmd=""
-defer() { exit_cmd="$@; $exit_cmd"; }
-trap 'bash -c "$exit_cmd"' EXIT
+REMOTE_PATH=s3://mdaffin-arch/repo/x86_64
+LOCAL_PATH=$HOME/.local/share/arch-repo
+REPO_NAME=mdaffin
 
 PACKAGES=${@:-pkg/*}
 CHROOT="$PWD/root"
 
-BUCKET=mdaffin-arch
-REPO_PATH=repo/x86_64
-REPO_NAME=mdaffin
-
+mkdir -p "$LOCAL_PATH"
 mkdir -p "$CHROOT"
-[[ -d "$CHROOT/root" ]] || mkarchroot -C /etc/pacman.conf $CHROOT/root base base-devel
+
+[[ -d "$CHROOT/root" ]] || mkarchroot -C /etc/pacman.conf "$CHROOT/root" base base-devel
 
 for package in $PACKAGES; do
     cd "$package"
@@ -503,29 +507,24 @@ for package in $PACKAGES; do
     cd -
 done
 
-repo="$(mktemp -d)"
-defer "rmdir '$repo'"
+s3cmd sync "$REMOTE_PATH/$REPO_NAME.{db,files}.tar.xz" "$LOCAL_PATH/"
+ln -sf "$REPO_NAME.db.tar.xz" "$LOCAL_PATH/$REPO_NAME.db"
+ln -sf "$REPO_NAME.files.tar.xz" "$LOCAL_PATH/$REPO_NAME.files"
 
-s3fs "$BUCKET" "$repo" -o "nosuid,nodev,default_acl=public-read"
-defer "fusermount -u '$repo'"
-
-rsync --ignore-existing -v pkg/*/*.pkg.tar.xz "$repo/$REPO_PATH"
-repose --verbose --xz --root="$repo/$REPO_PATH" "$REPO_NAME"
+repo-add "$LOCAL_PATH/$REPO_NAME.db.tar.xz" "${PACKAGES[@]}/"*.pkg.tar.xz
+s3cmd sync --follow-symlinks --acl-public \
+    "${PACKAGES[@]}/"*.pkg.tar.xz \
+    "$LOCAL_PATH/$REPO_NAME".{db,files}{,.tar.xz} \
+    "$REMOTE_PATH/"
 ```
 
 It starts with some boilerplate code which I will skip over, read [this
 post][bash-strict-mode] for more details about it.
 
-Next is a cleanup helper, again I am not going to talk about it here (but might
-in a future post if there is interest). All you need to know is that any
-command added by the `defer` function will be run in reverse order when the
-program exits for any reason. This ensures we clean up no matter how the
-program exits.
-
 Some useful variables are then defined, `${@:-pkg/*}` means take all arguments,
 but if there are none it defaults to `pkg/*`. This allows us to build a single
-package, any number of packages or by default all packages. `BUCKET`,
-`REPO_PATH` and `REPO_NAME` should be changed to match your repo.
+package, any number of packages or by default all packages. `REMOTE_PATH` and
+`REPO_NAME` should be changed to match your repo.
 
 We create the chroot directory and init the main root fs if it does not already
 exist. Then loop over all the packages to build them one at a time with
@@ -533,27 +532,13 @@ exist. Then loop over all the packages to build them one at a time with
 previous builds. This keeps the list of built packages down and ensures we only
 upload the latest build version.
 
-Lastly, we mount the remote repo to a tempory directory and copy all packages
-we have built into the repo. We ignore any that already exist in the repo with
-`--ignore-existing` on the `rsync` command. Packages should be immutable once
-uploaded to the repo if you want to change a package you should increment its
-version number which will create a newer non-conflicting package. Ideally we
-should refuse to build any package that already exists in the repo with the
-same version and a future version of this script may do that but for now, this
-is good enough. The final command updates the repo database with any packages
-that were added.
+Lastly, we sync down the remote database to a local cache, add the built packages to the database then upload all the artifacts back up to the S3 bucket.
 
 Some of this should look familiar from the script we created in the last post.
 It would be handy to store both this script and the `aursync` script from my
-previous post inside our repo under the `./bin/` directory. I have also created
-a shell script that mounts the repo and drops you in a shell, auto cleaning up
-after you exit the shell. I found this useful for manually fixing things in the
-repo as I was developing everything. I will not cover it in this post as the
-bulk of it has been described above. You can view/download it
-[here][shell-wrapper].
+previous post inside our repo under the `./bin/` directory.
 
 [bash-strict-mode]: /blog/another-bash-strict-mode/
-[shell-wrapper]: https://github.com/mdaffin/arch-pkgs/blob/71c6e07afc0a349b518444f5f383bd9dc44f05e0/bin/shell
 
 ## Example Config Meta-Packages
 
