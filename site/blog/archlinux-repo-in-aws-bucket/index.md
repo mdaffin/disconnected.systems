@@ -18,6 +18,13 @@ sidebar:
 
 # Automating Arch Linux Part 1: Hosting an Arch Linux Repo in an Amazon S3 Bucket
 
+::: tip Update on 2018-05-20
+I have updated this guide to switch from `repose` and `s3fs` to `repo-add` and
+`s3cmd` due to a number of limitation in `repose` and the fact that `aurutils`
+is dropping support for it as well as some instabilities with `s3fs` on weaker
+internet connections.
+:::
+
 In this three-part series, I will show you one way to simplify and manage
 multiple Arch Linux systems using a custom repo, a set of meta-packages and a
 scripted installer. Each part is standalone and can be used by its self, but
@@ -41,16 +48,19 @@ bucket to create a cheap, low maintenance Arch Linux repository. As well as
 making use of the `aurutils` package to make building and upgrading AUR packages
 a painless exercise.
 
+::: danger
 Although everything we are going to do in this post will fit inside the **AWS
 free tier**, it **only lasts** for **12 months**. Make sure to **delete** any
 **resources** you create once you are done to avoid an **unexpected charge**
 from AWS way in the future. Even without the free tier, it should only cost no
-more than a few dollars a month to maintain the bucket. You can also use
-alternatives like Digital Oceans Spaces, Google Cloud or a static file web
-server.
+more than a few dollars a month to maintain the bucket - even with a very large
+repository. You can also use alternatives like Digital Oceans Spaces, Google
+Cloud or a static file web server.
+:::
 
 [AUR]: https://aur.archlinux.org/
 [AUR helpers]: https://wiki.archlinux.org/index.php/AUR_helpers
+
 
 ## Dependencies
 
@@ -60,17 +70,13 @@ build and install manually.
 
 * [aurutils]: a set of utilities that make it easy to manage/update a repo with
   AUR packages.
-* [s3fs-fuse]: allows us to mount an s3 bucket locally so we can add/update the
-  repo using local tools.
-* [repose]: an alternative to add-repo, but makes deploying the repo easier
-  inside a bucket. Aurutils automatically uses repose if it is installed, so we
-  will not explicitly use. ^
+* [s3cmd]: a tool to upload and download files from a s3 bucket.
 * base-devel: needed to build aurutils and other packages.
 
 To install all of these run the following.
 
 ```bash
-sudo pacman -S --needed repose s3fs-fuse base-devel
+sudo pacman -S --needed s3cmd base-devel
 wget https://aur.archlinux.org/cgit/aur.git/snapshot/aurutils.tar.gz
 tar -xf aurutils.tar.gz
 cd aurutils
@@ -93,11 +99,7 @@ gpg --recv-key 6BC26A17B9B7018A
 ```
 
 [aurutils]: https://github.com/AladW/aurutils
-[s3fs-fuse]: https://github.com/s3fs-fuse/s3fs-fuse
-[repose]: https://github.com/vodik/repose
-
-*^ We are using `repose` instead of `repo-add` as `repo-add` creates symlinks to
-the database which do not always work inside buckets.*
+[s3cmd]: https://github.com/s3tools/s3cmd
 
 ## Creating the Amazon S3 Bucket
 
@@ -160,59 +162,21 @@ Keep this key secret as it will give anyone with it the ability to
 create/modify your buckets. If you lose the key or no longer require it then
 head to the user page and remove it from the user.
 
-Save it to `~/.passwd-s3fs` in the form
+Save it to `~/.s3cfg` in the form
 
 ```ini
-bucket_name:access_key:secret_key
+[default]
+access_key = <ACCESS_KEY>
+secret_key = <SECRET_KEY>
 ```
 
 And ensure it is only readable by your user
 
 ```bash
-chmod 0600 ~/.passwd-s3fs
+chmod 0600 ~/.s3cfg
 ```
 
 [AWS IAM management console]: https://console.aws.amazon.com/iam/home#/users
-
-## Mounting the Bucket
-
-Amazon S3 Buckets can be mounted locally with the [s3fs-fuse] utilities. This
-makes the bucket act like any local filesystem and allows us to run commands to
-manipulate files. This is very useful for running aurutils to build the
-packages locally, upload them to the bucket and use repose to add them to the
-repo.
-
-
-```bash
-mkdir -p bucket
-s3fs "${BUCKET}" "bucket" -o "nosuid,nodev,default_acl=public-read"
-```
-
-Be aware that operations inside the `repo` can be slow as they require network
-calls. Also, note that actions inside this directory will count towards your
-usage limits so avoid doing crazy things like compiling packages inside it.
-
-We have mounted the directory with the `public-read`. This ensures that
-anything we upload to the bucket is readable by everyone. This is so that
-Pacman is able to read/download the packages without needing a
-username/password. You should not store any secrets inside this bucket.
-
-*Note: if you are using digital ocean spaces or another s3 compatible service
-you can specify an alternative API URL to use with `url=<url>` in the `-o`
-options. Such as `-o url=https://ams3.digitaloceanspaces.com,nosuid,...`.*
-
-Now we can create a directory inside the bucket to contain the repo.
-
-
-```bash
-mkdir -p bucket/repo/x86_64
-```
-
-If you look inside the bucket on the Amazon web console you should see these
-directories appear. You can use any path you like for this, but it is common to
-end it in the architecture you are targeting (64bit in my case). Feel free to
-create additional repositories if you want to target multiple architectures
-though I will not cover cross-compiling for other architectures in this post.
 
 ## Aurutils - Building and Managing Packages
 
@@ -221,7 +185,7 @@ packages. The two main utilities we will use are `aursearch`, which can search
 AUR for packages that match a given pattern.
 
 ```bash
-% aursearch aurutils
+$ aursearch aurutils
 aur/aurutils 1.5.3-5 (55)
     helper tools for the arch user repository
 aur/aurutils-git 1.5.3.r234.g15ef2ab-1 (5)
@@ -250,53 +214,120 @@ in our repo.
 
 
 ```bash
-aursync --repo mdaffin --root bucket/repo/x86_64 aurutils
+$ mkdir -p local-repo
+$ aursync --repo mdaffin --root local-repo aurutils
 ```
 
-Replace mdaffin with the name of your repo, this must match the section in
+Replace `mdaffin` with the name of your repo, this must match the section in
 `/etc/pacman.conf`. Since we have a remote repo we need to tell `aursync` were
-to place the files using `--root <dir>` pointing it to the directory we created
-inside our mounted bucket.
+to place the files using `--root <dir>` pointing it to a local package cache
+(exact location does not matter).
 
 If all goes well you should end up with the package and repo database inside
-the bucket.
+the cache directory.
 
 ```bash
-% ls bucket/repo/x86_64
+$ ls local-repo
 aurutils-1.5.3-5-any.pkg.tar.xz  mdaffin.db  mdaffin.files
 ```
-
-They should also be visible on the Amazon Web Console and fetchable via Pacman.
-
-```bash
-% sudo pacman -Syy
-% pacman -Ss aurutils                                                              :(
-mdaffin/aurutils 1.5.3-5 [installed]
-    helper tools for the arch user repository
-```
-
-And that's it, you have created a repo inside an amazon s3 bucket. You can add
-more packages to this repo using the `aursync` command above.
 
 To check for and update all the packages in the repo simply add `-u` to the
 `aursync` command.
 
 ```bash
-aursync --repo mdaffin --root bucket/repo/x86_64 -u
-```
-
-Finally, when you are done unmount the bucket with `fusermount`.
-
-```bash
-fusermount -u bucket
+$ aursync --repo mdaffin --root local-repo -u
 ```
 
 [amazon web console]: https://s3.console.aws.amazon.com/s3/home
 
-## Wrapper Script
+## Uploading to the S3 Bucket
+
+Now that we have the packages locally we need to upload them to the bucket.
+This is where `s3cmd` comes in, we can tell it to take all the files in our
+local cache and upload them to a given directory in the bucket. There are a
+couple ways to do this, first is the `put` or `cp` methods which will copy up
+any files we give them, much like the local `cp` command. But as our local
+cache grows we will just waste bandwidth and operations uploading the same
+unchanged files over and over again. This is where the `sync` command comes in,
+much like `rsync` it checks the remote to see if the file already exists and if
+it is different form the local copy. Only if it is missing or differs will it
+upload the new files.
+
+There is one problem, S3 buckets do not support symlinks, which `repo-add`
+creates for us. We need to tell it to explicitly copy the files the symlinks
+point to with the `--follow-symlinks` flag. And lastly, we need to set the
+public permissions on any file we upload with the `--acl-public` flag.
+
+```bash
+$ s3cmd sync --follow-symlinks --acl-public local-repo/ s3://mdaffin-arch/repo/x86_64/
+```
+
+The packages should now be visible on the Amazon Web Console and installable via Pacman.
+
+```bash
+$ sudo pacsync mdaffin
+$ pacman -Ss aurutils
+mdaffin/aurutils 1.5.3-5 [installed]
+    helper tools for the arch user repository
+```
+
+And that's it, you have created a repo inside an Amazon S3 bucket. You can add
+more packages to this repo using the `aursync` command above.
+
+## Fetching Remote Changes
+
+If you want to manage this from multiple computers then you need a way to sync
+up the repos on each system. This can easily be done by reversing the sync
+command. For this we do not need the `--follow-symlinks` flag as there are no
+symlinks in the bucket nor the `--acl-public` flag as it does not make sense
+for a local file. But the `--delete-removed` is useful for clearing up files
+that have been deleted form the remote bucket to stop them from being restored
+when you next push changes.
+
+```bash
+$ s3cmd sync --delete-removed s3://mdaffin-arch/repo/x86_64/ local-repo/ 
+```
+
+But this will download all files from the remote which can grow quite large
+over time. We really only want to add or remove a few packages at a time and it
+is far more efficient to only download the repo (if it has changed), make any
+changes to it then upload any required files followed by the changed database.
+With this we can also only download a single copy of the database, rather than
+both copies and manually create the symlinks. Note that we do not need the
+`--delete-removed` flag as the database files should always exist both locally
+and remotely.
+
+```bash
+$ s3cmd sync s3://mdaffin-arch/repo/x86_64/mdaffin.{db,files}.tar.xz local-repo/
+$ ln -sf local-repo/mdaffin.db.tar.xz local-repo/mdaffin.db
+$ ln -sf local-repo/mdaffin.files.tar.xz local-repo/mdaffin.files
+```
+
+## Removing a package
+
+If you are keeping a fully copy of the remote repo locally you can simply
+remove the package and push the changes with the `--delete-removed` flag.
+
+```bash
+$ repo-remove local-repo/mdaffin.db.tar.xz aurutils
+$ s3cmd sync --delete-removed --follow-symlinks --acl-public local-repo/ s3://mdaffin-arch/repo/x86_64/
+```
+
+However, this cannot be done if we are only downloading the database as we will
+be missing more of the packages and thus end up deleting most of our remote
+repo. Instead we should update the local cache to remove the package, push only
+the repository files then tell the remote to delete the package.
+
+```bash
+$ repo-remove local-repo/mdaffin.db.tar.xz aurutils
+$ s3cmd sync --follow-symlinks --acl-public local-repo/mdaffin.{db,files}{,.tar.xz} s3://mdaffin-arch/repo/x86_64/
+$ s3cmd rm "s3://mdaffin-arch/repo/x86_64/aurutils-*.pkg.tar.xz"
+```
+
+## Wrapper Scripts
 
 We can automate most of this with a simple wrapper script around `aursync`.
-Simply save this script somewhere, replace the `BUCKET`, `REPO_PATH` and
+Simply save this script somewhere, replace the `REMOTE_PATH` and
 `REPO_NAME` variables with your own and call it like you would `aursync`:
 `./aursync_wrapper PACKAGE` or `./aursync_wrapper -u`.
 
@@ -306,35 +337,63 @@ Simply save this script somewhere, replace the `BUCKET`, `REPO_PATH` and
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 
-BUCKET=mdaffin-arch
-REPO_PATH=repo/x86_64
+REMOTE_PATH=s3://mdaffin-arch/repo/x86_64
+LOCAL_PATH=$HOME/.local/share/arch-repo
 REPO_NAME=mdaffin
 
-exit_cmd=""
-defer() { exit_cmd="$@; $exit_cmd"; }
-trap 'bash -c "$exit_cmd"' EXIT
+mkdir -p "$LOCAL_PATH"
 
-repo="$(mktemp -d)"
-defer "rmdir '$repo'"
+## Sync remote DB to local ##
+s3cmd sync "$REMOTE_PATH/$REPO_NAME.{db,files}.tar.xz" "$LOCAL_PATH/"
+ln -sf "$REPO_NAME.db.tar.xz" "$LOCAL_PATH/$REPO_NAME.db.tar.xz"
+ln -sf "$REPO_NAME.files.tar.xz" "$LOCAL_PATH/$REPO_NAME.files.tar.xz"
 
-s3fs "${BUCKET}" "$repo" -o "nosuid,nodev,default_acl=public-read"
-defer "fusermount -u '$repo'"
-mkdir -p "$repo/${REPO_PATH}"
+## Clean up older packages that may or may not have been deleted from the
+## remote so that we do not reupload them
+rm "$LOCAL_PATH/"*.pkg.tar.xz
 
-aursync --repo "$REPO_NAME" --root "$repo/$REPO_PATH" "$@"
+aursync --repo "$REPO_NAME" --root "$LOCAL_PATH" "$@"
+
+## Sync local DB to remote ##
+s3cmd sync --follow-symlinks --acl-public "$LOCAL_PATH/" "$REMOTE_PATH/"
 ```
 
-## AWS S3 Alternitives
+And to remove a package use the follow script and pass it the package you want
+to remove: `./del-from-repo aurutils`
+
+```bash
+#!/bin/bash
+# Wraps aursync command to mount an amazon s3 bucket which contains a repository
+set -uo pipefail
+trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
+
+REMOTE_PATH=s3://mdaffin-arch/repo/x86_64
+LOCAL_PATH=$HOME/.local/share/arch-repo
+REPO_NAME=mdaffin
+
+mkdir -p "$LOCAL_PATH"
+
+## Sync remote DB to local ##
+s3cmd sync "$REMOTE_PATH/$REPO_NAME.{db,files}.tar.xz" "$LOCAL_PATH/"
+ln -sf "$REPO_NAME.db.tar.xz" "$LOCAL_PATH/$REPO_NAME.db.tar.xz"
+ln -sf "$REPO_NAME.files.tar.xz" "$LOCAL_PATH/$REPO_NAME.files.tar.xz"
+
+repo-remove "$LOCAL_PATH/$REPO_NAME.db.tar.xz" "$package"
+s3cmd sync --follow-symlinks --acl-public "$LOCAL_PATH/$REPO_NAME".{db,files}{,.tar.xz} "$REMOTE_PATH/"
+s3cmd rm "$REMOTE_PATH/$package-*.pkg.tar.xz"
+```
+
+## Amazon AWS S3 Alternatives
 
 If you don't wish to use Amazon buckets there are some alternatives such as
-[Digital Ocean Spaces] or [Google Cloud Buckets] that can be used inplace. Some
-are compatible with the s3 API and thus can be used with the instructions above
-while others require a different fuse wrapper. For example, if you had your own
-static file web server you could use could use [sshfs] client instead.
+[Digital Ocean Spaces] or [Google Cloud Buckets] that can be used in place. Some
+are compatible with the S3 API and thus can be used with the instructions above
+while others require a different way to sync the changes. For example, if you
+have a static file server some where you can use `rsync` in place of most
+`s3cmd` with the relevant flags set.
 
 [Digital Ocean Spaces]: https://m.do.co/c/8fba3fc95fef
 [Google Cloud Buckets]: https://cloud.google.com/storage/
-[sshfs]: https://github.com/libfuse/sshfs
 
 *[Discuss on Reddit]*
 
