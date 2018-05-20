@@ -327,7 +327,7 @@ Simply save this script somewhere, replace the `REMOTE_PATH` and
 `./aursync_wrapper PACKAGE` or `./aursync_wrapper -u`.
 
 ```bash
-#!/bin/bash
+#!/bin/bash -x
 # Wraps aursync command to mount an amazon s3 bucket which contains a repository
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
@@ -340,12 +340,12 @@ mkdir -p "$LOCAL_PATH"
 
 ## Sync remote DB to local ##
 s3cmd sync "$REMOTE_PATH/$REPO_NAME.{db,files}.tar.xz" "$LOCAL_PATH/"
-ln -sf "$REPO_NAME.db.tar.xz" "$LOCAL_PATH/$REPO_NAME.db.tar.xz"
-ln -sf "$REPO_NAME.files.tar.xz" "$LOCAL_PATH/$REPO_NAME.files.tar.xz"
+ln -sf "$REPO_NAME.db.tar.xz" "$LOCAL_PATH/$REPO_NAME.db"
+ln -sf "$REPO_NAME.files.tar.xz" "$LOCAL_PATH/$REPO_NAME.files"
 
 ## Clean up older packages that may or may not have been deleted from the
 ## remote so that we do not reupload them
-rm "$LOCAL_PATH/"*.pkg.tar.xz
+rm -f "$LOCAL_PATH/"*.pkg.tar.xz
 
 aursync --repo "$REPO_NAME" --root "$LOCAL_PATH" "$@"
 
@@ -362,6 +362,8 @@ to remove: `./del-from-repo aurutils`
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 
+package=${1:?"Missing package"}
+
 REMOTE_PATH=s3://mdaffin-arch/repo/x86_64
 LOCAL_PATH=$HOME/.local/share/arch-repo
 REPO_NAME=mdaffin
@@ -370,12 +372,14 @@ mkdir -p "$LOCAL_PATH"
 
 ## Sync remote DB to local ##
 s3cmd sync "$REMOTE_PATH/$REPO_NAME.{db,files}.tar.xz" "$LOCAL_PATH/"
-ln -sf "$REPO_NAME.db.tar.xz" "$LOCAL_PATH/$REPO_NAME.db.tar.xz"
-ln -sf "$REPO_NAME.files.tar.xz" "$LOCAL_PATH/$REPO_NAME.files.tar.xz"
+ln -sf "$REPO_NAME.db.tar.xz" "$LOCAL_PATH/$REPO_NAME.db"
+ln -sf "$REPO_NAME.files.tar.xz" "$LOCAL_PATH/$REPO_NAME.files"
 
-repo-remove "$LOCAL_PATH/$REPO_NAME.db.tar.xz" "$package"
+repo-remove "$LOCAL_PATH/$REPO_NAME.db.tar.xz" "$@"
 s3cmd sync --follow-symlinks --acl-public "$LOCAL_PATH/$REPO_NAME".{db,files}{,.tar.xz} "$REMOTE_PATH/"
-s3cmd rm "$REMOTE_PATH/$package-*.pkg.tar.xz"
+for package in "$@"; do
+    s3cmd rm "$REMOTE_PATH/$package-*.pkg.tar.xz"
+done
 ```
 
 ## Amazon AWS S3 Alternatives
