@@ -7,11 +7,7 @@ tags:
 - automation
 - archlinux
 sidebar:
-- title: 'Hosting an Arch Linux Repo'
-  collapsable: false
-  children:
-  - ['/blog/archlinux-repo-in-aws-bucket/', 'In an Amazon S3 Bucket']
-  - ['/blog/archlinux-repo-in-a-git-repo/', 'In a Hosted Git Repository']
+- ['/blog/archlinux-repo-in-aws-bucket/', 'Hosting an Arch Linux Repo in an Amazon S3 Bucket']
 - ['/blog/archlinux-meta-packages/', 'Managing Arch Linux with Meta Packages']
 - ['/blog/archlinux-installer/', 'Creating a Custom Arch Linux Installer']
 ---
@@ -24,12 +20,10 @@ scripted installer. Each part is standalone and can be used by its self, but
 they are designed to build upon and complement each other each focusing on a
 different part of the problem.
 
-- **Part 1:** Hosting an Arch Linux Repo in an [Amazon S3 Bucket] or [Hosted Git Repository]
+- **Part 1:** [Hosting an Arch Linux Repo in an Amazon S3 Bucket]
 - **Part 2:** *Managing Arch Linux with Meta Packages*
 - **Part 3:** [Creating a Custom Arch Linux Installer]
 
-[Amazon S3 Bucket]: /blog/archlinux-repo-in-aws-bucket/
-[Hosted Git Repository]: /blog/archlinux-repo-in-a-git-repo/
 [Hosting an Arch Linux Repo in an Amazon S3 Bucket]: /blog/archlinux-repo-in-aws-bucket/
 [Creating a Custom Arch Linux Installer]: /blog/archlinux-installer/
 
