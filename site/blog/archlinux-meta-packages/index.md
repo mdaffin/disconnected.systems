@@ -401,7 +401,7 @@ ln -sf local-repo/mdaffin.files.tar.xz local-repo/mdaffin.files
 repo-add local-repo/mdaffin.db.tar.xz *.pkg.tar.xz
 # Upload the packages as well as the changed repo
 s3cmd sync --follow-symlinks --acl-public *.pkg.tar.xz \
-    local-repo/mdaffin.{db,files}.tar.xz \
+    local-repo/mdaffin.{db,files}{,.tar.xz} \
     s3://mdaffin-arch/repo/x86_64/
 ```
 
