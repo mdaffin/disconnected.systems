@@ -507,7 +507,7 @@ for package in $PACKAGES; do
     cd -
 done
 
-s3cmd sync "$REMOTE_PATH/$REPO_NAME.{db,files}.tar.xz" "$LOCAL_PATH/"
+s3cmd sync "$REMOTE_PATH/$REPO_NAME".{db,files}.tar.xz "$LOCAL_PATH/"
 ln -sf "$REPO_NAME.db.tar.xz" "$LOCAL_PATH/$REPO_NAME.db"
 ln -sf "$REPO_NAME.files.tar.xz" "$LOCAL_PATH/$REPO_NAME.files"
 
