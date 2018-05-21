@@ -6,17 +6,19 @@ tags:
 - linux
 - automation
 - archlinux
-sidebar:
-- title: 'Hosting an Arch Linux Repo'
-  collapsable: false
-  children:
-  - ['/blog/archlinux-repo-in-aws-bucket/', 'In an Amazon S3 Bucket']
-  - ['/blog/archlinux-repo-in-a-git-repo/', 'In a Hosted Git Repository']
-- ['/blog/archlinux-meta-packages/', 'Managing Arch Linux with Meta Packages']
-- ['/blog/archlinux-installer/', 'Creating a Custom Arch Linux Installer']
 ---
 
 # Automating Arch Linux Part 1b: Hosting an Arch Linux Repo in a Hosted Git Repository
+
+::: warning
+This post is no longer being updated as I found too many limitations around git
+repos and storing larger packages inside them, quite often hitting the size
+limitations for some packages. It currently makes use of `repose` but
+`aurutils` is set to drop support for it at some point as there are a number of
+issues with it and so will eventually stop working. It should be possible to
+use `repo-add` but this creates symlinks which need to be dealt with as they do
+not work when accessed via the raw links.
+:::
 
 In this three-part series, I will show you one way to simplify and manage
 multiple Arch Linux systems using a custom repo, a set of meta-packages and a
