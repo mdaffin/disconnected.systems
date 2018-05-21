@@ -113,7 +113,7 @@ Name your bucket and select the region you want to host it in.
 
 Then click on Next twice to get to (3) Set permissions and make the bucket
 public. This will allow anyone in the world to read the bucket and thus allows
-Pacman to download the packages anonymously.
+`pacman` to download the packages anonymously.
 
 ![Public Bucket](./03-public-bucket.png)
 
@@ -125,7 +125,7 @@ After you should have one public bucket listed like so.
 [Amazon S3]: https://s3.console.aws.amazon.com/s3/home?region=us-east-1
 [amazon pricing]: https://aws.amazon.com/s3/pricing/
 
-## Access credintials
+## Access Credentials
 
 We now need to create an access key that has permissions to edit this bucket.
 We can do this by creating a new restricted user that only have access to the
@@ -201,15 +201,16 @@ Server = https://s3.eu-west-2.amazonaws.com/mdaffin-arch/repo/x86_64/
 Give your repo a unique name by replacing `[mdaffin]` with something else.
 Change the URL to that of your bucket/repo path. You can get the exact URL by
 creating a file inside the directory and getting a link to that file from the
-[amazon web console].
+[Amazon Web Console].
 
 Now we can create the repo and upload our first package to it. For this, we are
 going to rebuild the aurutils package as it will be handy to have that stored
-in our repo.
-
+in our repo. But first we need to create a directory to store the repo as well
+as initialise the database files.
 
 ```bash
 $ mkdir -p local-repo
+$ repo-add local-repo/mdaffin.db.tar.xz
 $ aursync --repo mdaffin --root local-repo aurutils
 ```
 
@@ -257,7 +258,8 @@ public permissions on any file we upload with the `--acl-public` flag.
 $ s3cmd sync --follow-symlinks --acl-public local-repo/ s3://mdaffin-arch/repo/x86_64/
 ```
 
-The packages should now be visible on the Amazon Web Console and installable via Pacman.
+The packages should now be visible on the Amazon Web Console (or via `s3cmd ls
+s3://...`) and installable via `pacman`.
 
 ```bash
 $ sudo pacsync mdaffin
@@ -300,11 +302,12 @@ $ ln -sf local-repo/mdaffin.files.tar.xz local-repo/mdaffin.files
 
 ## Removing a package
 
-If you are keeping a fully copy of the remote repo locally you can simply
+If you are keeping a full copy of the remote repo locally you can simply
 remove the package and push the changes with the `--delete-removed` flag.
 
 ```bash
 $ repo-remove local-repo/mdaffin.db.tar.xz aurutils
+$ rm local-repo/aurutils-*.pkg.tar.xz
 $ s3cmd sync --delete-removed --follow-symlinks --acl-public local-repo/ s3://mdaffin-arch/repo/x86_64/
 ```
 
