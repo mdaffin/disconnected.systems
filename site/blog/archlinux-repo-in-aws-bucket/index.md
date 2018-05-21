@@ -59,13 +59,13 @@ Cloud or a static file web server.
 
 ## Dependencies
 
-We only require a few packages to get us going of which only `aurutils` needs to
+We only require a few packages to get us going, of which only `aurutils` needs to
 be installed from AUR. It will be the only package we are required to
 build and install manually.
 
 * [aurutils]: a set of utilities that make it easy to manage/update a repo with
   AUR packages.
-* [s3cmd]: a tool to upload and download files from a s3 bucket.
+* [s3cmd]: a tool to upload and download files from an AWS S3 bucket.
 * base-devel: needed to build aurutils and other packages.
 
 To install all of these run the following.
@@ -205,7 +205,7 @@ creating a file inside the directory and getting a link to that file from the
 
 Now we can create the repo and upload our first package to it. For this, we are
 going to rebuild the aurutils package as it will be handy to have that stored
-in our repo. But first we need to create a directory to store the repo as well
+in our repo. But first, we need to create a directory to store the repo as well
 as initialise the database files.
 
 ```bash
@@ -246,7 +246,7 @@ any files we give them, much like the local `cp` command. But as our local
 cache grows we will just waste bandwidth and operations uploading the same
 unchanged files over and over again. This is where the `sync` command comes in,
 much like `rsync` it checks the remote to see if the file already exists and if
-it is different form the local copy. Only if it is missing or differs will it
+it is different from the local copy. Only if it is missing or differs will it
 upload the new files.
 
 There is one problem, S3 buckets do not support symlinks, which `repo-add`
@@ -275,10 +275,10 @@ more packages to this repo using the `aursync` command above.
 
 If you want to manage this from multiple computers then you need a way to sync
 up the repos on each system. This can easily be done by reversing the sync
-command. For this we do not need the `--follow-symlinks` flag as there are no
+command. For this, we do not need the `--follow-symlinks` flag as there are no
 symlinks in the bucket nor the `--acl-public` flag as it does not make sense
 for a local file. But the `--delete-removed` is useful for clearing up files
-that have been deleted form the remote bucket to stop them from being restored
+that have been deleted from the remote bucket to stop them from being restored
 when you next push changes.
 
 ```bash
@@ -289,7 +289,7 @@ But this will download all files from the remote which can grow quite large
 over time. We really only want to add or remove a few packages at a time and it
 is far more efficient to only download the repo (if it has changed), make any
 changes to it then upload any required files followed by the changed database.
-With this we can also only download a single copy of the database, rather than
+With this, we can also only download a single copy of the database, rather than
 both copies and manually create the symlinks. Note that we do not need the
 `--delete-removed` flag as the database files should always exist both locally
 and remotely.
@@ -313,7 +313,7 @@ $ s3cmd sync --delete-removed --follow-symlinks --acl-public local-repo/ s3://md
 
 However, this cannot be done if we are only downloading the database as we will
 be missing more of the packages and thus end up deleting most of our remote
-repo. Instead we should update the local cache to remove the package, push only
+repo. Instead, we should update the local cache to remove the package, push only
 the repository files then tell the remote to delete the package.
 
 ```bash
@@ -394,7 +394,7 @@ If you don't wish to use Amazon buckets there are some alternatives such as
 [Digital Ocean Spaces] or [Google Cloud Buckets] that can be used in place. Some
 are compatible with the S3 API and thus can be used with the instructions above
 while others require a different way to sync the changes. For example, if you
-have a static file server some where you can use `rsync` in place of most
+have a static file server somewhere you can use `rsync` in place of most
 `s3cmd` with the relevant flags set.
 
 [Digital Ocean Spaces]: https://m.do.co/c/8fba3fc95fef

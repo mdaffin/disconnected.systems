@@ -65,8 +65,8 @@ once by installing a single meta-packages. Now, Arch Linux has a similar
 concept; package groups, and while they serve a similar purpose they are
 suitably different. This difference is when you add or remove dependencies -
 groups will not install/remove additional dependencies whereas meta packages
-will. This is what we want, when a dependency is added all our systems to
-automatically install it when they update.
+will, this is exactly what we want. When a dependency is added all our systems
+to automatically install it when they update.
 
 Now, we are going to abuse this concept slightly and not only use them to
 install groups of packages via dependencies but also to install related system
@@ -270,7 +270,7 @@ to hear from you.
 
 Let's take a look at how I did this with my i3 config file in my
 `mdaffin-desktop` package. First, we install the config file like we did in the
-previous section, but this time next to the original packages config.
+previous section, but this time next to the original package's config.
 
 ```bash
 source=('i3-config')
@@ -311,8 +311,9 @@ post_upgrade() {
 }
 ```
 
-This copies the file from the file that was dropped by the package, to its live
-location during an upgrade or install, overriting the original packages config.
+These run during an install or upgrade and copy the packaged configs to their
+destination, overwriting the configs that the upstream package dropped.
+
 Next, we need to tell makepkg about this install file by adding the following
 to `PKGBUILD`.
 
@@ -388,7 +389,7 @@ makechrootpkg -cur ./chroots
 Once done you will end up with a `<package>-<version>.pkg.tar.xz` package in
 the current directory just like with `makepkg`.
 
-For the last step we will install this package into a repo, such as the one I
+For the last step, we will install this package into a repo, such as the one I
 showed you how to create in my [last post].
 
 ```bash
@@ -415,7 +416,7 @@ as long as you have your repo added to `/etc/pacman.conf`.
 Now that we can create meta-package and publish them for use let's place these
 in a git repo (or another version control system if you prefer) and write a
 wrapper script to make building/uploading the packages even easier. You can
-find [my repo] on github, feel free to use it as a reference or clone it to
+find [my repo] on GitHub, feel free to use it as a reference or clone it to
 create your own but the packages in there are tuned to my liking and so I
 encourage you to create your own with how you like your systems setup.
 
@@ -433,8 +434,8 @@ mkdir pkg
 cp -r ~/mdaffin-base pkg/mdaffin-base
 ```
 
-But there a whole bunch of temporary/generated files we don't want to commit to
-let's add a gitignore for these.
+But there a whole bunch of temporary/generated files we don't want to commit
+to. Let's add a gitignore for these.
 
 ```bash
 cat <<'EOF' >.gitignore
@@ -532,7 +533,9 @@ exist. Then loop over all the packages to build them one at a time with
 previous builds. This keeps the list of built packages down and ensures we only
 upload the latest build version.
 
-Lastly, we sync down the remote database to a local cache, add the built packages to the database then upload all the artifacts back up to the S3 bucket.
+Lastly, we sync down the remote database to a local cache, add the built
+packages to the database then upload all the artefacts back up to the S3
+bucket.
 
 Some of this should look familiar from the script we created in the last post.
 It would be handy to store both this script and the `aursync` script from my
@@ -542,7 +545,7 @@ previous post inside our repo under the `./bin/` directory.
 
 ## Example Config Meta-Packages
 
-Here are some examples of system config meta packages that others have created:
+Here are some examples of system config meta-packages that others have created:
 
 - [mdaffin/arch-pkgs](https://github.com/mdaffin/arch-pkgs/tree/master/pkg/mdaffin)
 - [Earnestly/pkgbuilds](https://github.com/Earnestly/pkgbuilds/tree/master/system-config)
