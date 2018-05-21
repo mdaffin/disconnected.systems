@@ -330,7 +330,7 @@ Simply save this script somewhere, replace the `REMOTE_PATH` and
 `./aursync_wrapper PACKAGE` or `./aursync_wrapper -u`.
 
 ```bash
-#!/bin/bash -x
+#!/bin/bash
 # Wraps aursync command to mount an amazon s3 bucket which contains a repository
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
