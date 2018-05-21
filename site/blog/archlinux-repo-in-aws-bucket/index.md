@@ -339,7 +339,7 @@ REPO_NAME=mdaffin
 mkdir -p "$LOCAL_PATH"
 
 ## Sync remote DB to local ##
-s3cmd sync "$REMOTE_PATH/$REPO_NAME.{db,files}.tar.xz" "$LOCAL_PATH/"
+s3cmd sync "$REMOTE_PATH/$REPO_NAME".{db,files}.tar.xz "$LOCAL_PATH/"
 ln -sf "$REPO_NAME.db.tar.xz" "$LOCAL_PATH/$REPO_NAME.db"
 ln -sf "$REPO_NAME.files.tar.xz" "$LOCAL_PATH/$REPO_NAME.files"
 
@@ -350,7 +350,10 @@ rm -f "$LOCAL_PATH/"*.pkg.tar.xz
 aursync --repo "$REPO_NAME" --root "$LOCAL_PATH" "$@"
 
 ## Sync local DB to remote ##
-s3cmd sync --follow-symlinks --acl-public "$LOCAL_PATH/" "$REMOTE_PATH/"
+s3cmd sync --follow-symlinks --acl-public \
+    "$LOCAL_PATH/"*.pkg.tar.xz \
+    "$LOCAL_PATH/$REPO_NAME".{db,files}{,.tar.xz} \
+    "$REMOTE_PATH/"
 ```
 
 And to remove a package use the follow script and pass it the package you want
@@ -371,7 +374,7 @@ REPO_NAME=mdaffin
 mkdir -p "$LOCAL_PATH"
 
 ## Sync remote DB to local ##
-s3cmd sync "$REMOTE_PATH/$REPO_NAME.{db,files}.tar.xz" "$LOCAL_PATH/"
+s3cmd sync "$REMOTE_PATH/$REPO_NAME".{db,files}.tar.xz "$LOCAL_PATH/"
 ln -sf "$REPO_NAME.db.tar.xz" "$LOCAL_PATH/$REPO_NAME.db"
 ln -sf "$REPO_NAME.files.tar.xz" "$LOCAL_PATH/$REPO_NAME.files"
 
