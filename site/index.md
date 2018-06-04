@@ -25,6 +25,7 @@ export default {
         posts() {
             return this.$site.pages
                 .filter((page) => page.path.startsWith("/blog/"))
+                .filter((page) => !page.frontmatter['indexPage'])
                 .map((page) => ({...page, date: new Date(page.frontmatter.date)}))
                 .sort((a, b) => b.date - a.date);
         }
