@@ -140,7 +140,7 @@ export default {
   position relative
   margin-right 0.5rem
   input
-    cursor pointer
+    cursor text
     width 10rem
     color lighten($textColor, 25%)
     display inline-block
@@ -171,6 +171,7 @@ export default {
     line-height 1.4
     padding 0.4rem 0.6rem
     border-radius 4px
+    cursor pointer
     a
       color lighten($textColor, 35%)
       .page-title
@@ -184,14 +185,22 @@ export default {
         color $accentColor
 
 @media (max-width: $MQNarrow)
-  .search-box input
-    width 0
-    border-color transparent
-    position relative
-    left 1rem
-    &:focus
+  .search-box
+    input
+      cursor pointer
+      width 0
+      border-color transparent
+      position relative
+      left 1rem
+      &:focus
+        cursor text
+        left 0
+        width 10rem
+
+@media (max-width: $MQNarrow) and (min-width: $MQMobile)
+  .search-box
+    .suggestions
       left 0
-      width 10rem
 
 @media (max-width: $MQMobile)
   .search-box

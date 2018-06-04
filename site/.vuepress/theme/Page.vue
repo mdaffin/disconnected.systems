@@ -1,9 +1,15 @@
 <template>
   <div class="page">
     <Content :custom="false"/>
-    <div class="content edit-link" v-if="editLink">
-      <a :href="editLink" target="_blank" rel="noopener noreferrer">{{ editLinkText }}</a>
-      <OutboundLink/>
+    <div class="content edit-link">
+      <template v-if="editLink">
+        <a :href="editLink" target="_blank" rel="noopener noreferrer">{{ editLinkText }}</a>
+        <OutboundLink/>
+      </template>
+      <div v-if="lastUpdated" class="last-updated">
+        <span class="prefix">{{ lastUpdatedText }}: </span>
+        <span class="time">{{ lastUpdated }}</span>
+      </div>
     </div>
     <div class="content page-nav" v-if="prev || next">
       <p class="inner">
@@ -24,13 +30,25 @@
 </template>
 
 <script>
-import OutboundLink from './OutboundLink.vue'
 import { resolvePage, normalize, outboundRE, endingSlashRE } from './util'
 
 export default {
-  components: { OutboundLink },
   props: ['sidebarItems'],
   computed: {
+    lastUpdated () {
+      if (this.$page.lastUpdated) {
+        return new Date(this.$page.lastUpdated).toLocaleString(this.$lang)
+      }
+    },
+    lastUpdatedText () {
+      if (typeof this.$themeLocaleConfig.lastUpdated === 'string') {
+        return this.$themeLocaleConfig.lastUpdated
+      }
+      if (typeof this.$site.themeConfig.lastUpdated === 'string') {
+        return this.$site.themeConfig.lastUpdated
+      }
+      return 'Last Updated'
+    },
     prev () {
       const prev = this.$page.frontmatter.prev
       if (prev === false) {
@@ -52,6 +70,9 @@ export default {
       }
     },
     editLink () {
+      if (this.$page.frontmatter.editLink === false) {
+        return
+      }
       const {
         repo,
         editLinks,
@@ -73,8 +94,8 @@ export default {
           : `https://github.com/${docsRepo}`
         return (
           base.replace(endingSlashRE, '') +
-          `/edit/${docsBranch}/` +
-          docsDir.replace(endingSlashRE, '') +
+          `/edit/${docsBranch}` +
+          (docsDir ? '/' + docsDir.replace(endingSlashRE, '') : '') +
           path
         )
       }
@@ -126,6 +147,16 @@ function find (page, items, offset) {
   a
     color lighten($textColor, 25%)
     margin-right 0.25rem
+  .last-updated
+    margin-top: 0 !important
+    margin-bottom .5rem
+    float right
+    font-weight 500
+    font-size .9em
+    .prefix
+      color lighten($textColor, 25%)
+    .time
+      color #aaa
 
 .page-nav.content
   padding-top 1rem !important
@@ -135,6 +166,15 @@ function find (page, items, offset) {
     margin-top 0 !important
     border-top 1px solid $borderColor
     padding-top 1rem
+    overflow auto // clear float
   .next
     float right
+
+@media (max-width: $MQMobile)
+  .edit-link.content .last-updated
+    float none
+    text-align left
+    margin-top 1rem
+    font-size .8em
+
 </style>
