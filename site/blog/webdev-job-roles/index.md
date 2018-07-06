@@ -6,7 +6,7 @@ description: A look a the various jobs and roles in web development
 
 # Web Development Jobs and Roles
 
-## Overview
+There is a minefeild of job titles in the world of web development.
 
 ## A High-level look at the stack
 
@@ -20,24 +20,30 @@ browser|frontend ---REST API|GRAPHQL|JSON|XML--> backend|infrastructure
 
 ## The roles
 
-- UX
-- Frontend
-- Backend
-- Operations/Sysadmin
+* UX
+* Frontend
+* Backend
+* Operations/Sysadmin
 
-- Testers|QA
+* Testers|QA
 
 ### Combiners
 
-- Fullstack (UX|Frontend|Backend[|Ops])
-- Devops (Backend|Ops)
+* Fullstack (UX|Frontend|Backend[|Ops])
+* Devops (Backend|Ops)
 
 ### Senior|Junior|Lead
 
 ### Progressions
 
-- UX -> frontend
-- frontend -UX
-- backend -> frontend -> fullstack
-- frontend -> backend -> fullstack
-- backend -> ops -> devops
+* UX -> frontend
+* frontend -UX
+* backend -> frontend -> fullstack
+* frontend -> backend -> fullstack
+* backend -> ops -> devops
+
+## References
+
+* https://css-tricks.com/job-titles-in-the-web-industry/
+* https://blog.codeplace.com/all-the-job-titles-you-can-have-as-a-developer-f16c5f1f1380
+* https://medium.com/@isaaclyman/choosing-a-job-title-for-people-who-code-316a7673a83c
