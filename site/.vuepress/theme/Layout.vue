@@ -1,22 +1,58 @@
 <template>
-  <div class="theme-container"
+  <div
+    class="theme-container"
     :class="pageClasses"
     @touchstart="onTouchStart"
-    @touchend="onTouchEnd">
-    <Navbar v-if="shouldShowNavbar" @toggle-sidebar="toggleSidebar"/>
-    <div class="sidebar-mask" @click="toggleSidebar(false)"></div>
-    <Sidebar :items="sidebarItems" @toggle-sidebar="toggleSidebar">
-      <slot name="sidebar-top" slot="top"/>
-      <slot name="sidebar-bottom" slot="bottom"/>
+    @touchend="onTouchEnd"
+  >
+    <Navbar
+      v-if="shouldShowNavbar"
+      @toggle-sidebar="toggleSidebar"
+    />
+
+    <div
+      class="sidebar-mask"
+      @click="toggleSidebar(false)"
+    ></div>
+
+    <Sidebar
+      :items="sidebarItems"
+      @toggle-sidebar="toggleSidebar"
+    >
+      <slot
+        name="sidebar-top"
+        slot="top"
+      />
+      <slot
+        name="sidebar-bottom"
+        slot="bottom"
+      />
     </Sidebar>
-    <div class="custom-layout" v-if="$page.frontmatter.layout">
+
+    <div
+      class="custom-layout"
+      v-if="$page.frontmatter.layout"
+    >
       <component :is="$page.frontmatter.layout"/>
     </div>
+
     <Home v-else-if="$page.frontmatter.home"/>
-    <Page v-else :sidebar-items="sidebarItems">
-      <slot name="page-top" slot="top"/>
-      <slot name="page-bottom" slot="bottom"/>
+
+    <Page
+      v-else
+      :sidebar-items="sidebarItems"
+    >
+      <slot
+        name="page-top"
+        slot="top"
+      />
+      <slot
+        name="page-bottom"
+        slot="bottom"
+      />
     </Page>
+
+    <SWUpdatePopup :updateEvent="swUpdateEvent"/>
   </div>
 </template>
 
@@ -27,14 +63,16 @@ import Home from './Home.vue'
 import Navbar from './Navbar.vue'
 import Page from './Page.vue'
 import Sidebar from './Sidebar.vue'
-import { pathToComponentName } from '@app/util'
+import SWUpdatePopup from './SWUpdatePopup.vue'
 import { resolveSidebarItems } from './util'
 
 export default {
-  components: { Home, Page, Sidebar, Navbar },
+  components: { Home, Page, Sidebar, Navbar, SWUpdatePopup },
+
   data () {
     return {
-      isSidebarOpen: false
+      isSidebarOpen: false,
+      swUpdateEvent: null
     }
   },
 
@@ -42,7 +80,11 @@ export default {
     shouldShowNavbar () {
       const { themeConfig } = this.$site
       const { frontmatter } = this.$page
-      if (frontmatter.navbar === false) return false
+      if (
+        frontmatter.navbar === false ||
+        themeConfig.navbar === false) {
+        return false
+      }
       return (
         this.$title ||
         themeConfig.logo ||
@@ -51,8 +93,8 @@ export default {
         this.$themeLocaleConfig.nav
       )
     },
+
     shouldShowSidebar () {
-      const { themeConfig } = this.$site
       const { frontmatter } = this.$page
       return (
         !frontmatter.layout &&
@@ -61,6 +103,7 @@ export default {
         this.sidebarItems.length
       )
     },
+
     sidebarItems () {
       return resolveSidebarItems(
         this.$page,
@@ -69,51 +112,28 @@ export default {
         this.$localePath
       )
     },
-    pageClasses() {
+
+    pageClasses () {
       const userPageClass = this.$page.frontmatter.pageClass
       return [
         {
           'no-navbar': !this.shouldShowNavbar,
           'sidebar-open': this.isSidebarOpen,
-          'no-sidebar': !this.shouldShowSidebar,
+          'no-sidebar': !this.shouldShowSidebar
         },
         userPageClass
       ]
     }
   },
 
-  created () {
-    if (this.$ssrContext) {
-      this.$ssrContext.title = this.$title
-      this.$ssrContext.lang = this.$lang
-      this.$ssrContext.description = this.$page.description || this.$description
-    }
-
-  },
-
   mounted () {
-    // update title / meta tags
-    this.currentMetaTags = []
-    const updateMeta = () => {
-      document.title = this.$title
-      document.documentElement.lang = this.$lang
-      const meta = [
-        {
-          name: 'description',
-          content: this.$description
-        },
-        ...(this.$page.frontmatter.meta || [])
-      ]
-      this.currentMetaTags = updateMetaTags(meta, this.currentMetaTags)
-    }
-    this.$watch('$page', updateMeta)
-    updateMeta()
+    window.addEventListener('scroll', this.onScroll)
 
     // configure progress bar
     nprogress.configure({ showSpinner: false })
 
     this.$router.beforeEach((to, from, next) => {
-      if (to.path !== from.path && !Vue.component(pathToComponentName(to.path))) {
+      if (to.path !== from.path && !Vue.component(to.name)) {
         nprogress.start()
       }
       next()
@@ -123,16 +143,15 @@ export default {
       nprogress.done()
       this.isSidebarOpen = false
     })
-  },
 
-  beforeDestroy () {
-    updateMetaTags(null, this.currentMetaTags)
+    this.$on('sw-updated', this.onSWUpdated)
   },
 
   methods: {
     toggleSidebar (to) {
       this.isSidebarOpen = typeof to === 'boolean' ? to : !this.isSidebarOpen
     },
+
     // side swipe
     onTouchStart (e) {
       this.touchStart = {
@@ -140,6 +159,7 @@ export default {
         y: e.changedTouches[0].clientY
       }
     },
+
     onTouchEnd (e) {
       const dx = e.changedTouches[0].clientX - this.touchStart.x
       const dy = e.changedTouches[0].clientY - this.touchStart.y
@@ -150,25 +170,11 @@ export default {
           this.toggleSidebar(false)
         }
       }
-    }
-  }
-}
+    },
 
-function updateMetaTags (meta, current) {
-  if (current) {
-    current.forEach(c => {
-      document.head.removeChild(c)
-    })
-  }
-  if (meta) {
-    return meta.map(m => {
-      const tag = document.createElement('meta')
-      Object.keys(m).forEach(key => {
-        tag.setAttribute(key, m[key])
-      })
-      document.head.appendChild(tag)
-      return tag
-    })
+    onSWUpdated (e) {
+      this.swUpdateEvent = e
+    }
   }
 }
 </script>

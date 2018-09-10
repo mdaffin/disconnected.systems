@@ -1,19 +1,32 @@
 <template>
-  <nav class="nav-links" v-if="userLinks.length || repoLink">
+  <nav
+    class="nav-links"
+    v-if="userLinks.length || repoLink"
+  >
     <!-- user links -->
     <div
       class="nav-item"
       v-for="item in userLinks"
-      :key="item.link">
-      <DropdownLink v-if="item.type === 'links'" :item="item"/>
-      <NavLink v-else :item="item"/>
+      :key="item.link"
+    >
+      <DropdownLink
+        v-if="item.type === 'links'"
+        :item="item"
+      />
+      <NavLink
+        v-else
+        :item="item"
+      />
     </div>
+
     <!-- repo link -->
-    <a v-if="repoLink"
+    <a
+      v-if="repoLink"
       :href="repoLink"
       class="repo-link"
       target="_blank"
-      rel="noopener noreferrer">
+      rel="noopener noreferrer"
+    >
       {{ repoLabel }}
       <OutboundLink/>
     </a>
@@ -21,21 +34,22 @@
 </template>
 
 <script>
-import OutboundLink from './OutboundLink.vue'
 import DropdownLink from './DropdownLink.vue'
 import { resolveNavLinkItem } from './util'
 import NavLink from './NavLink.vue'
 
 export default {
-  components: { OutboundLink, NavLink, DropdownLink },
+  components: { NavLink, DropdownLink },
+
   computed: {
     userNav () {
       return this.$themeLocaleConfig.nav || this.$site.themeConfig.nav || []
     },
+
     nav () {
       const { locales } = this.$site
       if (locales && Object.keys(locales).length > 1) {
-        let currentLink = this.$page.path
+        const currentLink = this.$page.path
         const routes = this.$router.options.routes
         const themeLocales = this.$site.themeConfig.locales || {}
         const languageDropdown = {
@@ -62,13 +76,15 @@ export default {
       }
       return this.userNav
     },
+
     userLinks () {
-      return (this.nav || []).map((link => {
+      return (this.nav || []).map(link => {
         return Object.assign(resolveNavLinkItem(link), {
           items: (link.items || []).map(resolveNavLinkItem)
         })
-      }))
+      })
     },
+
     repoLink () {
       const { repo } = this.$site.themeConfig
       if (repo) {
@@ -77,6 +93,7 @@ export default {
           : `https://github.com/${repo}`
       }
     },
+
     repoLabel () {
       if (!this.repoLink) return
       if (this.$site.themeConfig.repoLabel) {
@@ -93,7 +110,7 @@ export default {
       }
 
       return 'Source'
-    },
+    }
   }
 }
 </script>
@@ -109,11 +126,12 @@ export default {
     &:hover, &.router-link-active
       color $accentColor
   .nav-item
-    cursor: pointer
     position relative
     display inline-block
     margin-left 1.5rem
     line-height 2rem
+    &:first-child
+      margin-left 0
   .repo-link
     margin-left 1.5rem
 
@@ -126,7 +144,7 @@ export default {
   .nav-links a
     &:hover, &.router-link-active
       color $textColor
-  .nav-item > a
+  .nav-item > a:not(.external)
     &:hover, &.router-link-active
       margin-bottom -2px
       border-bottom 2px solid lighten($accentColor, 8%)
