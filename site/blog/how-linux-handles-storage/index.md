@@ -17,16 +17,7 @@ that can be assembled into some very complex layouts. In this post we will take
 a look at what is going on under the hood at how the Linux Filesystem works and
 how your files and directories are stored.
 
-## Physcial Media
-
-Fundemeatally, all storage media is designed to store a seqence of 1s and 0s.
-To the device these have no meaning, its only job is to store them when asked
-and retreve them what asked. To do this the disk and the OS need a way to addess every single
-bit so that when the OS asks for a specific bit the disk knows which one to fetch. 
-
-It is impracticle to address each individual bit however, so instead 
-
-But disks are huge, modern disks can be hundreads of terrabytes in size.
+## Block Devices
 
 [disk-sector]: https://en.wikipedia.org/wiki/Disk_sector
 [hard-drive-knowledge-blocks-vs-sectors]: http://www.alphaurax-computer.com/computer-tips/hard-drive-knowledge-blocks-vs-sectors
