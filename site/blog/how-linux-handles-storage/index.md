@@ -20,7 +20,9 @@ Unlike Windows, Linux (and Unix systrms overall) use a single directory structur
 This is distint from `/root` (aka "slash root") which is the root users home directoy inside the root of the directory structure.
 :::
 
+One of the key concepts in Linux is that almost everything is a file, or more accruatly can be interfaced with via a file handle. this not only includes actual files, but also the partition inwhich thse files live, the disk the partitions are on, you keyboard, mouse and display, even your printer as well as internal kernel datastructures and data.
 
+ So how does linux talk to all of thse ddifferent devives throught the same interface?
 
 ## Block Devices
 
