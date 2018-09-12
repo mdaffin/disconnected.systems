@@ -9,13 +9,8 @@ tags:
 
 # How Linux Handles Files
 
-In Linux *almost* everything is a file, configuration, 
-
-
-How disks are handled in Linux is based on some fairly simple building blocks
-that can be assembled into some very complex layouts. In this post we will take
-a look at what is going on under the hood at how the Linux Filesystem works and
-how your files and directories are stored.
+One of the fundermental parts of Linux is the filesystem heirarchy. There are a lot of guides out there explaining the purpose of each directory in it, but none as to how it actually works, how are directories mounted, how are files stored, how to partitions and filesystems function
+ In this article we are going to explore these details and look at how linux manages files, folders and stores these on disks.
 
 ## Block Devices
 
