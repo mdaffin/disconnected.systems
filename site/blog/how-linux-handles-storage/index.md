@@ -12,6 +12,16 @@ tags:
 One of the fundermental parts of Linux is the filesystem heirarchy. There are a lot of guides out there explaining the purpose of each directory in it, but none as to how it actually works, how are directories mounted, how are files stored, how to partitions and filesystems function
  In this article we are going to explore these details and look at how linux manages files, folders and stores these on disks.
 
+## The Filesystem Hierarchy
+
+Unlike Windows, Linux (and Unix systrms overall) use a single directory structure which starts at the root aka `/`. Everything is located somewhere inside this directory tree.
+
+::: note:::
+This is distint from `/root` (aka "slash root") which is the root users home directoy inside the root of the directory structure.
+:::
+
+
+
 ## Block Devices
 
 [disk-sector]: https://en.wikipedia.org/wiki/Disk_sector
