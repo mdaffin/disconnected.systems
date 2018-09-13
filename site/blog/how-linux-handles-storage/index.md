@@ -14,15 +14,15 @@ One of the fundermental parts of Linux is the filesystem heirarchy. There are a 
 
 ## The Filesystem Hierarchy
 
-Unlike Windows, Linux (and Unix systrms overall) use a single directory structure which starts at the root aka `/`. Everything is located somewhere inside this directory tree.
+Unlike Windows, Linux (and Unix systems overall) use a single directory structure which starts at the root aka `/`. Everything is located somewhere inside this directory tree.
 
 ::: note:::
 This is distint from `/root` (aka "slash root") which is the root users home directoy inside the root of the directory structure.
 :::
 
-One of the key concepts in Linux is that almost everything is a file, or more accruatly can be interfaced with via a file handle. this not only includes actual files, but also the partition inwhich thse files live, the disk the partitions are on, you keyboard, mouse and display, even your printer as well as internal kernel datastructures and data.
+The hole structure is virtual, it does not exist in its entireity anywhere. Instead it is backed by multiple different locations, partitions on hard drives, in memory data structures, on remote macheines accessed over the network etc.
 
- So how does linux talk to all of thse ddifferent devives throught the same interface?
+However, typically on most systems the majority of the tree is backed by a single partition on a single disk The kernel makes no aumption of this and you
 
 ## Block Devices
 
