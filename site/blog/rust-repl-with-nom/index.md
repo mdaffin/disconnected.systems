@@ -1,5 +1,5 @@
 ---
-date: "2018-09-14:00:00Z"
+date: "2018-09-16T00:00:00Z"
 description: A look at implementing a simple nom based REPL application in rust.
 slug: repl-in-rust-with-nom
 tags:
@@ -77,6 +77,8 @@ the user to enter a line of text and return us the line or and error if it
 failed for any reason. This is the bulk of the REPL, the only bit left is to
 parse and evaluate the user input.
 
+### Handling errors and exiting cleanly
+
 But before we do that lets handle that error more cleanly, we don't want our
 program panicing everying time the user wants to exit the application.
 
@@ -125,6 +127,8 @@ directly in the loop.
             ...
         }
 ```
+
+### Partial input and buffering
 
 We also want to handle partial input, that is when the user partly types in an
 expression and the parser needs more input before it can parse it. For this we
@@ -176,6 +180,8 @@ the buffer and seeing if it is empty.
             }
 ```
 
+### Command History
+
 One very nice feature of rustyline is history, this allows the user to use the
 up/down arrows to select previous entries, much like you are use to from
 shells and other popular REPLs. This feature is already enabled and all we need
@@ -208,6 +214,8 @@ fn main() {
     }
 }
 ```
+
+### Input Processing
 
 Finally we will complete out main function with a stub for processing the
 input, we will expand this later when we look at the parser but for now it will
