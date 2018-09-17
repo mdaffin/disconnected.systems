@@ -53,11 +53,10 @@ partial input).
 
 ## The REPL
 
-The read, print and loop parts are all really easy to implement thanks to the
-[rustyline] package.
+The R_PL parts are all really easy to implement thanks to the [rustyline]
+package.
 
 ```rust
-#[macro_use]
 extern crate rustyline;
 
 fn main() {
@@ -72,7 +71,25 @@ fn main() {
 }
 ```
 
-This forms our main loop and in it rustyline will print our prompt, wait for
+We import the crate, just like any other crate, then setup the rustyline
+editor. The default editor has some very nice defaults so we don't need to play
+around with the [config builder] but there are a number of options you might
+want to consider if the default behaviour is not right for your application.
+
+[config builder]: https://docs.rs/rustyline/2.1.0/rustyline/config/struct.Config.html
+
+Not that this is very hard to do without rustyline and if this is all you want
+to do you can argue that it is not worth the extra dependency. But rustyline
+has some very nice extra features like history and multi-line edits that are
+worth the extra dependency. We will see how to use these features later.
+
+::: note :::
+Rustyline also includes a bunch of other worth while features like
+autocompletion, file completion, ability to kill commands that are well worth
+looking at if you require them or they can benefit your project.
+::::::
+
+Now we have our main loop and in it rustyline will print our prompt, wait for
 the user to enter a line of text and return us the line or and error if it
 failed for any reason. This is the bulk of the REPL, the only bit left is to
 parse and evaluate the user input.
