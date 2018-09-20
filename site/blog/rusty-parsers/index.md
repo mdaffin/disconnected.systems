@@ -20,3 +20,4 @@ CHIP Xor {
 ```
 
 But for this exersise I am only going to be implementing a line from the PARTS subsection, such as `Not(in=a, out=nota);`. This takes the form `<chip_name> ( <internal_wire>=<outter_wire>, <internal_wire>=<outter_wire> );`. White space can exist between any of the tokens and there can be any number of inner/outter wire pairs. For this we are going to ignore comments.
+
