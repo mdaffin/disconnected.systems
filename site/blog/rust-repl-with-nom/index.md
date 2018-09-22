@@ -53,7 +53,7 @@ partial input).
 
 ## The REPL
 
-The R_PL parts are all really easy to implement thanks to the [rustyline]
+The R\*PL parts are all really easy to implement thanks to the [rustyline]
 package.
 
 ```rust
@@ -83,11 +83,11 @@ to do you can argue that it is not worth the extra dependency. But rustyline
 has some very nice extra features like history and multi-line edits that are
 worth the extra dependency. We will see how to use these features later.
 
-::: note :::
+::: tip
 Rustyline also includes a bunch of other worth while features like
 autocompletion, file completion, ability to kill commands that are well worth
 looking at if you require them or they can benefit your project.
-::::::
+:::
 
 Now we have our main loop and in it rustyline will print our prompt, wait for
 the user to enter a line of text and return us the line or and error if it
@@ -100,7 +100,8 @@ But before we do that lets handle that error more cleanly, we don't want our
 program panicing everying time the user wants to exit the application.
 
 There are various errors returned by rustyline, most are due to underlying I/O
-errors which we cannot not do much about but print a message and exit.
+errors which we cannot not do much about, something has gone horribly wrong
+with the users terminal so just print a message and exit.
 
 ```rust
         match &rl.readline(">>> ") {
@@ -112,10 +113,16 @@ errors which we cannot not do much about but print a message and exit.
         }
 ```
 
-Now, two common errors we do want to handle separatly are for EOF which happens
+Now, two common errors we do want to handle separatly are for Eof which happens
 when the user hits `CTRL+D` and Interrupted for when the user presses `CTRL+C`
-(rustlyline stops this from triggering a SIGTERM signal so we need to implement
-its behaviour ourselves).
+
+rustlyline uses a raw terminal mode where ctrl+c does not trigger a SIGTERM to
+fire. Instead it gets this as any other key that must be handled separatly.
+This is the same way that vim and other complex interactive applications work.
+
+We want ctrl+c to behave like any other application so we simply end the loop
+and exit cleanly when we recieve it. The same goes for crtl+d which typically
+sends an end of file message to tell the application no more data is incomming.
 
 ```rust
 use rustyline::error::ReadlineError;
@@ -134,8 +141,8 @@ fn main() {
 ```
 
 Now, it would also be nice to type `exit` as another way to exit he program.
-This one we could handle with the parser but it is simpler to handle it
-directly in the loop.
+This one we _could_ handle with the parser but it is simpler to handle it
+directly in the loop as it is a special case.
 
 ```rust
         match &rl.readline(">>> ") {
@@ -148,23 +155,19 @@ directly in the loop.
 ### Partial input and buffering
 
 We also want to handle partial input, that is when the user partly types in an
-expression and the parser needs more input before it can parse it. For this we
-need a buffer to store the previous lines between each loop.
+expression and the parser needs more input before it can fully parse it. For
+this we need a buffer to store the previous lines between each loop.
 
 ```rust
 fn main() {
     let mut buffer = String::new();
     ...
-
-    loop {
-        ...
-    }
 }
 ```
 
 When we get a new line we need to append it to this buffer along with the
-newline that was stripped by rustyline (as the newline char will be required by
-the parser). Then we print and clear the buffer which we will make conditional
+newline that was stripped by rustyline as the newline char will be required by
+the parser. Then we print and clear the buffer which we will make conditional
 later based on the output of the parser.
 
 ```rust
@@ -178,8 +181,6 @@ later based on the output of the parser.
             }
             ...
         }
-    }
-}
 ```
 
 We also want to ignore empty lines as there is nothing to process and it is not
@@ -270,41 +271,120 @@ Well, at least as much as you can call it that. Nom allows you to parse things
 into any datastructure you wish whish allows you to parse into very specific
 structures if you want to and make extensive use of rusts strong type system.
 
+Only a couple of types are needed, both enums, the first to identify an
+operator, esentially one of `+` `-` `*` or `/`.
+
 ```rust
-    #[derive(Debug)]
+mod ast {
+    #[derive(Debug, Copy, Clone)]
     pub enum Operator {
         Add,
         Subtract,
         Multiply,
         Divide,
     }
+    ...
+}
 ```
+
+And the second is the meat of the datasstructure, any expression. This is a
+recusrive structure which will allow us to build up any valid expression no
+matter how complex or nested it is, well assuming we don't run out of ram. This
+is a tree, with the leaves being any floating point number (we are only
+supporting floating point numbers) and the branches being chains of
+operator/operand pairs.
+
+Each _chain_ must start with a sub expression or number and can optionally be
+followed by any number of operator/operand pairs. Originally I was going to go
+for a binary tree like structure with (expr, opp, expr) and just nest things
+from there, but this complicated operator precedence which the parser would
+have to handle. With the list we can move that out of the parser and into the
+evaluation logic.
 
 ```rust
 mod ast {
+    ...
     #[derive(Debug)]
     pub enum Expr {
+        /// A single 64 bit floating point number. This is the leaf node of the AST, all
+        /// expressions eventually end in a number.
         Number(f64),
-        Operation(Box<Expr>, Operator, Box<Expr>),
+        /// A chain of operators, like 1+2*3+4
+        OperationChain(Box<Expr>, Vec<(Operator, Box<Expr>)>),
     }
+    ...
+}
 ```
 
+The evaluation logic is also added to this module as it is not that complex and
+so does not really warrent splitting it out. The job of this function is to
+translate our expression into a single floating point number that can later be
+printed to the screen.
+
+Expr is a enum so we must match on it to change our behaviour depending on the
+type. `Operator::Number` is easy, just dereference the value and return it.
+
 ```rust
+mod ast {
+    ...
     impl Expr {
-        /// Evaluate the expression
         pub fn eval(&self) -> f64 {
             use self::Expr::*;
             use self::Operator::*;
             match self {
                 Number(n) => *n,
-                Operation(l, Add, r) => l.eval() + r.eval(),
-                Operation(l, Subtract, r) => l.eval() - r.eval(),
-                Operation(l, Multiply, r) => l.eval() * r.eval(),
-                Operation(l, Divide, r) => l.eval() / r.eval(),
+                ...
             }
         }
     }
 }
+```
+
+The chain is where we need to do some actualy work. We start by recursivly
+evaluating all of the subexpressions, and map them to f64s. This will leave us
+with a single array of `(Operator, f64)` pairs as well as the first value -
+which does not have an operator associated with it.
+
+```rust
+            match self {
+                ...
+                OperationChain(l, r) => {
+                    let first = l.eval();
+                    let list: Vec<_> = r.into_iter()
+                        .map(|(opp, expr)| (opp, expr.eval()))
+                        .collect();
+```
+
+Now for the complex bit, we need to resolve all multiplication and division
+first, leaving all addition and subtraction in place.
+
+```rust
+                    ...
+                    let (mut list, tail) = list.into_iter().fold(
+                        (Vec::new(), (Operator::Add, first)),
+                        |(mut head, (p_opp, p_val)), (opp, val)| match opp {
+                            Multiply => (head, (p_opp, p_val * val)),
+                            Divide => (head, (p_opp, p_val / val)),
+                            opp => {
+                                head.push((p_opp, p_val));
+                                (head, (*opp, val))
+                            }
+                        },
+                    );
+                    ...
+```
+
+```rust
+                    list.push(tail);
+
+                    // Add and subtract remaining
+                    list.into_iter().fold(0.0, |total, (opp, val)| match opp {
+                        Add => total + val,
+                        Subtract => total - val,
+                        _ => unreachable!(),
+                    })
+                }
+            }
 ```
 
 [rustyline]: TODO
