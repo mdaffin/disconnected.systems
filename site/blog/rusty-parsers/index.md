@@ -21,3 +21,146 @@ CHIP Xor {
 
 But for this exersise I am only going to be implementing a line from the PARTS subsection, such as `Not(in=a, out=nota);`. This takes the form `<chip_name> ( <internal_wire>=<outter_wire>, <internal_wire>=<outter_wire> );`. White space can exist between any of the tokens and there can be any number of inner/outter wire pairs. For this we are going to ignore comments.
 
+## Boiler plate code
+
+For this exersise I built a simple repl and test suit that I will use to develop each parser, the only requirement is that each parser implements a function `pub fn parse(buffer: &str) -> Result<Option<Part>, String>` and parses the code into `Part` struct defiend in `repl.rs`. A string error is returned on parser error, `None` when more data is required by the parser (for multiline support) or the parsed part on a successful parse.
+
+Each parser demo is defined as a separate binary in `Cargo.toml`.
+
+`repl.rs`
+
+```rust
+use std::collections::HashMap;
+use rustyline::error::ReadlineError;
+use rustyline::Editor;
+
+use super::parse;
+
+#[derive(Debug, PartialEq)]
+pub struct Part<'a> {
+    pub name: &'a str,
+    pub wires: HashMap<&'a str, &'a str>,
+}
+
+pub fn start() {
+    let mut buffer = String::new();
+    let mut rl = Editor::<()>::new();
+
+    loop {
+        let prompt = if buffer.is_empty() { ">>> " } else { "... " };
+        let line = match rl.readline(prompt) {
+            Ok(line) => line,
+            Err(ReadlineError::Eof) | Err(ReadlineError::Interrupted) => break,
+            // For other errors print them and exit with an error. This should not happen often and
+            // means there is a problem with reading from stdin or the chars read are not UTF8.
+            Err(e) => {
+                eprintln!("Could not read from stdin: {}", e);
+                ::std::process::exit(1);
+            }
+        };
+
+        buffer.push_str(&line);
+        // Input can span multiple lines and the grammer can deal with this but readline above
+        // strips the trailing new line, so we add it back
+        buffer.push('\n');
+
+        match buffer.trim() {
+            // No input, such as if the user just hits enter
+            "" => {
+                buffer.clear();
+                continue;
+            }
+            "exit" => break,
+            _ => (),
+        }
+
+        match parse(buffer.as_str()) {
+            Ok(None) => continue, // Need more input
+            Ok(Some(result)) => println!("{:?}", result),
+            Err(msg) => eprintln!("{}", msg),
+        }
+
+        // Add the buffer to the history without the last newline, we do this for any complete
+        // input, even if it is invalid so the user can correct any mistake they make.
+        rl.add_history_entry(buffer.trim_right_matches('\n').to_string());
+        buffer.clear();
+    }
+}
+```
+
+`tests.rs`:
+
+```rust
+use super::{parse, Part};
+use std::collections::HashMap;
+
+macro_rules! test_case {
+    ($test:ident, $input:expr, None) => {
+        #[test]
+        fn $test() {
+            assert_eq!(parse($input).unwrap(), None);
+        }
+    };
+    ($test:ident, $input:expr, Err) => {
+        #[test]
+        fn $test() {
+            assert!(parse($input).is_err());
+        }
+    };
+    ($test:ident, $input:expr, $name:expr, [ $($inner:expr => $outer:expr),* ]) => {
+        #[test]
+        fn $test() {
+            #![allow(unused_mut)]
+            let mut wires = HashMap::new();
+            $(wires.insert($inner, $outer);)*
+            let expected = Part {
+                name: $name,
+                wires: wires
+            };
+            assert_eq!(parse($input).unwrap().unwrap(), expected);
+        }
+    };
+}
+
+test_case!(simple_1, "Foo();", "Foo", []);
+test_case!(simple_2, "Bar();", "Bar", []);
+test_case!(simple_3, "FooBar();", "FooBar", []);
+test_case!(single_wire_1, "Foo(a=b);", "Foo", ["a"=>"b"]);
+test_case!(single_wire_2, "Foo(in=in);", "Foo", ["in"=>"in"]);
+test_case!(single_wire_3, "Foo(input=input);", "Foo", ["input"=>"input"]);
+test_case!(single_wire_4, "FOO(INPUT=INPUT);", "FOO", ["INPUT"=>"INPUT"]);
+test_case!(single_wire_5, "Foo(a_b=c_d);", "Foo", ["a_b"=>"c_d"]);
+test_case!(multi_wire_1, "Foo(a=a,b=b);", "Foo", ["a"=>"a", "b"=>"b"]);
+test_case!(multi_wire_2, "Foo(a=z,b=y,c=x);", "Foo", ["a"=>"z", "b"=>"y", "c"=>"x"]);
+
+test_case!(whitespace_1, " Foo ( a = z , b = y ) ; ", "Foo", ["a"=>"z", "b"=>"y"]);
+test_case!(whitespace_2, "  Foo  (  a  =  z  ,  b  =  y  )  ;  ", "Foo", ["a"=>"z", "b"=>"y"]);
+test_case!(whitespace_3, "\tFoo\t(\ta\t=\tz\t,\tb\t=\ty\t)\t;\t", "Foo", ["a"=>"z", "b"=>"y"]);
+test_case!(whitespace_4,
+       "\t\tFoo\t\t(\t\ta\t\t=\t\tz\t\t,\t\tb\t\t=\t\ty\t\t)\t\t;\t\t",
+       "Foo", ["a"=>"z", "b"=>"y"]
+    );
+test_case!(whitespace_5, "\nFoo\n(\na\n=\nz\n,\nb\n=\ny\n)\n;\n", "Foo", ["a"=>"z", "b"=>"y"]);
+test_case!(whitespace_6,
+       "\n\nFoo\n\n(\n\na\n\n=\n\nz\n\n,\n\nb\n\n=\n\ny\n\n)\n\n;\n\n",
+       "Foo", ["a"=>"z", "b"=>"y"]
+    );
+
+test_case!(partial_1, "F", None);
+test_case!(partial_2, "Foo", None);
+test_case!(partial_3, "Foo(", None);
+test_case!(partial_4, "Foo(a", None);
+test_case!(partial_5, "Foo(a=b", None);
+test_case!(partial_6, "Foo(a=b,", None);
+test_case!(partial_7, "Foo(a=b,c", None);
+test_case!(partial_8, "Foo(a=b,c=", None);
+test_case!(partial_9, "Foo(a=b,c=d", None);
+test_case!(partial_10, "Foo(a=b,c=d)", None);
+test_case!(partial_11, "Foo(a=b)", None);
+test_case!(partial_12, "Foo()", None);
+
+test_case!(error_1, "Foo(;", Err);
+test_case!(error_2, "Foo(a;", Err);
+test_case!(error_3, "Foo;", Err);
+test_case!(error_4, "Foo()a;", Err);
+```
