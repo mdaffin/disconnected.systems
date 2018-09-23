@@ -1,4 +1,46 @@
-Nom is a combinator parser - which means it builds more complex parsers from simpler sub parsers. There is no separate grammer like other parser libraries use, each parser deals with parsing the input and translating it into some useful struct. Each parser takes the signature `fn parser(input: I) -> IResult<I, O, E>;` and you basically have to write each one by hand. But nom offers a bunch of macros and convience functions to help make this a trivial task and I found writing the parsers quite simple once you understand how nom functions and what its macros do.
+---
+date: '2018-09-22T00:00:00Z'
+description: A look at various parsers in rust
+slug: rusty-parsers-nom
+tags:
+- rust
+- programming
+- parsers
+---
+
+# Rusty Parsers - Nom
+
+Nom is a combinator parser - which means it builds more complex parsers from
+simpler sub parsers. There is no separate grammer like other parser libraries
+use, each parser deals with parsing the input and translating it into some
+useful struct. Each parser takes the signature
+`fn parser(input: I) -> IResult<I, O, E>;` and you basically have to write each
+one by hand. While you can write all of the parsers by hand, nom offers a bunch
+of macros and convience functions to help make this much eaiser and faster.
+
+Nom is the first parser I looked at as it seems to be one of the more popular
+ones and lots of people recomending it from various places. In this post I am
+not going to be walking you though creating a parser in rust and instead focus
+on my opinion of the library (as someone completely new to parsers in general
+and inperticular the pain points which I encountered while developing the
+simple demo parsers (which you can find at the bottom of the post and [in this
+repo].
+
+This project was done using Nom v4.
+
+[rust-parser]: /blog/rusty-parser
+[in this repo]: https://gitlab.com/mdaffin/rusty-parsers/blob/master/src/nom.rs
+
+## Getting started with nom
+
+Getting started with nom is quite simple, the documentation offers some nice
+simple _yet complete_ examples that you can use to get started. [The main
+documentation] does an exellent job of describing how some of the common
+parsers work and how you should use them.
+
+The problems start when you want to dive a bit deeper and start implementing
+your own parsers. The parts that are not mentioned in the main introductary
+documentation are spotty, with some of the macro barly having anything more then the macro signature
 
 ## Implementation
 
@@ -91,8 +133,6 @@ named!(wire_name<&str, &str>,
 );
 named!(chip_name<&str, &str>, recognize!(preceded!(alpha, alphanumeric0)));
 ```
-
-
 
 ```
 error: no rules expected the token `,`

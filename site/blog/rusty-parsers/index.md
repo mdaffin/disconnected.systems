@@ -1,166 +1,109 @@
-Recently I started a project where I needed to parse some text in the form of a hardware discription language (a way of describing how logic gates are connected on a chip). Nothing very complex as far as parsers are conserned, quite short input and a quite simple structure - quite liekly something that I could do by hand but I wanted to take this as an oppotinity to learn some of rusts parsing libraries.
+---
+date: '2018-09-22T00:00:00Z'
+description: A look at various parsers in rust
+slug: rusty-parsers
+tags:
+- rust
+- programming
+- parsers
+---
 
-I first tried nom, being one of the more popular libraries that lots of people seemed to rave about. I hit quite a few issues, and decided to take a step back and look at pest, another popular library. Quite quickly I ran into some other issues. I relised that this was not going to be as simple as I first thourght and decided to learn a selection of different libraries out there to compare and contrast them. I went back to nom, taking a subset of the full language and started to learn nom in more details, push through the problems and get a complete solution to my partital problem. Then repeate this process for pest, and a selection of other popular or intresting parser libraries.
+# Rusty Parsers
 
-As part of this I am looking at erganomics over preformance, there are other resources out there that benchmark the various libraries (and all seem to come to different conslusions). But I want to know about the developers side, how well are they documented? How nice are they to use? What are the best practices of using them? How well do they handle errors? In this series I will be attempting to answer these questions as well as gain a better understanding of parsing in general and create some minimal - but complete - examples for each of the libraries (as I found a lot of partial example and very few that tie everything togeather that were not hugly complex).
+Recently I started a project where I needed to parse some text in the form of a
+hardware discription language (a way of describing how logic gates are
+connected on a chip). Nothing very complex as far as parsers are conserned,
+quite short input and a quite simple structure - quite liekly something that I
+could do by hand but I wanted to take this as an oppotinity to learn some of
+rusts parsing libraries.
 
-The language I will be parsing is a subset of a HDL language that is used by the [nand2tetris](https://www.nand2tetris.org/) course. The full HDL looks like:
+I first tried nom, being one of the more popular libraries that lots of people
+seemed to rave about. I hit quite a few issues, and decided to take a step back
+and look at pest, another popular library. Quite quickly I ran into some other
+issues. I relised that this was not going to be as simple as I first thourght
+and decided to learn a selection of different libraries out there to compare
+and contrast them. I went back to nom, taking a subset of the full language and
+started to learn nom in more details, push through the problems and get a
+complete solution to my partital problem. Then repeate this process for pest,
+and a selection of other popular or intresting parser libraries.
 
-```
-CHIP Xor {
-    IN a, b;
-    OUT out;
-    PARTS:
-    Not(in=a, out=nota);
-    Not(in=b, out=notb);
-    And(a=a, b=notb, out=w1);
-    And(a=nota, b=b, out=w2);
-    Or(a=w1, b=w2, out=out);
-}
-```
+As part of this I am looking at erganomics over preformance, there are other
+resources out there that benchmark the various libraries (and all seem to come
+to different conslusions). But I want to know about the developers side, how
+well are they documented? How nice are they to use? What are the best practices
+of using them? How well do they handle errors? In this series I will be
+attempting to answer these questions as well as gain a better understanding of
+parsing in general and create some minimal - but complete - examples for each
+of the libraries (as I found a lot of partial example and very few that tie
+everything togeather that were not hugly complex).
 
-But for this exersise I am only going to be implementing a line from the PARTS subsection, such as `Not(in=a, out=nota);`. This takes the form `<chip_name> ( <internal_wire>=<outter_wire>, <internal_wire>=<outter_wire> );`. White space can exist between any of the tokens and there can be any number of inner/outter wire pairs. For this we are going to ignore comments.
+## Nom
 
-## Boiler plate code
+Getting started with the examples was very easy, it does a good job of
+explaining how the macro parsers work and how you can chain them up to build
+more complex parsers. One thing I really like about nom is being able to parse
+into any datastructure. This allows you to build up your own AST which makes
+use of rusts powerful type system and saftey checks.
 
-For this exersise I built a simple repl and test suit that I will use to develop each parser, the only requirement is that each parser implements a function `pub fn parse(buffer: &str) -> Result<Option<Part>, String>` and parses the code into `Part` struct defiend in `repl.rs`. A string error is returned on parser error, `None` when more data is required by the parser (for multiline support) or the parsed part on a successful parse.
+But once you move beyond the simple examples into creating your own parsers
+things get a little bit more hary. The refence documentation is no were near as
+complete or detailed as the getting started documentation with some macros
+almost completely lacking any good description of what they actually do or how
+to use them.
 
-Each parser demo is defined as a separate binary in `Cargo.toml`.
+Mostly all the required details are there - but you have to learn to
+interperate them which takes a bit of time. You should defently take some time
+to read and digest the documentation and what all the parsers are supose to do
+before getting started. But once you have things are not too bad.
 
-`repl.rs`
+There is a nice long list of projects using nom - which is mostly useless for
+refence. A lot of what is listed uses older version (quite often v1) and the
+same goes for most thrid part blog posts and guides about it. As such, always
+check which version of nom some resource is using before you invest too much
+time in reading it. I wasted quite a few hours reading out dated guides that
+only confused me when they didn't work as written. At this time of writing this
+included almost all thrid party documentation on the matter - though the
+internal docs are consistant and upto date.
 
-```rust
-use std::collections::HashMap;
-use rustyline::error::ReadlineError;
-use rustyline::Editor;
+Version 4 switch from its own error type to the rusts Result type and encodes
+various different situations into its error type. Nom is a streaming parser -
+that means it must deal with partial input (when htere is not enough data to
+complete a parser). It acutally handles this very well and returns an
+`Err(Incomplete(uszie))` in this situation, you simply then obtain more data
+from your source into your buffers and send it back to the parser.
 
-use super::parse;
+But the rest of error management is complex, confusing and hard to get your
+head around - let along figuring out how to use it. There are basicly no
+examples on how to handle errors or report them to the user. There is a whole
+documentation page on error managment - that does not do a great job at
+explaining things, it took me a few reads and quite a bit of trial and error to
+figure things out. I think I will leave the details of this to a future post as
+it would take too long to describe everything about them here but in short most
+of the time I spent on learning nom was how to deal with its errors and parse
+them into some semi sane message for the end user.
 
-#[derive(Debug, PartialEq)]
-pub struct Part<'a> {
-    pub name: &'a str,
-    pub wires: HashMap<&'a str, &'a str>,
-}
+Whitespace //todo
 
-pub fn start() {
-    let mut buffer = String::new();
-    let mut rl = Editor::<()>::new();
+My last major consern is stability, it is already on version 4 which had some
+large breaking changes from the previous version and this version still feels
+incomplete - notabily around the error managment side. I suspect that at
+somepoint more breaking changes will happen though I do have confidence that
+this will result in a new major version. I don't fell the libaray is really at
+1.0 quaility yet - though it is widly used for a number of tasks I could not
+find many examples of proper error handling that also used arecent version of
+nom.
 
-    loop {
-        let prompt = if buffer.is_empty() { ">>> " } else { "... " };
-        let line = match rl.readline(prompt) {
-            Ok(line) => line,
-            Err(ReadlineError::Eof) | Err(ReadlineError::Interrupted) => break,
-            // For other errors print them and exit with an error. This should not happen often and
-            // means there is a problem with reading from stdin or the chars read are not UTF8.
-            Err(e) => {
-                eprintln!("Could not read from stdin: {}", e);
-                ::std::process::exit(1);
-            }
-        };
+## Pest
 
-        buffer.push_str(&line);
-        // Input can span multiple lines and the grammer can deal with this but readline above
-        // strips the trailing new line, so we add it back
-        buffer.push('\n');
+- Very good documentation and examples of how to write a grammer
+- Grammer is very easy to read and write
+-
 
-        match buffer.trim() {
-            // No input, such as if the user just hits enter
-            "" => {
-                buffer.clear();
-                continue;
-            }
-            "exit" => break,
-            _ => (),
-        }
+* The book is imcomplete and missing some crutal examples of parsing the AST
+* Lacks any documentation about how to parse their AST into a useable result
+* Lacks any complete examples or shows best practices outside of writting grammers
+* You need to parse the AST - it is too abstract (accross any program ever) which makes it almost useless for intermadary use. This results in a lot of potential places to panic in your code or some very verbose error handling (which should never happen if there is not a bug).
 
-        match parse(buffer.as_str()) {
-            Ok(None) => continue, // Need more input
-            Ok(Some(result)) => println!("{:?}", result),
-            Err(msg) => eprintln!("{}", msg),
-        }
+## Lalrpop
 
-        // Add the buffer to the history without the last newline, we do this for any complete
-        // input, even if it is invalid so the user can correct any mistake they make.
-        rl.add_history_entry(buffer.trim_right_matches('\n').to_string());
-        buffer.clear();
-    }
-}
-```
-
-`tests.rs`:
-
-```rust
-use super::{parse, Part};
-use std::collections::HashMap;
-
-macro_rules! test_case {
-    ($test:ident, $input:expr, None) => {
-        #[test]
-        fn $test() {
-            assert_eq!(parse($input).unwrap(), None);
-        }
-    };
-    ($test:ident, $input:expr, Err) => {
-        #[test]
-        fn $test() {
-            assert!(parse($input).is_err());
-        }
-    };
-    ($test:ident, $input:expr, $name:expr, [ $($inner:expr => $outer:expr),* ]) => {
-        #[test]
-        fn $test() {
-            #![allow(unused_mut)]
-            let mut wires = HashMap::new();
-            $(wires.insert($inner, $outer);)*
-            let expected = Part {
-                name: $name,
-                wires: wires
-            };
-            assert_eq!(parse($input).unwrap().unwrap(), expected);
-        }
-    };
-}
-
-test_case!(simple_1, "Foo();", "Foo", []);
-test_case!(simple_2, "Bar();", "Bar", []);
-test_case!(simple_3, "FooBar();", "FooBar", []);
-test_case!(single_wire_1, "Foo(a=b);", "Foo", ["a"=>"b"]);
-test_case!(single_wire_2, "Foo(in=in);", "Foo", ["in"=>"in"]);
-test_case!(single_wire_3, "Foo(input=input);", "Foo", ["input"=>"input"]);
-test_case!(single_wire_4, "FOO(INPUT=INPUT);", "FOO", ["INPUT"=>"INPUT"]);
-test_case!(single_wire_5, "Foo(a_b=c_d);", "Foo", ["a_b"=>"c_d"]);
-test_case!(multi_wire_1, "Foo(a=a,b=b);", "Foo", ["a"=>"a", "b"=>"b"]);
-test_case!(multi_wire_2, "Foo(a=z,b=y,c=x);", "Foo", ["a"=>"z", "b"=>"y", "c"=>"x"]);
-
-test_case!(whitespace_1, " Foo ( a = z , b = y ) ; ", "Foo", ["a"=>"z", "b"=>"y"]);
-test_case!(whitespace_2, "  Foo  (  a  =  z  ,  b  =  y  )  ;  ", "Foo", ["a"=>"z", "b"=>"y"]);
-test_case!(whitespace_3, "\tFoo\t(\ta\t=\tz\t,\tb\t=\ty\t)\t;\t", "Foo", ["a"=>"z", "b"=>"y"]);
-test_case!(whitespace_4,
-       "\t\tFoo\t\t(\t\ta\t\t=\t\tz\t\t,\t\tb\t\t=\t\ty\t\t)\t\t;\t\t",
-       "Foo", ["a"=>"z", "b"=>"y"]
-    );
-test_case!(whitespace_5, "\nFoo\n(\na\n=\nz\n,\nb\n=\ny\n)\n;\n", "Foo", ["a"=>"z", "b"=>"y"]);
-test_case!(whitespace_6,
-       "\n\nFoo\n\n(\n\na\n\n=\n\nz\n\n,\n\nb\n\n=\n\ny\n\n)\n\n;\n\n",
-       "Foo", ["a"=>"z", "b"=>"y"]
-    );
-
-test_case!(partial_1, "F", None);
-test_case!(partial_2, "Foo", None);
-test_case!(partial_3, "Foo(", None);
-test_case!(partial_4, "Foo(a", None);
-test_case!(partial_5, "Foo(a=b", None);
-test_case!(partial_6, "Foo(a=b,", None);
-test_case!(partial_7, "Foo(a=b,c", None);
-test_case!(partial_8, "Foo(a=b,c=", None);
-test_case!(partial_9, "Foo(a=b,c=d", None);
-test_case!(partial_10, "Foo(a=b,c=d)", None);
-test_case!(partial_11, "Foo(a=b)", None);
-test_case!(partial_12, "Foo()", None);
-
-test_case!(error_1, "Foo(;", Err);
-test_case!(error_2, "Foo(a;", Err);
-test_case!(error_3, "Foo;", Err);
-test_case!(error_4, "Foo()a;", Err);
-```
+## Combine
