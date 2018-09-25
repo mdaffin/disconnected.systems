@@ -41,10 +41,10 @@ fork it and make it your own.
 
 This guide is also not a tutorial on installing ArchLinux, it assumes some
 basic knowledge of the install process and shows you how to script it.
-Beginners should first go through the [offical install guide] and be able to
+Beginners should first go through the [official install guide] and be able to
 create a working Arch Linux system before following this guide.
 
-[offical install guide]: https://wiki.archlinux.org/index.php/Installation_guide
+[official install guide]: https://wiki.archlinux.org/index.php/Installation_guide
 
 ## Setting Variables and Collecting User Input
 
@@ -119,7 +119,7 @@ pick from.
 
 ```bash
 devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)
-device=$(dialog --stdout --menu "Select installtion disk" 0 0 0 ${devicelist}) || exit 1
+device=$(dialog --stdout --menu "Select installation disk" 0 0 0 ${devicelist}) || exit 1
 ```
 
 ![dialog disk selection](/blog/archlinux-installer/01-dialog-disk.png)
@@ -141,21 +141,20 @@ with a disk to let the user format it however they want.
 gdisk "${device}"
 ```
 
-This works fine in side a script, you are able to interact with it like you are
-user to, but when it exits our script will continue.
+This works fine inside a script, you are able to interact with it like you are
+user as well, and when you exit it our script will continue.
 
-The major problem with these interactive approaches is figuring out the
-formatting and layout they user wants or expected for that install. You are
-mostly forced to ask the user what they want to do with each partition they
-created, which complicates the script and install process quite a bit. Or just
-assume a layout and hope the user formatted it correctly.
+The major problem with this interactive approach is figuring out the formatting
+and layout the user wants or expected for that install. You are mostly forced to
+ask the user what they want to do with each partition they created, which
+complicates the script and install process quite a bit. Or just assume a layout
+and hope the user formatted it correctly.
 
-Alternatively, if most or all of your systems are formatted identically you can
-hardcode the layout into the script. This keeps the script simpler and means
-there are fewer steps to go through when installing a system. In the event you
-do need a custom disk layout for a single system you can download and manually
-edit the script or even delete the formatting section entirely and formatting
-it manually beforehand.
+Alternatively, if most or all of your systems are formatted identically, you can
+hardcode the layout into the script. This keeps the script simpler with fewer
+steps to go through. In the event that you do need a custom disk layout for some
+special case, you can download and manually edit the script or even delete the
+formatting section entirely and formatting it manually beforehand.
 
 ```bash
 parted --script "${device}" -- mklabel gpt \
@@ -165,8 +164,8 @@ parted --script "${device}" -- mklabel gpt \
   mkpart primary ext4 2177MiB 100%
 ```
 
-You can make this more flexible by allowing the user to speficy the size of the
-ESP or swap space, or even calcualte the swap basied on the available ram.
+You can make this more flexible by allowing the user to specify the size of the
+ESP or swap space, or even calculate the swap based on the available ram.
 
 ```bash
 swap_size=$(free --mebi | awk '/Mem:/ {print $2}')
@@ -202,8 +201,8 @@ part_boot="${device}p1"
 
 To generalise over these two types of disks you can use `ls` and `grep` to find
 and filter the actual partition. I found the bashes globbing was not powerful
-enough to filter out just a single partition while ignoreing device files such
-as `/dev/mmcblk0boot1` that also exist on some of these systems.
+enough to filter out just a single partition while ignoring device files such
+as `/dev/mmcblk0boot1` that also exist on some systems.
 
 ```bash
 part_boot="$(ls ${device}* | grep -E "^${device}p?1$")"
