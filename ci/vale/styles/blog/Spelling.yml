@@ -1,0 +1,6 @@
+extends: spelling
+message: "Did you really mean '%s'?"
+level: error
+aff: en_GB.aff
+dic: en_GB.dic
+ignore: ignore
