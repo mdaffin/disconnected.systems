@@ -1,33 +1,34 @@
 ---
 aliases:
-- /bare-metal-c-on-the-teensy-3.1/
-- /posts/bare-metal-c-on-the-teensy-3.1/
-date: '2015-11-23T00:00:00Z'
-description: A look at bare metal programming in c on the teensy 3.1 with out external
+  - /bare-metal-c-on-the-teensy-3.1/
+  - /posts/bare-metal-c-on-the-teensy-3.1/
+date: "2015-11-23T00:00:00Z"
+description:
+  A look at bare metal programming in c on the teensy 3.1 with out external
   dependencies.
 slug: bare-metal-c-on-the-teensy-3.1
 tags:
-- c
-- teensy
-- arm
+  - c
+  - teensy
+  - arm
 ---
 
 # Bare Metal C on the Teensy 3.1
 
 As a follow on from my previous post about writing [bare metal assembly on the
-teensy 3.1](../bare-metal-assembly-on-the-teensy-3.1) I wanted to see what it
+Teensy 3.1](../bare-metal-assembly-on-the-teensy-3.1) I wanted to see what it
 would take to port it to C. There where a few bits missing from the assembly
 example that are more important in the C port, which I will cover in this post.
 
-The final source can be found in [this github
+The final source can be found in [this GitHub
 repository](https://github.com/mdaffin/embedded-examples/tree/master/teensy-3-c)
 and only contains two files: the c source and the linker script.
 
 ## The Linker Script
 
-The linker script is very similar to the assembly example, just with a couple of
-additions. The `MEMORY` block is identical to the assembly example so we will
-skip over it.
+The linker script is similar to the assembly example, just with a couple of
+additions. We will skip over the `MEMORY` block as it is identical to the
+assembly example.
 
 C places all `const` variables inside a section called `.rodata`, which we place
 after the code section with by adding the following to the end of the `.text`
@@ -50,7 +51,7 @@ SECTIONS {
 ```
 
 Next we define the `.data` section. This is where C will place all initialized
-global variables, which can be modified so should be placed in `RAM`.
+global variables, which should be placed in `RAM` as it can be modified.
 
 #### [layout.ld](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/layout.ld#L48-L55)
 
@@ -65,17 +66,16 @@ global variables, which can be modified so should be placed in `RAM`.
     } > RAM AT > FLASH
 ```
 
-`RAM` is volatile so we cannot store the initial values of variables there
-directly. Instead we want to reserve space in `RAM` for them, but actually store
-them in the `FLASH` section. This will allow us to copy them from `FLASH` to
-`RAM` at runtime when the chip resets. We tell the linker to do this with `> RAM
-AT > FLASH`.
+We cannot store the initial values of variables directly in `RAM`as it is
+volatile. Instead we want to reserve space in `RAM` for them, but actually
+store them in the `FLASH` section. This will allow us to copy them from `FLASH`
+to `RAM` at runtime when the chip resets. We tell the linker to do this with `> RAM AT > FLASH`.
 
 To copy the data at runtime we need to know the start and end address of the
 data in `RAM`, which we store in the variables `_sdata` and `_edata`. We also
 need to know where the data starts in `FLASH`, which we obtain using `LOADADDR`
-and store in `_sflashdata`. This references the whole data block so much be
-located outside of it, we just place it at the top for convenience.
+and store in `_sflashdata`. This must be located outside as it references the
+whole data block, it is place it at the top for convenience.
 
 #### [layout.ld](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/layout.ld#L29)
 
@@ -85,11 +85,11 @@ _sflashdata = LOADADDR(.data);
 
 Note that we place two bits in the `.data` section. `.data` which contains the
 uninitialized variables and `.fastrun` which can contain any code that we want
-copied to `RAM` so it can be loaded faster when executed.
+copied to `RAM` to ensure it can be loaded faster when executed.
 
 The uninitialized variables are easier to deal with as we don't need to worry
-about copying them from `FLASH`. C stores them in a section called `.bss`. So we
-create that next, again storing the start and end in `_sbss` and `_ebss`.
+about copying them from `FLASH`. C stores them in a section called `.bss`. That
+is what we create next, again storing the start and end in `_sbss` and `_ebss`.
 
 #### [layout.ld](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/layout.ld#L57-L64)
 
@@ -124,9 +124,9 @@ memory locations by name rather then their actual address.
 #define GPIOC_PDOR   (*(volatile unsigned short *)0x400FF080) // GPIOC_PDOR - page 1334,1335
 ```
 
-You should recognize these values from the assembly example and can all be found
-in the programmers manual. They have all been brought to the top so their
-definitions can be reused and to make the code easier to read.
+You should recognize these values from the assembly example and can all be
+found in the programmers manual. They have all been brought to the top to make
+their definitions reusable and the code easier to read.
 
 Then we declare the linker script variables and the functions we will use later.
 
@@ -156,7 +156,7 @@ We define the exception vectors as an array of const function pointers and
 assign the function we want to handle each interrupt. Like in the assembly
 example we need to tell gcc that this code should be placed in the `.vectors`
 section which is done with the attribute flag. The `used` attribute flag tells
-gcc the the code is used and to not remove it during the optimization process.
+gcc the code is used and to not remove it during the optimization process.
 
 #### [blink.c](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/blink.c#L55-L64)
 
@@ -210,7 +210,6 @@ location in `RAM`, then zeroing the `.bss` section in `RAM`.
 
 #### [blink.c](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/blink.c#L78-L83)
 
-
 ```c
   unsigned long *src = &_sflashdata;
   unsigned long *dest = &_sdata;
@@ -220,7 +219,7 @@ location in `RAM`, then zeroing the `.bss` section in `RAM`.
   while (dest < &_ebss) *dest++ = 0;
 ```
 
-And the rest of startup simply configures the gpio pins as we did in the
+And the rest of startup simply configures the GPIO pins as we did in the
 assembly example before jumping into the loop.
 
 #### [blink.c](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/blink.c#L85-L93)
@@ -237,7 +236,7 @@ assembly example before jumping into the loop.
 }
 ```
 
-Our loop is also very similar to the assembly example, the major difference is
+Our loop is also similar to the assembly example, the major difference is
 we initialize a variable to pass to delay. This is done simply to verify that
 the `.data` section is initialize correctly by our startup code.
 
@@ -274,7 +273,7 @@ void delay(int ms) {
 }
 ```
 
-Finally all of the exception handlers are defined to simply lockup the cpu by
+Finally all of the exception handlers are defined to simply lockup the CPU by
 busy looping.
 
 #### [blink.c](https://github.com/mdaffin/embedded-examples/blob/master/teensy-3-c/blink.c#L118-L122)
@@ -301,10 +300,10 @@ teensy-loader-cli -w --mcu=mk20dx256 crt0.hex
 
 ## Conclusion
 
-Although more complete then the assembly example there are still some missing
-bits. Most notably we have not setup the heap or malloc so cannot dynamically
-allocate memory. I would still recommend using a more complete base for any real
-project such as form the teensy project
+Although better then the assembly example there are still some missing bits.
+Most notably we have not setup the heap or malloc therefore cannot dynamically
+allocate memory. I would still recommend using a more polished base for any
+real project such as form the teensy project
 ([mk29dx128.c](https://github.com/PaulStoffregen/cores/blob/master/teensy3/mk20dx128.c),
 [mk20dx256.ld](https://github.com/PaulStoffregen/cores/blob/master/teensy3/mk20dx256.ld))
 which you will see share many similar parts as explained in this post.

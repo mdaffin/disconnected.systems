@@ -1,16 +1,16 @@
 ---
 aliases:
-- /quasselcore-on-archlinux/
-- /posts/quasselcore-on-archlinux/
-date: '2013-04-14T00:00:00Z'
+  - /quasselcore-on-archlinux/
+  - /posts/quasselcore-on-archlinux/
+date: "2013-04-14T00:00:00Z"
 description: A guide to setting up a quassel server on an Arch Linux server.
 slug: quasselcore-on-archlinux
 tags:
-- archlinux
-- linux
+  - archlinux
+  - linux
 ---
 
-# QuasselCore on Archlinux
+# QuasselCore on Arch Linux
 
 I just set up a quassel server on an Arch Linux box. There is a serious lack of documentation around
 it, though it is simple enough to set up I stumbled around a bit wondering why I could not connect
@@ -58,7 +58,7 @@ following details
 **Hostname:** The hostname or ip of the server  
 **Port:** The default is 4242, use that unless you have changed it  
 **User:** The name of the user you want to connect via (Might not matter on the first connection)  
-**Password:** The password of that user (does not matter on the first connection)  
+**Password:** The password of that user (does not matter on the first connection)
 
 and click ok to connect. The first run wizard should now launch, just follow it through to set up
 the admin user that you will use from now on to connect to the quassel server.
@@ -81,7 +81,7 @@ sudo systemctl restart quassel
 
 ## Add additional users
 
-After set up you can add new users by logging into the server and running 
+After set up you can add new users by logging into the server and running
 
 ```bash
 sudo quasselcore --configdir=/var/lib/quassel --add-user
@@ -90,7 +90,7 @@ sudo quasselcore --configdir=/var/lib/quassel --add-user
 and filling in the appropriate information when prompted.
 Note that there is no easy way to delete a user once added.
 
-You can change a forgotten password by running 
+You can change a forgotten password by running
 
 ```bash
 sudo quasselcore --configdir=/var/lib/quassel --change-userpass=USERNAME

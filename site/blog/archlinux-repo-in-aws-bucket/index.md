@@ -1,18 +1,21 @@
 ---
-date: '2018-01-21T11:28:17Z'
+date: "2018-01-21T11:28:17Z"
 description: How to host an Arch Linux repository in an Amazon S3 bucket with aurutils
 slug: archlinux-repo-in-aws-bucket
 tags:
-- linux
-- automation
-- archlinux
+  - linux
+  - automation
+  - archlinux
 sidebar:
-- ['/blog/archlinux-repo-in-aws-bucket/', 'Hosting an Arch Linux Repo in an Amazon S3 Bucket']
-- ['/blog/archlinux-meta-packages/', 'Managing Arch Linux with Meta Packages']
-- ['/blog/archlinux-installer/', 'Creating a Custom Arch Linux Installer']
+  - [
+      "/blog/archlinux-repo-in-aws-bucket/",
+      "Hosting an Arch Linux Repository in an Amazon S3 Bucket",
+    ]
+  - ["/blog/archlinux-meta-packages/", "Managing Arch Linux with Meta Packages"]
+  - ["/blog/archlinux-installer/", "Creating a Custom Arch Linux Installer"]
 ---
 
-# Automating Arch Linux Part 1: Hosting an Arch Linux Repo in an Amazon S3 Bucket
+# Automating Arch Linux Part 1: Hosting an Arch Linux Repository in an Amazon S3 Bucket
 
 ::: tip Update on 2018-05-20
 I have updated this guide to switch from `repose` and `s3fs` to `repo-add` and
@@ -22,17 +25,17 @@ internet connections.
 :::
 
 In this three-part series, I will show you one way to simplify and manage
-multiple Arch Linux systems using a custom repo, a set of meta-packages and a
+multiple Arch Linux systems using a custom repository, a set of meta-packages and a
 scripted installer. Each part is standalone and can be used by its self, but
 they are designed to build upon and complement each other each focusing on a
 different part of the problem.
 
-- **Part 1:** *Hosting an Arch Linux Repo in an Amazon S3 Bucket*
+- **Part 1:** _Hosting an Arch Linux Repository in an Amazon S3 Bucket_
 - **Part 2:** [Managing Arch Linux with Meta Packages]
 - **Part 3:** [Creating a Custom Arch Linux Installer]
 
-[Managing Arch Linux with Meta Packages]: /blog/archlinux-meta-packages/
-[Creating a Custom Arch Linux Installer]: /blog/archlinux-installer/
+[managing arch linux with meta packages]: /blog/archlinux-meta-packages/
+[creating a custom arch linux installer]: /blog/archlinux-installer/
 
 When you use Arch Linux for any length of time you start collecting sets of
 [AUR] packages that you frequently use. Now, Arch Linux has loads of [AUR
@@ -48,14 +51,13 @@ Although everything we are going to do in this post will fit inside the **AWS
 free tier**, it **only lasts** for **12 months**. Make sure to **delete** any
 **resources** you create once you are done to avoid an **unexpected charge**
 from AWS way in the future. Even without the free tier, it should only cost no
-more than a few dollars a month to maintain the bucket - even with a very large
+more than a few dollars a month to maintain the bucket - even with a large
 repository. You can also use alternatives like Digital Oceans Spaces, Google
 Cloud or a static file web server.
 :::
 
-[AUR]: https://aur.archlinux.org/
-[AUR helpers]: https://wiki.archlinux.org/index.php/AUR_helpers
-
+[aur]: https://aur.archlinux.org/
+[aur helpers]: https://wiki.archlinux.org/index.php/AUR_helpers
 
 ## Dependencies
 
@@ -63,10 +65,10 @@ We only require a few packages to get us going, of which only `aurutils` needs t
 be installed from AUR. It will be the only package we are required to
 build and install manually.
 
-* [aurutils]: a set of utilities that make it easy to manage/update a repo with
+- [aurutils]: a set of utilities that make it easy to manage/update a repository with
   AUR packages.
-* [s3cmd]: a tool to upload and download files from an AWS S3 bucket.
-* base-devel: needed to build aurutils and other packages.
+- [s3cmd]: a tool to upload and download files from an AWS S3 bucket.
+- base-devel: needed to build aurutils and other packages.
 
 To install all of these run the following.
 
@@ -98,7 +100,7 @@ gpg --recv-key 6BC26A17B9B7018A
 
 ## Creating the Amazon S3 Bucket
 
-Sign in to [Amazon's console][Amazon S3] and head to the [Amazon S3] interface.
+Sign in to [Amazon's console][amazon s3] and head to the [Amazon S3] interface.
 You will be required to enter your credit card details in order to create the
 bucket, this should be free for the first year if you stay under 5GB of storage
 and [fairly cheap][amazon pricing] after that.
@@ -121,8 +123,7 @@ After you should have one public bucket listed like so.
 
 ![Bucket List](./04-bucket-list.png)
 
-
-[Amazon S3]: https://s3.console.aws.amazon.com/s3/home?region=us-east-1
+[amazon s3]: https://s3.console.aws.amazon.com/s3/home?region=us-east-1
 [amazon pricing]: https://aws.amazon.com/s3/pricing/
 
 ## Access Credentials
@@ -132,22 +133,22 @@ We can do this by creating a new restricted user that only have access to the
 Amazon S3 buckets.
 
 Head over to the [AWS IAM management console] and add a new user. Then enter
-the username and ensure *Programmatic access* check box is selected.
+the username and ensure _Programmatic access_ check box is selected.
 
 ![Account Name](./05-create-user.png)
 
-Click Next to head to the permission page then *Attach existing policies
-directly*. Search for *S3* and check *AmazonS3FullAccess*.
+Click Next to head to the permission page then _Attach existing policies
+directly_. Search for _S3_ and check _AmazonS3FullAccess_.
 
 ![Account Permissions](./06-permissions.png)
 
-Click *Next* and on the review page double check it has *Programmatic access*
-and *AmazonS3FullAccess*.
+Click _Next_ and on the review page double check it has _Programmatic access_
+and _AmazonS3FullAccess_.
 
 ![Account Review](./07-review.png)
 
-Click *Create User* to get the access key. Take note of the *Access key ID* as
-well as the *Secret access key*. Ensure you save these somewhere, once you
+Click _Create User_ to get the access key. Take note of the _Access key ID_ as
+well as the _Secret access key_. Ensure you save these somewhere, once you
 leave this page you will not have access to the secret key through the AWS
 console and will have to regenerate a new key.
 
@@ -171,11 +172,11 @@ And ensure it is only readable by your user
 chmod 0600 ~/.s3cfg
 ```
 
-[AWS IAM management console]: https://console.aws.amazon.com/iam/home#/users
+[aws iam management console]: https://console.aws.amazon.com/iam/home#/users
 
 ## Aurutils - Building and Managing Packages
 
-Aurutils contains a suite of utilities that can be used to manage a repo of AUR
+Aurutils contains a suite of utilities that can be used to manage a repository of AUR
 packages. The two main utilities we will use are `aursearch`, which can search
 AUR for packages that match a given pattern.
 
@@ -188,9 +189,9 @@ aur/aurutils-git 1.5.3.r234.g15ef2ab-1 (5)
 ```
 
 And `aursync` which will download and build packages and ensure packages in the
-repo are up to date.
+repository are up to date.
 
-For `aursync` to work, we need to add a repo to `/etc/pacman.conf`
+For `aursync` to work, we need to add a repository to `/etc/pacman.conf`
 
 ```ini
 [mdaffin]
@@ -198,14 +199,14 @@ SigLevel = Optional TrustAll
 Server = https://s3.eu-west-2.amazonaws.com/mdaffin-arch/repo/x86_64/
 ```
 
-Give your repo a unique name by replacing `[mdaffin]` with something else.
-Change the URL to that of your bucket/repo path. You can get the exact URL by
+Give your repository a unique name by replacing `[mdaffin]` with something else.
+Change the URL to that of your bucket/repository path. You can get the exact URL by
 creating a file inside the directory and getting a link to that file from the
 [Amazon Web Console].
 
-Now we can create the repo and upload our first package to it. For this, we are
+Now we can create the repository and upload our first package to it. For this, we are
 going to rebuild the aurutils package as it will be handy to have that stored
-in our repo. But first, we need to create a directory to store the repo as well
+in our repository. But first, we need to create a directory to store the repository as well
 as initialise the database files.
 
 ```bash
@@ -214,12 +215,12 @@ $ repo-add local-repo/mdaffin.db.tar.xz
 $ aursync --repo mdaffin --root local-repo aurutils
 ```
 
-Replace `mdaffin` with the name of your repo, this must match the section in
-`/etc/pacman.conf`. Since we have a remote repo we need to tell `aursync` were
+Replace `mdaffin` with the name of your repository, this must match the section in
+`/etc/pacman.conf`. Since we have a remote repository we need to tell `aursync` were
 to place the files using `--root <dir>` pointing it to a local package cache
 (exact location does not matter).
 
-If all goes well you should end up with the package and repo database inside
+If all goes well you should end up with the package and repository database inside
 the cache directory.
 
 ```bash
@@ -227,7 +228,7 @@ $ ls local-repo
 aurutils-1.5.3-5-any.pkg.tar.xz  mdaffin.db  mdaffin.files
 ```
 
-To check for and update all the packages in the repo simply add `-u` to the
+To check for and update all the packages in the repository simply add `-u` to the
 `aursync` command.
 
 ```bash
@@ -258,8 +259,7 @@ public permissions on any file we upload with the `--acl-public` flag.
 $ s3cmd sync --follow-symlinks --acl-public local-repo/ s3://mdaffin-arch/repo/x86_64/
 ```
 
-The packages should now be visible on the Amazon Web Console (or via `s3cmd ls
-s3://...`) and installable via `pacman`.
+The packages should now be visible on the Amazon Web Console (or via `s3cmd ls s3://...`) and installable via `pacman`.
 
 ```bash
 $ sudo pacsync mdaffin
@@ -268,13 +268,13 @@ mdaffin/aurutils 1.5.3-5 [installed]
     helper tools for the arch user repository
 ```
 
-And that's it, you have created a repo inside an Amazon S3 bucket. You can add
-more packages to this repo using the `aursync` command above.
+And that's it, you have created a repository inside an Amazon S3 bucket. You can add
+more packages to this repository using the `aursync` command above.
 
 ## Fetching Remote Changes
 
 If you want to manage this from multiple computers then you need a way to sync
-up the repos on each system. This can easily be done by reversing the sync
+up the repositories on each system. This can easily be done by reversing the sync
 command. For this, we do not need the `--follow-symlinks` flag as there are no
 symlinks in the bucket nor the `--acl-public` flag as it does not make sense
 for a local file. But the `--delete-removed` is useful for clearing up files
@@ -282,12 +282,12 @@ that have been deleted from the remote bucket to stop them from being restored
 when you next push changes.
 
 ```bash
-$ s3cmd sync --delete-removed s3://mdaffin-arch/repo/x86_64/ local-repo/ 
+$ s3cmd sync --delete-removed s3://mdaffin-arch/repo/x86_64/ local-repo/
 ```
 
 But this will download all files from the remote which can grow quite large
 over time. We really only want to add or remove a few packages at a time and it
-is far more efficient to only download the repo (if it has changed), make any
+is far more efficient to only download the repository (if it has changed), make any
 changes to it then upload any required files followed by the changed database.
 With this, we can also only download a single copy of the database, rather than
 both copies and manually create the symlinks. Note that we do not need the
@@ -302,7 +302,7 @@ $ ln -sf local-repo/mdaffin.files.tar.xz local-repo/mdaffin.files
 
 ## Removing a package
 
-If you are keeping a full copy of the remote repo locally you can simply
+If you are keeping a full copy of the remote repository locally you can simply
 remove the package and push the changes with the `--delete-removed` flag.
 
 ```bash
@@ -313,7 +313,7 @@ $ s3cmd sync --delete-removed --follow-symlinks --acl-public local-repo/ s3://md
 
 However, this cannot be done if we are only downloading the database as we will
 be missing more of the packages and thus end up deleting most of our remote
-repo. Instead, we should update the local cache to remove the package, push only
+repository. Instead, we should update the local cache to remove the package, push only
 the repository files then tell the remote to delete the package.
 
 ```bash
@@ -397,9 +397,9 @@ while others require a different way to sync the changes. For example, if you
 have a static file server somewhere you can use `rsync` in place of most
 `s3cmd` with the relevant flags set.
 
-[Digital Ocean Spaces]: https://m.do.co/c/8fba3fc95fef
-[Google Cloud Buckets]: https://cloud.google.com/storage/
+[digital ocean spaces]: https://m.do.co/c/8fba3fc95fef
+[google cloud buckets]: https://cloud.google.com/storage/
 
-*[Discuss on Reddit]*
+_[Discuss on Reddit]_
 
-[Discuss on Reddit]: https://www.reddit.com/r/archlinux/comments/7v7g4w/managing_multiple_arch_linux_systems_with/
+[discuss on reddit]: https://www.reddit.com/r/archlinux/comments/7v7g4w/managing_multiple_arch_linux_systems_with/

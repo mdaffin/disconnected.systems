@@ -1,25 +1,35 @@
 ---
 aliases:
-- /nim-on-arduino/
-- /posts/nim-on-arduino/
-date: '2015-11-02T00:00:00Z'
+  - /nim-on-arduino/
+  - /posts/nim-on-arduino/
+date: "2015-11-02T00:00:00Z"
 description: A minimal example of programming an arduino uno in the nim language
 slug: nim-on-adruino
 tags:
-- nim
-- arduino
-- atmega328p
+  - nim
+  - arduino
+  - atmega328p
 ---
 
 # Nim on Arduino
 
-There has been a few interesting projects over the past few years that have tried to bring alternative languages to the embedded world. The [espruino](http://www.espruino.com/) and [micropython](https://micropython.org/) are two very interesting project that allow you to run programs written in javascript and python on a micro-controller. However they have one large drawback, they only support their own boards and therefore can only run them on a limited number of micro-controllers. These are two very interesting new programming languages designed for low level system programming making them ideally suited for micro-controllers - rust and nim.
+There has been a few interesting projects over the past few years that have
+tried to bring alternative languages to the embedded world. The
+[espruino](http://www.espruino.com/) and
+[micropython](https://micropython.org/) are two interesting project that allow
+you to run programs written in JavaScript and python on a micro-controller.
+However they have one large drawback, they only support their own boards and
+therefore can only run them on a limited number of micro-controllers. These are
+two interesting new programming languages designed for low level system
+programming making them ideally suited for micro-controllers - rust and nim.
 
 This post I will look at nim in an attempt to get it running on an Arduino UNO.
 
 ## Hello World in nim
 
-After installing the latest version of [nim](http://nim-lang.org/download.html) (0.12.0 at the time of writing) it was trivial to get an example program up and running:
+After installing the latest version of [nim](http://nim-lang.org/download.html)
+(0.12.0 at the time of writing) it was trivial to get an example program up and
+running:
 
 #### example.nim
 
@@ -30,15 +40,21 @@ var name: string = readLine(stdin)
 echo("Hi, ", name, "!")
 ```
 
-``` bash
+```bash
 nim compile --run example.nim
 ```
 
-There are quite a few tutorials on how to program in nim, so I will skip on to the more interesting parts.
+There are quite a few tutorials on how to program in nim in this post I will
+skip to the more interesting parts.
 
 ## Programming AVR without arduino
 
-Before we start to look at how to compile and upload a nim program to and avr chip we first need to see how this works without the Arduino SDK. Fortunately this process is quite easy and the example below where adapted from [Balau's blog](https://balau82.wordpress.com/2011/03/29/programming-arduino-uno-in-pure-c/) on the subject. I recommend reading his blog post for more details about the process.
+Before we start to look at how to compile and upload a nim program to and AVR
+chip we first need to see how this works without the Arduino SDK. Fortunately
+this process is quite easy and the example below where adapted from [Balau's
+blog](https://balau82.wordpress.com/2011/03/29/programming-arduino-uno-in-pure-c/)
+on the subject. I recommend reading his blog post for more details about the
+process.
 
 #### led.c
 
@@ -75,13 +91,14 @@ avr-objcopy -O ihex -R .eeprom led led.hex
 avrdude -F -V -c arduino -p ATMEGA328P -P /dev/ttyACM0 -b 115200 -U flash:w:led.hex
 ```
 
-And thats it, the on board LED should now be slowly blinking away.
+And that is it, the on board LED should now be slowly blinking away.
 
-## Compile and example nim program for avr
+## Compile and example nim program for AVR
 
-The only working example I could find of how to compile a nim program for avr was from this  [Github issue](https://github.com/nim-lang/Nim/issues/1964).
+The only working example I could find of how to compile a nim program for AVR
+was from this [GitHub issue](https://github.com/nim-lang/Nim/issues/1964).
 
-So let us try it out
+So let us try it out:
 
 #### hello.nim
 
@@ -107,13 +124,16 @@ proc panic(s: string) =
 {.pop.}
 ```
 
-The above files can be converted to c with the following, note that I needed to add the --gc:none from the example from the github issue.
+The above files can be converted to c with the following, note that I needed to
+add the `--gc:none` from the example from the GitHub issue.
 
 ```bash
 nim c -c --gc:none --cpu:avr --os:standalone --deadCodeElim:on hello.nim
 ```
 
-This will give you a directory named `nimcache` with two c file inside, these can be compiled and uploaded to the Arduino UNO using the commands from our previous step, note that I added the include path to the nim libraries.
+This will give you a directory named `nimcache` with two c file inside, these
+can be compiled and uploaded to the Arduino UNO using the commands from our
+previous step, note that I added the include path to the nim libraries.
 
 ```bash
 avr-gcc -Os -DF_CPU=16000000UL -mmcu=atmega328p -I/usr/lib/nim -c -o nimcache/hello.o nimcache/hello.c
@@ -123,9 +143,14 @@ avr-objcopy -O ihex -R .eeprom nimcache/hello nimcache/hello.hex
 avrdude -F -V -c arduino -p ATMEGA328P -P /dev/ttyACM0 -b 115200 -U flash:w:nimcache/hello.hex
 ```
 
-And the led stops blinking - progress, but nim is able to directly compile to avr, so we should be able to skip the avr-gcc steps. In order to do this we need to specify a few options via the nim.cfg. I found these options by using the `--parallelBuild:1 --verbosity:2` flags to see how nim was compiling the program.
+And the led stops blinking - progress, but nim is able to directly compile to
+AVR, allowing us to skip the `avr-gcc` steps. In order to do this we need to
+specify a few options via the nim.cfg. I found these options by using the
+`--parallelBuild:1 --verbosity:2` flags to see how nim was compiling the
+program.
 
-First I noticed it was using `gcc` not `gcc-avr`. This was fixed by adding the following
+First I noticed it was using `gcc` not `gcc-avr`. This was fixed by adding the
+following
 
 #### nim.cfg
 
@@ -135,7 +160,8 @@ avr.standalone.gcc.exe = "avr-gcc"
 avr.standalone.gcc.linkerexe = "avr-gcc"
 ```
 
-I then noticed some of the flags where missing from the compiler and linker. This was fixed by adding the following to the config
+I then noticed some of the flags where missing from the compiler and linker.
+This was fixed by adding the following to the config
 
 #### nim.cfg
 
@@ -157,7 +183,9 @@ define = "release"
 deadCodeElim = "on"
 ```
 
-I could not get the os flag to work in the config, so that is the only one that needs to be passed on the command line. You can now compile and upload the program with
+The os flag is the only one I could not get to work in the config and needs to
+be passed in on the command line. You can now compile and upload the program
+with
 
 ```bash
 nim c --os:standalone hello.nim
@@ -167,7 +195,10 @@ avrdude -F -V -c arduino -p ATMEGA328P -P /dev/ttyACM0 -b 115200 -U flash:w:hell
 
 ## Blink in nim
 
-Now its time to get nim to blink the led. We will only need the `nim.cfg` and `panicoverride.nim` files from the previous steps. Then we need to create a small c library to talk to the Arduino that we can wrap with nim. This is just the c example above split into separate functions.
+Now its time to get nim to blink the led. We will only need the `nim.cfg` and
+`panicoverride.nim` files from the previous steps. Then we need to create a
+small c library to talk to the Arduino that we can wrap with nim. This is just
+the c example above split into separate functions.
 
 #### led.c
 
@@ -215,7 +246,9 @@ when isMainModule:
     delay(1000);
 ```
 
-Finally the steps to compile and upload it, these are basically the same as above. Note that we led.c is compiled for us due to the  `{.compile: "led.c".}` line in blink.nim.
+Finally the steps to compile and upload it, these are basically the same as
+above. Note that we led.c is compiled for us due to the `{.compile: "led.c".}`
+line in blink.nim.
 
 ```bash
 nim c --os:standalone blink.nim
@@ -225,4 +258,8 @@ avrdude -F -V -c arduino -p ATMEGA328P -P /dev/ttyACM0 -b 115200 -U flash:w:blin
 
 ## Conclusion
 
-Overall the process was quite straight forward with the main issue being lack of documentation specific to the avr architecture. Although it is a good starting point to trying out nim on an Arduino we are still missing the Arduino libraries so it would be allot of work for any real project to be written in it without more work on supporting libraries or wrapping the Arduino libraries.
+Overall the process was quite straight forward with the main issue being lack
+of documentation specific to the AVR architecture. Although it is a good
+starting point to trying out nim on an Arduino we are still missing the Arduino
+libraries. It would be a lot of work for any real project to be written in it
+without more work on supporting libraries or wrapping the Arduino libraries.

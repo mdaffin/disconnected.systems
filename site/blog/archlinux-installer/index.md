@@ -1,36 +1,39 @@
 ---
-date: '2018-02-04T14:28:00Z'
+date: "2018-02-04T14:28:00Z"
 description: How to create a script to automate the installation of Arch Linux
 slug: archlinux-installer
 tags:
-- linux
-- automation
-- archlinux
+  - linux
+  - automation
+  - archlinux
 sidebar:
-- ['/blog/archlinux-repo-in-aws-bucket/', 'Hosting an Arch Linux Repo in an Amazon S3 Bucket']
-- ['/blog/archlinux-meta-packages/', 'Managing Arch Linux with Meta Packages']
-- ['/blog/archlinux-installer/', 'Creating a Custom Arch Linux Installer']
+  - [
+      "/blog/archlinux-repo-in-aws-bucket/",
+      "Hosting an Arch Linux Repository in an Amazon S3 Bucket",
+    ]
+  - ["/blog/archlinux-meta-packages/", "Managing Arch Linux with Meta Packages"]
+  - ["/blog/archlinux-installer/", "Creating a Custom Arch Linux Installer"]
 ---
 
 # Automating Arch Linux Part 3: Creating a Custom Arch Linux Installer
 
 In this three-part series, I will show you one way to simplify and manage
-multiple Arch Linux systems using a custom repo, a set of meta-packages and a
+multiple Arch Linux systems using a custom repository, a set of meta-packages and a
 scripted installer. Each part is standalone and can be used by its self, but
 they are designed to build upon and complement each other each focusing on a
 different part of the problem.
 
-- **Part 1:** [Hosting an Arch Linux Repo in an Amazon S3 Bucket]
+- **Part 1:** [Hosting an Arch Linux Repository in an Amazon S3 Bucket]
 - **Part 2:** [Managing Arch Linux with Meta Packages]
-- **Part 3:** *Creating a Custom Arch Linux Installer*
+- **Part 3:** _Creating a Custom Arch Linux Installer_
 
-[Hosting an Arch Linux Repo in an Amazon S3 Bucket]: /blog/archlinux-repo-in-aws-bucket/
-[Managing Arch Linux with Meta Packages]: /blog/archlinux-meta-packages/
+[hosting an arch linux repository in an amazon s3 bucket]: /blog/archlinux-repo-in-aws-bucket/
+[managing arch linux with meta packages]: /blog/archlinux-meta-packages/
 
 The Arch Linux install process can be quite daunting to new users, but once you
 understand it, it becomes quite elegant in its simplicity. The best part is
-that it's command line based with very little abstraction built on top of it.
-This makes it very easy to automate through bash scripting and over the years I
+that it's command line based with little abstraction built on top of it.
+This makes it easy to automate through bash scripting and over the years I
 have done just that. In this post, I will go through this script and show you
 how to custom it to your own tastes.
 
@@ -48,12 +51,12 @@ create a working Arch Linux system before following this guide.
 
 ## Setting Variables and Collecting User Input
 
-There are a few variables that generally change on every install, the hostname
-and disk at the very least. There are also settings that you might not want to
-bake into a script such as your username and password. So we require a way to
-customise the script on each install. The simplest way is to add some variables
-to the top of the script for everything you want, blanking out any secrets you
-don't want to share.
+Not all variables should be hard-coded into the scripts as they are different
+on each system such as the host name or which disk to use. There are also
+settings that you might not want to bake into a script such as your username
+and password. Therefore we require a way to customise the script on each install. The
+simplest way is to add some variables to the top of the script for everything
+you want, blanking out any secrets you don't want to share.
 
 ```bash
 hostname="myhost"
@@ -74,12 +77,12 @@ Or better yet, throw an error and halt the install process on missing input.
 hostname="${1:?"Missing hostname"}"
 ```
 
-*There are many other useful things you can do with [bash's parameter
+_There are many other useful things you can do with [bash's parameter
 substitution], which are worth looking up if you want to write bash scripts to
-automate things.*
+automate things._
 
-But I always forget the order of these arguments, so I prefer to be prompted
-for input. You can do this with the `read` builtin.
+But I always forget the order of these arguments and being prompted stops the
+need to look it up every time. You can do this with the `read` builtin.
 
 ```bash
 echo -n "Hostname: "
@@ -88,7 +91,7 @@ read hostname
 ```
 
 Note that `:` is a no-op, we are using it to test the validity of the
-`hostname` variable and to exit early if it is blank (ie the user hit enter
+`hostname` variable and to exit early if it is blank (i.e. the user hit enter
 without typing anything).
 
 For passwords, you should turn off echoing with `-s`, echo a blank line (as the
@@ -124,13 +127,14 @@ device=$(dialog --stdout --menu "Select installation disk" 0 0 0 ${devicelist}) 
 
 ![dialog disk selection](/blog/archlinux-installer/01-dialog-disk.png)
 
-In addition to looking fancy, this also helps to reduce typos and requires less
-typing. The list is sorted by reverse size so the disk you want is likely at
-the top of the list.
+In addition to looking fancy, this also reducing the amount of typing and
+therefore typos.
+
+The list is sorted by reverse size which puts the disk you likely want at the top.
 
 [bash's parameter substitution]: http://wiki.bash-hackers.org/syntax/pe
 
-## Partioning and Formatting the Disk
+## Partitioning and Formatting the Disk
 
 Most people are familiar with `fdisk` or `gdisk` for partitions their disk. But
 you might want to consider their lesser used sisters, `cfdisk` and `cgdisk` if
@@ -151,7 +155,7 @@ complicates the script and install process quite a bit. Or just assume a layout
 and hope the user formatted it correctly.
 
 Alternatively, if most or all of your systems are formatted identically, you can
-hardcode the layout into the script. This keeps the script simpler with fewer
+hard-code the layout into the script. This keeps the script simpler with fewer
 steps to go through. In the event that you do need a custom disk layout for some
 special case, you can download and manually edit the script or even delete the
 formatting section entirely and formatting it manually beforehand.
@@ -200,7 +204,7 @@ part_boot="${device}p1"
 ```
 
 To generalise over these two types of disks you can use `ls` and `grep` to find
-and filter the actual partition. I found the bashes globbing was not powerful
+and filter the actual partition. I found the bashes globing was not powerful
 enough to filter out just a single partition while ignoring device files such
 as `/dev/mmcblk0boot1` that also exist on some systems.
 
@@ -222,15 +226,15 @@ mkdir /mnt/boot
 mount "${part_boot}" /mnt/boot
 ```
 
-Note that if you want swap you should enable the swap partition so that
+Note that if you want swap you should enable the swap partition to ensure that
 `genfstab` picks it up correctly.
 
-## Install the System and Bootloader
+## Install the System and Boot Loader
 
-We are ready to pacstrap the system with any and all packages you want on your
+We are ready to `pacstrap` the system with any and all packages you want on your
 final system. I use the meta-packages I created in [part 2], which will, in
 turn, install all the packages I want on my base system. For this, I need to
-append my repo to the end of `/etc/pacman.conf` before running `pacstrap`.
+append my repository to the end of `/etc/pacman.conf` before running `pacstrap`.
 
 ```bash
 cat >>/etc/pacman.conf <<EOF
@@ -242,7 +246,7 @@ EOF
 pacstrap /mnt mdaffin-desktop
 ```
 
-Now to make our system actually bootable we must install a bootloader. I use
+Now to make our system actually bootable we must install a boot loader. I use
 UEFI on my systems and as such use `bootctl`. For commands that you want to run
 inside the context of your installed system wrap them with `arch-chroot /mnt`.
 
@@ -270,8 +274,8 @@ you require. You can automate the configuration of your entire set up if you
 want to or bootstrap configuration managers like [SaltStack] or [Ansible] if
 you want to get really fancy.
 
-[SaltStack]: https://saltstack.com/
-[Ansible]: https://www.ansible.com/
+[saltstack]: https://saltstack.com/
+[ansible]: https://www.ansible.com/
 
 At a minimum run `genfstab`
 
@@ -279,7 +283,7 @@ At a minimum run `genfstab`
 genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
 ```
 
-Set your hostname
+Set your host name
 
 ```bash
 echo "${hostname}" > /mnt/etc/hostname
@@ -297,9 +301,8 @@ echo "root:$password" | chpasswd --root /mnt
 
 ## Other Useful Bits
 
-There are a couple of other bits in the script that have nothing to do with
-installing Arch Linux but improve the error handling and make it easier to
-debug problems.
+A couple of other bits in the script that have nothing to do with installing
+Arch Linux but improve the error handling and make it easier to debug problems.
 
 First, there is my standard preamble, hardening the [script against
 failure][bash strict mode], which if you have been following my posts you
@@ -317,16 +320,15 @@ off the screen. Most of the time this is not an issue, but when something goes
 wrong you wish you had it. To get around this I redirect stdout and stderr of
 the script to the `tee` command. This splits the stream, continuing to output
 it to the screen but also writes it to a log file in case there is a need to
-inspect it later. Honestly, I have only ever used this output once, but it is
-not expensive or complicated to do so I just leave it in.
+inspect it later.
 
 ```bash
 exec 1> >(tee "stdout.log")
 exec 2> >(tee "stderr.log")
 ```
 
-I also ensure ntp is enabled as I have systems that like to drift when
-unpowered for a long time.
+I also ensure NTP is enabled to ensure the clock has not drifted for any
+reason.
 
 ```bash
 timedatectl set-ntp true
@@ -339,10 +341,10 @@ timedatectl set-ntp true
 ## The Complete Installer Script
 
 Here is my version, at the time of writing, of the installer script in its
-entirety. You can find my [live/latest incarnation] in my [arch-pkgs] git
+entirety. You can find my [live/latest incarnation] in my [`arch-pkgs`] git
 repository alongside all of the other resources I discuss in this series. I
 highly recommend that you start with this as a base, fork it or place it in
-your own repo and customise it to your liking. My version is likely to change
+your own repository and customise it to your liking. My version is likely to change
 in the future as I evolve how I run my systems.
 
 [live/latest incarnation]: https://github.com/mdaffin/arch-pkgs/blob/master/installer/install-arch
@@ -457,9 +459,9 @@ echo "root:$password" | chpasswd --root /mnt
 Running the script is as simple as downloading it from the Arch Linux live
 USB/CD and running the script. To make this easier, since you often cannot copy
 in the live environment, you can use a URL shortener such as git.io or goo.gl
-to make the URLs easier to type. *Remember to use the raw link to the script if
-you host it on github or similar sites.* Once you have the URL I recommend
-adding it to the top of the script or a README in the repo for easy reference
+to make the URLs easier to type. _Remember to use the raw link to the script if
+you host it on GitHub or similar sites._ Once you have the URL I recommend
+adding it to the top of the script or a README in the repository for easy reference
 later.
 
 Here is the curl line I use in my script.
@@ -482,12 +484,12 @@ to hack and change either before you download the script or just before you run
 it.
 
 You can even take this a step further and bake the installer into a [custom
-arch iso][archiso]. But I did not find this worth the effort unless you want to
+arch ISO][archiso]. But I did not find this worth the effort unless you want to
 automate the installation of Arch Linux on multiple identical systems, such as
 running Arch with a kiosk browser on a bunch of monitors.
 
 [archiso]: https://wiki.archlinux.org/index.php/archiso
 
-*[Discuss on Reddit]*
+_[Discuss on Reddit]_
 
-[Discuss on Reddit]: https://www.reddit.com/r/archlinux/comments/7v7g4w/managing_multiple_arch_linux_systems_with/
+[discuss on reddit]: https://www.reddit.com/r/archlinux/comments/7v7g4w/managing_multiple_arch_linux_systems_with/

@@ -1,14 +1,14 @@
 ---
 aliases:
-- /bare-metal-rust-on-the-teensy-3.1/
-- /posts/bare-metal-rust-on-the-teensy-3.1/
-date: '2016-01-24T00:00:00Z'
+  - /bare-metal-rust-on-the-teensy-3.1/
+  - /posts/bare-metal-rust-on-the-teensy-3.1/
+date: "2016-01-24T00:00:00Z"
 description: A bare metal example of blink written in rust for the teensy 3.1
 slug: bare-metal-rust-on-the-teensy-3.1
 tags:
-- rust
-- teensy
-- arm
+  - rust
+  - teensy
+  - arm
 ---
 
 # Bare Metal Rust on the Teensy 3.1
@@ -18,9 +18,9 @@ traditional languages I wanted to look at [rust](https://www.rust-lang.org/). In
 this post I will port the [bare metal c](../bare-metal-c-on-the-teensy-3.1/)
 example to rust with cargo, rusts dependency manager and build manager.
 
-The final source can be found in [this github
+The final source can be found in [this GitHub
 repository](https://github.com/mdaffin/teensy-3-rust). It contains a fair few
-more files and cargo enforces a stricter layout (ie the source must be in the
+more files and cargo enforces a stricter layout (i.e. the source must be in the
 `src/` directory. Most of the addition files are for rust and are meant to make
 life simpler in the long run. The final project structure is as follows:
 
@@ -35,9 +35,9 @@ life simpler in the long run. The final project structure is as follows:
 └── thumbv7em-none-eabi.json
 ```
 
-The linker script
+We will skip over the linker script
 [`layout.ld`](https://github.com/mdaffin/teensy-3-rust/blob/master/layout.ld)
-is identical to the c version so we will skip over it, I recommend reading my
+as it is identical to the c version. I recommend reading my
 [previous post](../bare-metal-c-on-the-teensy-3.1/) for more details about it.
 
 ## The Rust Code
@@ -46,21 +46,21 @@ This is a simple port of blink.c from the c example. We have moved it to src as
 this is where cargo looks for our code and have renamed it to main.rs to tell
 cargo we want to build a binary.
 
-Rust makes use of feature guards to stop accidental use of unsable/experimental
+Rust makes use of feature guards to stop accidental use of unstable/experimental
 features. Unfortunately bare metal programming still requires a few of these
-features so we must state which ones we want to use.
+features and we need to state which ones we want to use.
 
-* [lang_items](https://doc.rust-lang.org/book/lang-items.html): so we can define
-  some functions that are needed by rust to work (these are normally defined in
-  the standard libraries)
-* [no_std](https://doc.rust-lang.org/book/no-stdlib.html): to disable the
+- [`lang_items`](https://doc.rust-lang.org/book/lang-items.html): to define some
+  functions that are needed by rust to work (these are normally defined in the
+  standard libraries)
+- [`no_std`](https://doc.rust-lang.org/book/no-stdlib.html): to disable the
   standard libraries as they require an operating system to work
-* [core_intrinsics](https://doc.rust-lang.org/core/intrinsics/): to make use of
+- [`core_intrinsics`](https://doc.rust-lang.org/core/intrinsics/): to make use of
   the `core::intrinsics::volatile_store` which is normally wrapped by the
   standard libraries.
-* [asm](https://doc.rust-lang.org/book/inline-assembly.html): to allow us to
+- [`asm`](https://doc.rust-lang.org/book/inline-assembly.html): to allow us to
   call inline assembly directly
-* [start](https://gist.github.com/luqmana/fa40eb63ff653fdfb3cf): to allow us to
+- [`start`](https://gist.github.com/luqmana/fa40eb63ff653fdfb3cf): to allow us to
   override the entry point to our program
 
 We then disable the standard library with `#![no_std]`. Then tell rust we want a
@@ -124,8 +124,8 @@ fn lang_start(_: isize, _: *const *const u8) -> isize {
 
 The rest of the code is a direct port from the [C
 example](https://gist.github.com/mdaffin/f9132c388fae9ef5f5fe#file-blink-c).
-The only real difference is the syntax, its function is identical the the C
-version and is described in my [previous post](../bare-metal-c-on-the-teensy-3.1/).
+The only real difference is the syntax, its function is identical the C version
+and is described in my [previous post](../bare-metal-c-on-the-teensy-3.1/).
 
 One thing to note however is there is no volatile keyword in rust. Instead we
 define the macros without it and use `volatile_store` to write the value and
@@ -176,7 +176,7 @@ a configuration file instead.
 
 ### Compile and upload
 
-Compiling is very simple and unlike the c and assembly examples it doesn't get
+Compiling is simple and unlike the c and assembly examples it doesn't get
 more complex as the project grows as cargo handles this for us.
 
 ```bash
@@ -188,7 +188,7 @@ teensy-loader-cli -w --mcu=mk20dx256 blink.hex
 
 Note that this compiles a debug version of the application, to compile for
 release you simply pass the `--release` flag to cargo. However when I tried to
-do this rustc decided none of my code was 'used' and optimized it all away. I
+do this `rustc` decided none of my code was 'used' and optimized it all away. I
 could not find any satisfying solution to this. Most of the example I found used
 some c code to handle the startup code and rust to handle the application logic
 but I wanted to see if it was possible to avoid. I believe the
@@ -212,5 +212,5 @@ this one at some point. This makes the whole process more tedious then it should
 be as allot of the information out there is out of date.
 
 I don't feel bare metal/embedded rust is quite ready yet for a serious project.
-It is still a very interesting language which I hope to play around with a bit
+It is still a interesting language which I hope to play around with a bit
 more on a more stable branch.

@@ -1,45 +1,49 @@
 ---
 aliases:
-- /bare-metal-assembly-on-the-teensy-3.1/
-- /posts/bare-metal-assembly-on-the-teensy-3.1/
-date: '2015-11-12T00:00:00Z'
-description: A look at bare metal programming in assembly on the teensy 3.1 with out
+  - /bare-metal-assembly-on-the-teensy-3.1/
+  - /posts/bare-metal-assembly-on-the-teensy-3.1/
+date: "2015-11-12T00:00:00Z"
+description:
+  A look at bare metal programming in assembly on the teensy 3.1 with out
   external dependencies.
 slug: bare-metal-assembly-on-the-teensy-3.1
 tags:
-- assembly
-- teensy
-- arm
+  - assembly
+  - teensy
+  - arm
 ---
 
 # Bare Metal Assembly on the Teensy 3.1
 
 I started to look at bare metal programming on the Teensy 3.1 and found quite a
-few examples mainly based off the work of [Karl
-Lunt](http://www.seanet.com/~karllunt/bareteensy31.html). All of these examples
+few examples mainly based off the work of [Karl Lunt]. All of these examples
 include several files and do not explain what they are for or where they are
-obtained. I started to dig a bit deeper and found an nice guide to low level arm
-programming [here](http://bravegnu.org/gnu-eprog/) which explained what some of
-them where for. Then I found a minimal working example in pure assembly for the
-Teensy 3.0
-[here](https://forum.pjrc.com/threads/25762-Turn-the-LED-on-with-assembler-code-\(-Teensy-3-1-\)?p=47739&viewfull=1#post47739).
-I also found the [programmers
-manual](https://www.pjrc.com/teensy/K20P64M72SF1RM.pdf) for the MK20DX256VLH7
-very useful.
+obtained. I started to dig a bit deeper and found an nice guide to low level
+arm programming [here][gnu-eprog] which explained what some of them where for.
+Then I found a minimal working example in pure assembly for the Teensy 3.0
+[here][led-assembler-code]. I also found the [programmers
+manual][k20p64m72sf1rm] for the MK20DX256VLH7 useful.
+
+[karl lunt]: http://www.seanet.com/~karllunt/bareteensy31.html
+[gnu-eprog]: http://bravegnu.org/gnu-eprog/
+[k20p64m72sf1rm]: https://www.pjrc.com/teensy/K20P64M72SF1RM.pdf
+[led-assembler-code]: https://forum.pjrc.com/threads/25762-Turn-the-LED-on-with-assembler-code-(-Teensy-3-1-)?p=47739&viewfull=1#post47739
 
 I took the minimal assembly example above with what I learned from other
-articles around the topic to give a more complete, but still minimal, example.
-The final source can be found in [this github
-repository](https://gist.github.com/mdaffin/d6fb7e91aa21d6943ef4)
+articles around the topic to give a more detailed, but still minimal, example.
+The final source can be found in [this GitHub
+repository]
 and only contains two files: the assembly source and the linker script, which I
 will explain in this post.
 
+[this github repository]: https://gist.github.com/mdaffin/d6fb7e91aa21d6943ef4
+
 ## Requirements
 
-This post is about what is needed to get the Teensy up and running rather then a
-guide to assembly programming so I assume you have a basic knowledge of
-assembly. You will also require the arm-none-eabi toolkit, explicitly the
-assembler `arm-none-eabi-as`, linker `arm-none-eabi-ld` and objcopy
+This post I assume you have a basic knowledge of assembly as it is about what
+is needed to get the Teensy up and running rather then a guide to assembly
+programming . You will also require the `arm-none-eabi` toolkit, explicitly the
+assembler `arm-none-eabi-as`, linker `arm-none-eabi-ld` and
 `arm-none-eabi-objcopy` binaries. These can be obtained from most Linux
 distribution's package managers or from inside a Arduino SDK's tools directory:
 `$ARDUINO_SDK/hardware/tools/arm/bin`.
@@ -70,22 +74,22 @@ SECTIONS {
 
 There are two main blocks to the linker script called `MEMORY` and `SECTIONS`.
 The `MEMORY` block tells the linker how the storage address space should be
-broken up. Typical microncontrollers have two main type os storage, flash
+broken up. Typical microcontrollers have two main type os storage, flash
 (slower but non-volatile) and ram (faster but volatile).
 
-At a minimum you should define where the non-volitile (flash) and volitile
-(ram) storage blocks, which is what we do above. These values are defined in
-the datasheet of the chip, for the teensy 3.1 it is [this
-one](https://www.pjrc.com/teensy/K20P64M72SF1RM.pdf).  For example, in our
+At a minimum you should define where the non-volatile (flash) and volatile
+(ram) storage blocks, which is what we do above. You can find these values are
+defined in the datasheet of the chip, for the teensy 3.1 it is [this
+one](https://www.pjrc.com/teensy/K20P64M72SF1RM.pdf). For example, in our
 linker scripts we have split the storage address space into two parts, one for
 non-volatile `FLASH` storage and the other for volatile `RAM` storage. We tell
 the linker where these regions start, the `ORIGIN` and how long they are, the
 `LENGTH`.
 
-You can split these sections up as much as you like and in doing so can change
-the permissions for various different parts. For example, you can make a
-section for read only, non executable data to protect that section from being
-manuplated at runtime with the following.
+You can split these sections up as much as you like which allows different
+permissions for various parts. For example, you can make a section for read
+only, non executable data to protect that section from being manipulated at
+runtime with the following.
 
 ```
 MEMORY {
@@ -105,26 +109,26 @@ typically you would also have a block for initialized and uninitialized data
 `.text : {...} > FLASH` matches all the text (aka code) and tells it to place it
 in the FLASH section defined above.
 
-The first part of all arm chips is where the exception vectors are placed. These
+The first part of all arm chips is where the exception vectors are placed which
 hold locations that the arm chip will jump to an events occurs, such as an
 interrupt firing or a memory fault occurs. For a full list of them see the table
 on page 63 of the programmers manual. We tell the linker to place the vectors
 first with `KEEP(*(.vectors))`. To break this down further:
 
-* `KEEP(...)` tells the linker to not remove any
-dead/duplicate code as we do not want it moving or skipping various vectors.
-* `*(...)` matches any file, you could specify a file name to only include code
-from within that file however you generally don't need to make use of this
-feature.
-* `.vectors` is the part of our code that we want to place here, we will
-look at how to label the code when we look at the assembly file below.
+- `KEEP(...)` tells the linker to not remove any
+  dead/duplicate code as we do not want it moving or skipping various vectors.
+- `*(...)` matches any file, you could specify a file name to only include code
+  from within that file however you generally don't need to make use of this
+  feature.
+- `.vectors` is the part of our code that we want to place here, we will
+  look at how to label the code when we look at the assembly file below.
 
 Next `. = 0x400` causes us to skip to address `0x400` and tells the linker to
 place the `.flashconfig` section here. This address and the values in this
 section allow you to configure the protection settings of the flash, you can
 read more about the values on page 569 of the programmers manual.
 
-After the flashconfig the startup code is placed with `*(.startup)` and finally the
+After the `.flashconfig` the startup code is placed with `*(.startup)` and finally the
 rest of the code with `*(.text)`.
 
 Finally we set a variable `_estack` to point to the end of the ram which will be
@@ -136,8 +140,7 @@ Arm assembly comes in two flavors, the 16bit thumb instruction set and the
 full 32bit arm instruction set. With the first line of code `.syntax unified`
 we well the assembler we are using a mix of the instruction sets.
 
-First thing to do is set the instruction set we wish to use, for modern `ARM
-THUMB` we use the `unified` syntax.
+First thing to do is set the instruction set we wish to use, for modern `ARM THUMB` we use the `unified` syntax.
 
 #### blink.s
 
@@ -167,11 +170,11 @@ start of the flash section. Due to this it does not matter where in the file
 this code is placed, it will always be placed at the start of the flash by the
 linker script.
 
-In this example we only really make use of the *Inital Program Counter* to tell
+In this example we only really make use of the _Initial Program Counter_ to tell
 the chip where to start executing from a reset, here we tell it to jump to the
 \_startup label which is defined below.
 
-The *Inital Stack Pointer* tells the arm chip where to start the stack, which
+The _Initial Stack Pointer_ tells the arm chip where to start the stack, which
 we defined at the end of the ram in the linker script. However we do not
 properly initialize or make use of the stack in this example.
 
@@ -230,11 +233,11 @@ the registers to 0.
 ```
 
 The Teensy 3 has a watchdog, which is enabled by default. This will cause the
-chip to reset if the watchdog is not reset frequently. We do not want to worry
-about the watchdog in this example so we are going to disable it. This involves
-disabling interrupts, unlocking the watchdog (so it can be configured) then
-disable it before enabling interrupts again. You can read more about how to
-configure the watchdog on page 463 of the programmers manual.
+chip to reset if the watchdog is not reset frequently. We will disable the
+watchdog in this example as we don't require it. This involves disabling
+interrupts, unlocking the watchdog (allowing it to be configured) then disable it
+before enabling interrupts again. You can read more about how to configure the
+watchdog on page 463 of the programmers manual.
 
 #### blink.s
 
@@ -281,13 +284,13 @@ is connected to.
     str r0, [r6]
 ```
 
-Our logic is very simple:
+Our logic is simple:
 
-* Turn on the led
-* Busy wait
-* Turn off the led
-* Busy wait
-* Repeat
+- Turn on the led
+- Busy wait
+- Turn off the led
+- Busy wait
+- Repeat
 
 Which is done by the following loop.
 
@@ -370,14 +373,19 @@ teensy-loader-cli -w --mcu=mk20dx256 blink.hex
 
 ## Summary
 
-This was a very informative experience for me, having never touched assembly or
-done any bare metal programming on the arm before. There are still some bits
-missing that are required by higher level languages or more complete programs
-but is nice start to understanding what happens on the arm ship at the lowest
-level. I hope to expand on this in the future and see what it takes to convert
-the assembler to a higher level language such as C.
+This was a informative experience for me, having never touched assembly or done
+any bare metal programming on the arm before. Some bits are still missing that
+are required by higher level languages or more complex programs but is nice
+start to understanding what happens on the arm ship at the lowest level. I hope
+to expand on this in the future and see what it takes to convert the assembler
+to a higher level language such as C.
 
 ## References
-1. [Karl Lunt - Bare-metal Teensy 3.x Development](http://www.seanet.com/~karllunt/bareteensy31.html)
-2. [Vijay Kumar B. - Embedded Programming with the GNU Toolchain](http://bravegnu.org/gnu-eprog/)
-3. [glock45 - Turn the LED on with assembler code ( Teensy 3.1 )](https://forum.pjrc.com/threads/25762-Turn-the-LED-on-with-assembler-code-\(-Teensy-3-1-\)?p=47739&viewfull=1#post47739)
+
+1. [Karl Lunt - Bare-metal Teensy 3.x Development]
+2. [Vijay Kumar B. - Embedded Programming with the GNU Toolchain]
+3. [glock45 - Turn the LED on with assembler code ( Teensy 3.1 )]
+
+[karl lunt - bare-metal teensy 3.x development]: http://www.seanet.com/~karllunt/bareteensy31.html
+[vijay kumar b. - embedded programming with the gnu toolchain]: http://bravegnu.org/gnu-eprog/
+[glock45 - turn the led on with assembler code ( teensy 3.1 )]: https://forum.pjrc.com/threads/25762-Turn-the-LED-on-with-assembler-code-(-Teensy-3-1-)?p=47739&viewfull=1#post47739>

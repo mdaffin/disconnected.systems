@@ -1,42 +1,45 @@
 ---
-date: '2018-02-01T09:00:00Z'
+date: "2018-02-01T09:00:00Z"
 description: Show how you can use meta package to manage multiple arch linux systems
 slug: archlinux-meta-packages
 tags:
-- linux
-- automation
-- archlinux
+  - linux
+  - automation
+  - archlinux
 sidebar:
-- ['/blog/archlinux-repo-in-aws-bucket/', 'Hosting an Arch Linux Repo in an Amazon S3 Bucket']
-- ['/blog/archlinux-meta-packages/', 'Managing Arch Linux with Meta Packages']
-- ['/blog/archlinux-installer/', 'Creating a Custom Arch Linux Installer']
+  - [
+      "/blog/archlinux-repo-in-aws-bucket/",
+      "Hosting an Arch Linux Repository in an Amazon S3 Bucket",
+    ]
+  - ["/blog/archlinux-meta-packages/", "Managing Arch Linux with Meta Packages"]
+  - ["/blog/archlinux-installer/", "Creating a Custom Arch Linux Installer"]
 ---
 
 # Automating Arch Linux Part 2: Managing Arch Linux with Meta Packages
 
 In this three-part series, I will show you one way to simplify and manage
-multiple Arch Linux systems using a custom repo, a set of meta-packages and a
+multiple Arch Linux systems using a custom repository, a set of meta-packages and a
 scripted installer. Each part is standalone and can be used by its self, but
 they are designed to build upon and complement each other each focusing on a
 different part of the problem.
 
-- **Part 1:** [Hosting an Arch Linux Repo in an Amazon S3 Bucket]
-- **Part 2:** *Managing Arch Linux with Meta Packages*
+- **Part 1:** [Hosting an Arch Linux Repository in an Amazon S3 Bucket]
+- **Part 2:** _Managing Arch Linux with Meta Packages_
 - **Part 3:** [Creating a Custom Arch Linux Installer]
 
-[Hosting an Arch Linux Repo in an Amazon S3 Bucket]: /blog/archlinux-repo-in-aws-bucket/
-[Creating a Custom Arch Linux Installer]: /blog/archlinux-installer/
+[hosting an arch linux repo in an amazon s3 bucket]: /blog/archlinux-repo-in-aws-bucket/
+[creating a custom arch linux installer]: /blog/archlinux-installer/
 
-I really enjoy Arch Linux for its customisation - you can truly make it *your*
+I really enjoy Arch Linux for its customisation - you can truly make it _your_
 own. But while crafting your system exactly how you want it once can be a fun
 and rewarding experience, repeating this process on multiple computers becomes
-tedious. Worst, it very easily leads to inconsistencies between each system as
+tedious. Worst, it easily leads to inconsistencies between each system as
 you forget things that you configured or as you slowly evolve your configs on
 each system you set up. The more systems you manage the worst this problem
 becomes.
 
 There are a fair few applications that aim to make this easier, most notably
-the plethora of *[dotfile managers]* out there. I have used a few of these over
+the plethora of _[dotfile managers]_ out there. I have used a few of these over
 the years and they all suffer from the same problem; they are only designed to
 manage user files. I want to manage my whole system. I used [SaltStack] for [a
 while][salt-arch] but started to dislike it when it became hard to debug
@@ -44,15 +47,15 @@ problems (salts error handling is quite bad) and I kept forgetting to run
 `salt-call state.apply` to resync my systems.
 
 My ultimate goal is to find a way to automatically install Arch Linux on a
-system with minimal input (only things like hostname, username, password etc).
+system with minimal input (only things like host name, username, password etc).
 As well as for a way to automatically update all of my systems whenever I
 change a config or add/remove a package. Ideally just running `pacman -Syu` on
 a system to sync all the configs from a master set. In this post, I will show
-you how I solved this second goal using the repo I set up in my [last post]
-with a set of custom [meta-packages].
+you how I solved this second goal using the repository I set up in my [last
+post] with a set of custom [meta-packages].
 
 [dotfile managers]: https://wiki.archlinux.org/index.php/Dotfiles
-[SaltStack]: https://saltstack.com/
+[saltstack]: https://saltstack.com/
 [salt-arch]: https://github.com/mdaffin/salt-arch
 [last post]: /blog/archlinux-repo-in-aws-bucket/
 [meta-packages]: https://wiki.archlinux.org/index.php/creating_packages
@@ -71,8 +74,8 @@ to automatically install it when they update.
 Now, we are going to abuse this concept slightly and not only use them to
 install groups of packages via dependencies but also to install related system
 configuration. This is not something `pacman` is really designed to do and
-results in some hacky workaround which we will discuss below. The end result,
-however, works very well in practice.
+results in some hacky workaround which we will discuss below. In practice this
+works really well.
 
 ## Organising Our Meta-Packages
 
@@ -85,9 +88,9 @@ these more general ones.
 
 For example, I have [`mdaffin-base`] that contains everything that I require on
 all of my systems. Then [`mdaffin-desktop`] for any system that needs a desktop
-interface, such as my desktops and laptops. This package depends on
-[`mdaffin-base`] so I still only have one package to install. But then I have a
-[`mdaffin-dell-xps-13`] which contains very specific settings only useful on my
+interface, such as my desktops and laptops. I still only have one package to
+install as this package depends on [`mdaffin-base`]. But then I have a
+[`mdaffin-dell-xps-13`] which contains specific settings only useful on my
 laptop. This, in turn, depends on [`mdaffin-desktop`].
 
 Separate to this I have [`mdaffin-devel`] package that contains a whole bunch
@@ -99,7 +102,7 @@ In the future, I might have a `mdaffin-laptop` or `mdaffin-server` as or when I
 decide I will require them but for now, these systems will be based off one of
 the existing packages.
 
-One major advantage of using meta-packages like this is it is very simple to
+One major advantage of using meta-packages like this is it is simple to
 see how your system is configured with simple `pacman` commands, for example,
 to see packages that were explicitly installed run the following.
 
@@ -126,7 +129,7 @@ mdaffin-devel
 This is a hidden and quite powerful feature of this method. Whereas on most
 Arch Linux systems you might see hundreds of packages explicitly installed with
 no way to track why you installed them, we only have a handful. This is
-actually very useful as it lets you track bloat on your systems over time where
+actually useful as it lets you track bloat on your systems over time where
 you can either promote them to one of your meta-packages if you use them a lot
 or remove them from your systems if you don't. You also have the option of
 commenting the dependencies in your meta-packages to remind you why you added
@@ -163,7 +166,7 @@ depends=(
 ```
 
 [creating a package]: https://wiki.archlinux.org/index.php/creating_packages#Meta_packages_and_groups
-[PKGBUILD]: https://wiki.archlinux.org/index.php/PKGBUILD
+[pkgbuild]: https://wiki.archlinux.org/index.php/PKGBUILD
 
 ### Adding Dependencies
 
@@ -197,9 +200,9 @@ depends=(
 )
 ```
 
-And there, that's our first meta package. Although, it's currently not much
-more helpful than the base group so go ahead and add any additional packages
-you want. For example, I have added these (as well as many others) to the list
+And there, that is our first meta package, although, it's currently not much
+more helpful than the base group. Go ahead and add any additional packages
+you want, for example, I have added these (as well as many others) to the list
 as I use them on all of my systems.
 
 ```bash
@@ -215,13 +218,13 @@ Adding a config file to a package is done just like any other package except
 you also add it to the `backup` array in the `PKGBUILD`. This instructs pacman
 to not replace the file during an upgrade if the user has modified it at all.
 But we don't want this for our package - rather, we want to treat config files
-as any other package file so that it is replaced on an upgrade. We do this to
+as any other package file ensuring it gets replaced on an upgrade. We do this to
 stop the configs from drifting apart at the risk of losing some changes to one
 system if you don't add those changes back to the package.
 
 Some packages don't drop a default config, while others will read and merge all
 files inside a certain directory. These types of packages are easy to add
-configs for, we just add the file to our package and let packman place it in
+configs for, we just add the file to our package and let pacman place it in
 the correct place. To do this place the configs you want next to the `PKGBUILD`
 and add it to the `sources` array with a corresponding entry in `md5sum` or
 `sha256sum` (or equivalent) arrays. Then add an `install` line in the `package`
@@ -248,11 +251,11 @@ will prevent any other package from directly modifying them.
 
 ### Overwriting Existing Configs
 
-However, most packages drop a default config file to give the users a base to
-start editing and do not support config directories. These are problematic as
-pacman will not allow us to simply install our config over them. Unfotinuatly,
-pacman has no nice way around this limitation but there is a slightly hacky way
-to work around the problem using pacman's install hooks.
+However, a lot of packages drop a default config file to give the users a base
+to start editing from and do not support config directories. Unfortunately
+these are problematic as pacman will not allow us to simply install our config
+over them. Pacman has no nice way around this limitation but there is a
+slightly hacky way to work around the problem using pacman's install hooks.
 
 Instead of dropping the config file directly into place, we can drop it
 alongside the existing file, that way we get no conflict with other packages.
@@ -284,17 +287,17 @@ package() {
 Then we define the hooks in a separate install file, which is a bash script
 with at least one of the following functions defined.
 
-* `pre_install()` - runs before the package contents are installed the first
+- `pre_install()` - runs before the package contents are installed the first
   time the package is installed
-* `post_install()` - after the package contents are installed the first time
+- `post_install()` - after the package contents are installed the first time
   the package is installed
-* `pre_upgrade()` - before the package contents are installed when a package is
+- `pre_upgrade()` - before the package contents are installed when a package is
   being upgraded
-* `post_upgrade()` - after the package contents are installed when a package is
+- `post_upgrade()` - after the package contents are installed when a package is
   being upgraded
-* `pre_remove()` - before the package contents are removed when a package is
+- `pre_remove()` - before the package contents are removed when a package is
   being removed
-* `post_remove()` - after the package contents are removed when a package is
+- `post_remove()` - after the package contents are removed when a package is
   being removed
 
 Let's call this file `mdaffin-desktop.install`, once again place it next to the
@@ -314,7 +317,7 @@ post_upgrade() {
 These run during an install or upgrade and copy the packaged configs to their
 destination, overwriting the configs that the upstream package dropped.
 
-Next, we need to tell makepkg about this install file by adding the following
+Next, we need to tell `makepkg` about this install file by adding the following
 to `PKGBUILD`.
 
 ```bash
@@ -323,7 +326,7 @@ install=mdaffin-desktop.install
 ...
 ```
 
-Which tells makepkg to include this install script in the package and pacman
+Which tells `makepkg` to include this install script in the package and pacman
 will run the relevant functions during an install or upgrade of the package.
 
 ### Starting Services
@@ -331,14 +334,14 @@ will run the relevant functions during an install or upgrade of the package.
 One more common thing we want to do is enable/start services. Typically, Arch
 Linux does not auto enable or start services on a package install, instead, it
 leaves this up to the user. Normally, this is a better approach as it lets you
-configure them before they are started for the first time. But we are
-configuring the applications with our meta-packages so why not enable and start
-the services as well.
+configure them before they are started for the first time. This is against the
+packaging guidelines but since we are creating personal meta-packages it is not
+a major problem.
 
 The `post_install` hook from the previous section can also be used to get
 `systemctl` to start and enable the service on the first install, where the
 user is then free to disable/stop it thereafter. We could also add it to the
-`post_upgrade` hook to ensure it gets reenabled after an upgrade, or if you add
+`post_upgrade` hook to ensure it gets re-enabled after an upgrade, or if you add
 an extra service to a package later on. For example, my desktop package has
 these in the install script (in addition to the things in the previous
 section).
@@ -353,7 +356,7 @@ post_install() {
 Note that `--now` on a `systemctl enable` causes it to also start the service
 in addition to enabling it, basically equivalent to `systemctl start` and
 `systemctl enable` in one command. `systemctl` will also behave correctly
-inside a chroot environment (such as when pacstraping a system).
+inside a chroot environment (such as when pacstrapping a system).
 
 ## Building the Package
 
@@ -367,8 +370,8 @@ prep work and is a little slower. Feel free to continue to use `makepkg` if you
 want.
 
 To save time on installing a base arch system into each chroot, `makechrootpkg`
-relies on a preprepared root which it copies for each package it builds. We can
-create this root fs by running `mkarchroot`.
+relies on a prepared root which it copies for each package it builds. We can
+create this root filesystem by running `mkarchroot`.
 
 ```bash
 mkdir -p ./chroots
@@ -376,7 +379,7 @@ mkarchroot -C /etc/pacman.conf ./chroots/root base-devel
 ```
 
 `chroot` is where all of the chroots for each of our build environments will
-live and `root` is the base root fs `makechrootpkg` will use as a base for each
+live and `root` is the base root filesystem `makechrootpkg` will use as a base for each
 environment by default.
 
 While inside our packages directory run `makechrootpkg` and tell it what
@@ -389,11 +392,11 @@ makechrootpkg -cur ./chroots
 Once done you will end up with a `<package>-<version>.pkg.tar.xz` package in
 the current directory just like with `makepkg`.
 
-For the last step, we will install this package into a repo, such as the one I
+For the last step, we will install this package into a repository, such as the one I
 showed you how to create in my [last post].
 
 ```bash
-# Copy the live repo down
+# Copy the live repository down
 mkdir -p local-repo
 s3cmd sync s3://mdaffin-arch/repo/x86_64/mdaffin.{db,files}.tar.xz local-repo/
 ln -sf local-repo/mdaffin.db.tar.xz local-repo/mdaffin.db
@@ -407,18 +410,19 @@ s3cmd sync --follow-symlinks --acl-public *.pkg.tar.xz \
 ```
 
 You can now install this package like you do any other package with `pacman`,
-as long as you have your repo added to `/etc/pacman.conf`.
+as long as you have your repository added to `/etc/pacman.conf`.
 
 [last post]: /blog/archlinux-repo-in-aws-bucket/
 
-## Git Repo and Scripting the Build
+## Git Repository and Scripting the Build
 
 Now that we can create meta-package and publish them for use let's place these
-in a git repo (or another version control system if you prefer) and write a
-wrapper script to make building/uploading the packages even easier. You can
-find [my repo] on GitHub, feel free to use it as a reference or clone it to
-create your own but the packages in there are tuned to my liking and so I
-encourage you to create your own with how you like your systems setup.
+in a git repository (or another version control system if you prefer) and write
+a wrapper script to make building/uploading the packages even easier. You can
+find [my repository] on GitHub, feel free to use it as a reference or clone it
+to create your own but the packages in there are tuned to my liking. I
+encourage you to create your own with how you like your systems setup as I will
+radically change them without warning should I wish to try something new.
 
 ```bash
 mkdir arch-pkgs
@@ -427,7 +431,7 @@ git init
 ```
 
 I like to put all of my packages inside `pkg/<package name>` to keep them in
-one place. So let's copy the package we created above to that location
+one place. Let's copy the package we created above to that location
 
 ```bash
 mkdir pkg
@@ -476,12 +480,12 @@ run `git reset <file>`. Repeat until you are happy then commit.
 git commit -m "My first package"
 ```
 
-[my repo]: https://github.com/mdaffin/arch-pkgs
+[my repository]: https://github.com/mdaffin/arch-pkgs
 
 ### The Build Script
 
 The commands above can be wrapped into a helper script to make building and
-uploading the packages very simple. Here is the script in its entirety.
+uploading the packages simple. Here is the script in its entirety.
 
 ```bash
 #!/bin/bash
@@ -525,13 +529,13 @@ post][bash-strict-mode] for more details about it.
 Some useful variables are then defined, `${@:-pkg/*}` means take all arguments,
 but if there are none it defaults to `pkg/*`. This allows us to build a single
 package, any number of packages or by default all packages. `REMOTE_PATH` and
-`REPO_NAME` should be changed to match your repo.
+`REPO_NAME` should be changed to match your repository.
 
-We create the chroot directory and init the main root fs if it does not already
-exist. Then loop over all the packages to build them one at a time with
-`makechrootpkg`, during which we delete all old package files left over from
-previous builds. This keeps the list of built packages down and ensures we only
-upload the latest build version.
+We create the `chroot` directory and init the main root filesystem if it does
+not already exist. Then loop over all the packages to build them one at a time
+with `makechrootpkg`, during which we delete all old package files left over
+from previous builds. This keeps the list of built packages down and ensures we
+only upload the latest build version.
 
 Lastly, we sync down the remote database to a local cache, add the built
 packages to the database then upload all the artefacts back up to the S3
@@ -539,7 +543,7 @@ bucket.
 
 Some of this should look familiar from the script we created in the last post.
 It would be handy to store both this script and the `aursync` script from my
-previous post inside our repo under the `./bin/` directory.
+previous post inside our repository under the `./bin/` directory.
 
 [bash-strict-mode]: /blog/another-bash-strict-mode/
 
@@ -568,6 +572,6 @@ one user, or all your users are fine with the same default settings, but they
 can always override them within their own home directory like you normally
 would.
 
-*[Discuss on Reddit]*
+_[Discuss on Reddit]_
 
-[Discuss on Reddit]: https://www.reddit.com/r/archlinux/comments/7v7g4w/managing_multiple_arch_linux_systems_with/
+[discuss on reddit]: https://www.reddit.com/r/archlinux/comments/7v7g4w/managing_multiple_arch_linux_systems_with/

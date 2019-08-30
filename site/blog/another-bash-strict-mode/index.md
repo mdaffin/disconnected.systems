@@ -1,14 +1,14 @@
 ---
 aliases:
-- /another-bash-strict-mode/
-- /posts/another-bash-strict-mode/
-date: '2016-04-14T00:00:00Z'
+  - /another-bash-strict-mode/
+  - /posts/another-bash-strict-mode/
+date: "2016-04-14T00:00:00Z"
 description: Cause bash scripts to fail fast and loud to aid debugging.
 slug: another-bash-strict-mode
 tags:
-- linux
-- bash
-- shell
+  - linux
+  - bash
+  - shell
 ---
 
 # Another Bash Strict Mode
@@ -27,10 +27,10 @@ trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 IFS=$'\n\t'
 ```
 
-The major problem with `set -e` and `set -o pipefail` is that they are silent so
-you have to rely the output of the failed command to debug your script. But not
-all commands fail loudly and when they do they don't tell you where in your
-script they failed.
+The major problem with `set -e` and `set -o pipefail` is that they are silent
+forcing you have to rely the output of the failed command to debug your script.
+But not all commands fail loudly and when they do they don't tell you where in
+your script they failed.
 
 Error traps can give you more information, anything that is available to the
 bash shell at the time they where triggered. Most usefully the command that
