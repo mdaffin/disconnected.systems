@@ -1,4 +1,4 @@
 [build]
-  publish = "site/.vuepress/dist"
-  command = "yarn run build"
+  publish = "public"
+  command = "false"
 
