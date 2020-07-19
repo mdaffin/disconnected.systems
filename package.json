@@ -1,19 +1,18 @@
 {
   "name": "disconnected.systems",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Programming, Linux and all things Open Source",
   "repository": "git@github.com:mdaffin/disconnected.systems.git",
   "author": "Michael Daffin <michael@daffin.io>",
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "vuepress dev site",
-    "build": "vuepress build site && ./bin/hacky-extensions.js"
-  },
-  "devDependencies": {
-    "vuepress": "~0"
+    "build": "gridsome build",
+    "develop": "gridsome develop",
+    "explore": "gridsome explore"
   },
   "dependencies": {
-    "rss": "^1.2.2"
+    "@gridsome/source-filesystem": "^0.6.2",
+    "gridsome": "^0.7.0"
   }
 }
