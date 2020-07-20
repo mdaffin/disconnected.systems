@@ -5,3 +5,8 @@ dist/
 .nuxt/
 node_modules/
 *.log
+
+
+#Added by cargo
+
+/target
