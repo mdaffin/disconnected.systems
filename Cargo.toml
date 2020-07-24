@@ -9,6 +9,7 @@ edition = "2018"
 [dependencies]
 anyhow = "1.0.31"
 render = { git = "https://github.com/render-rs/render.rs.git" }
+walkdir = "2.3.1"
 
 [dev-dependencies]
 tempfile = "3.1.0"
