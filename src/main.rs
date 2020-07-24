@@ -31,32 +31,45 @@ fn Layout<'a, Children: Render>(title: &'a str, children: Children) {
     }
 }
 
-pub fn index() -> String {
-    html! {
-      <Layout title={"Disconnected Systems"}>
-        <h1>{"Hello"}</h1>
-        {"Welcome!"}
-      </Layout>
+pub fn index() -> RenderedPage {
+    RenderedPage {
+        route: "".to_string(),
+        content: html! {
+          <Layout title={"Disconnected Systems"}>
+            <h1>{"Hello"}</h1>
+            {"Welcome!"}
+          </Layout>
+        },
     }
 }
 
 fn main() -> Result<()> {
-    let out_dir = OutputDirectory(PathBuf::from("dist"));
+    let out_dir = OutputDirectory::new("dist");
     let _site_dir = Path::new("site");
 
     out_dir.clear()?;
-
-    out_dir.write_page("", index())?;
+    out_dir.write(&index())?;
 
     Ok(())
 }
 
-pub struct OutputDirectory(PathBuf);
+pub struct RenderedPage {
+    route: String,
+    content: String,
+}
+
+pub struct OutputDirectory {
+    path: PathBuf,
+}
 
 impl OutputDirectory {
+    fn new(path: impl Into<PathBuf>) -> Self {
+        Self { path: path.into() }
+    }
+
     fn clear(&self) -> Result<()> {
-        create_dir_all(&self.0).context("failed to create output directory")?;
-        for entry in self.0.read_dir()? {
+        create_dir_all(&self.path).context("failed to create output directory")?;
+        for entry in self.path.read_dir()? {
             let path = entry?.path();
             if path.is_dir() {
                 remove_dir_all(path)
@@ -68,8 +81,8 @@ impl OutputDirectory {
         Ok(())
     }
 
-    fn write_page(&self, route: impl AsRef<Path>, content: impl AsRef<[u8]>) -> Result<()> {
-        let dest_file = self.0.join(route);
+    fn write(&self, page: &RenderedPage) -> Result<()> {
+        let dest_file = self.path.join(&page.route);
         let dest_file = match dest_file.extension() {
             None => dest_file.join("index.html"),
             _ => dest_file,
@@ -80,7 +93,7 @@ impl OutputDirectory {
 
         File::create(dest_file)
             .context("failed to create page")?
-            .write_all(content.as_ref())
+            .write_all(page.content.as_ref())
             .context("failed to write to page")?;
 
         Ok(())
@@ -91,19 +104,19 @@ impl OutputDirectory {
 mod tests {
 
     mod output_directory {
-        use super::super::OutputDirectory;
+        use super::super::{OutputDirectory, RenderedPage};
         use std::fs::read_to_string;
         use test_case::test_case;
 
         #[test]
         fn when_the_output_directory_does_not_exist_clear_should_create_it() {
             let temp_dir = tempfile::tempdir().unwrap();
-            let out_dir = OutputDirectory(temp_dir.path().join("out_dir"));
+            let out_dir = OutputDirectory::new(temp_dir.path().join("out_dir"));
 
             out_dir.clear().unwrap();
 
-            assert!(out_dir.0.exists());
-            assert!(out_dir.0.is_dir());
+            assert!(out_dir.path.exists());
+            assert!(out_dir.path.is_dir());
         }
 
         #[test_case("" ; "site root")]
@@ -113,14 +126,17 @@ mod tests {
         fn writing_a_page_with_no_extension_path_writes_to_index_file_in(route: &str) {
             let temp_dir = tempfile::tempdir().unwrap();
             let out_path = temp_dir.path().join("out_dir");
-            let out_dir = OutputDirectory(out_path.clone());
-            let content = "content";
+            let out_dir = OutputDirectory::new(out_path.clone());
+            let page = RenderedPage {
+                route: route.to_string(),
+                content: "content".to_string(),
+            };
 
-            out_dir.write_page(route, content).unwrap();
+            out_dir.write(&page).unwrap();
 
             assert_eq!(
                 &read_to_string(out_path.join(route).join("index.html")).unwrap(),
-                content
+                &page.content
             );
         }
 
@@ -135,29 +151,55 @@ mod tests {
         fn writing_a_page_with_an_extension_path_writes_directly_to_that_path(route: &str) {
             let temp_dir = tempfile::tempdir().unwrap();
             let out_path = temp_dir.path().join("out_dir");
-            let out_dir = OutputDirectory(out_path.clone());
-            let content = "content";
+            let out_dir = OutputDirectory::new(out_path.clone());
+            let page = RenderedPage {
+                route: route.to_string(),
+                content: "content".to_string(),
+            };
 
-            out_dir.write_page(route, content).unwrap();
+            out_dir.write(&page).unwrap();
 
-            assert_eq!(&read_to_string(out_path.join(route)).unwrap(), content);
+            assert_eq!(
+                &read_to_string(out_path.join(route)).unwrap(),
+                &page.content
+            );
         }
 
         #[test]
         fn clean_removes_all_files_and_directories_that_have_been_written() {
             let temp_dir = tempfile::tempdir().unwrap();
-            let out_dir = OutputDirectory(temp_dir.path().join("out_dir"));
+            let out_dir = OutputDirectory::new(temp_dir.path().join("out_dir"));
 
-            out_dir.write_page("", "content").unwrap();
-            out_dir.write_page("page1", "content").unwrap();
-            out_dir.write_page("page2", "content").unwrap();
-            out_dir.write_page("page3/subpage", "content").unwrap();
+            out_dir
+                .write(&RenderedPage {
+                    route: "".to_string(),
+                    content: "content".to_string(),
+                })
+                .unwrap();
+            out_dir
+                .write(&RenderedPage {
+                    route: "page1".to_string(),
+                    content: "content".to_string(),
+                })
+                .unwrap();
+            out_dir
+                .write(&RenderedPage {
+                    route: "page2".to_string(),
+                    content: "content".to_string(),
+                })
+                .unwrap();
+            out_dir
+                .write(&RenderedPage {
+                    route: "page3/subpage".to_string(),
+                    content: "content".to_string(),
+                })
+                .unwrap();
 
             out_dir.clear().unwrap();
 
             assert!(
                 out_dir
-                    .0
+                    .path
                     .read_dir()
                     .expect("could not read output directory")
                     .next()
