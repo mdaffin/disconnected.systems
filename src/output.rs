@@ -1,25 +1,12 @@
+use crate::renderer::RenderedPage;
 use std::fs::{create_dir_all, remove_dir_all, remove_file, File};
 use std::io::prelude::*;
 use std::path::PathBuf;
 
 use anyhow::{Context, Result};
 
-pub struct RenderedPage {
-    route: String,
-    content: String,
-}
-
 pub struct OutputDirectory {
     path: PathBuf,
-}
-
-impl RenderedPage {
-    pub fn new(route: impl Into<String>, content: impl Into<String>) -> Self {
-        Self {
-            route: route.into(),
-            content: content.into(),
-        }
-    }
 }
 
 impl OutputDirectory {
@@ -62,8 +49,10 @@ impl OutputDirectory {
 
 #[cfg(test)]
 mod tests {
-    use super::super::{OutputDirectory, RenderedPage};
+    use super::OutputDirectory;
+    use crate::output::RenderedPage;
     use std::fs::read_to_string;
+    use std::path::PathBuf;
     use test_case::test_case;
 
     #[test]
@@ -85,7 +74,7 @@ mod tests {
         let temp_dir = tempfile::tempdir().unwrap();
         let out_path = temp_dir.path().join("out_dir");
         let out_dir = OutputDirectory::new(out_path.clone());
-        let page = RenderedPage::new(route, "content");
+        let page = rendered_page(route, "content");
 
         out_dir.write(&page).unwrap();
 
@@ -107,7 +96,7 @@ mod tests {
         let temp_dir = tempfile::tempdir().unwrap();
         let out_path = temp_dir.path().join("out_dir");
         let out_dir = OutputDirectory::new(out_path.clone());
-        let page = RenderedPage::new(route, "content");
+        let page = rendered_page(route, "content");
 
         out_dir.write(&page).unwrap();
 
@@ -122,15 +111,11 @@ mod tests {
         let temp_dir = tempfile::tempdir().unwrap();
         let out_dir = OutputDirectory::new(temp_dir.path().join("out_dir"));
 
-        out_dir.write(&RenderedPage::new("", "content")).unwrap();
+        out_dir.write(&rendered_page("", "content")).unwrap();
+        out_dir.write(&rendered_page("page1", "content")).unwrap();
+        out_dir.write(&rendered_page("page2", "content")).unwrap();
         out_dir
-            .write(&RenderedPage::new("page1", "content"))
-            .unwrap();
-        out_dir
-            .write(&RenderedPage::new("page2", "content"))
-            .unwrap();
-        out_dir
-            .write(&RenderedPage::new("page3/subpage", "content"))
+            .write(&rendered_page("page3/subpage", "content"))
             .unwrap();
 
         out_dir.clear().unwrap();
@@ -144,5 +129,12 @@ mod tests {
                 .is_none(),
             "output_directory is not empty"
         );
+    }
+
+    fn rendered_page(route: impl Into<PathBuf>, content: impl Into<String>) -> RenderedPage {
+        RenderedPage {
+            route: route.into(),
+            content: content.into(),
+        }
     }
 }

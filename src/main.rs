@@ -1,62 +1,20 @@
 use anyhow::Result;
 
-use render::html::HTML5Doctype;
-use render::{component, html, rsx, Render};
-
 mod input;
 mod output;
+mod renderer;
 
-use input::SiteDirectory;
-use output::{OutputDirectory, RenderedPage};
-
-#[component]
-fn Layout<'a, Children: Render>(title: &'a str, children: Children) {
-    rsx! {
-      <>
-        <HTML5Doctype />
-        <html lang={"en"}>
-            <head>
-                <meta charset={"utf-8"} />
-                <meta name={"viewport"} content={"width=device-width, initial-scale=1"} />
-                <title>{title}</title>
-                <link rel={"stylesheet"} href={"/css/normalize.css"} />
-                <link rel={"stylesheet"} href={"/css/main.css"} />
-            </head>
-            <body>
-                <header></header>
-                <main>
-                    {children}
-                </main>
-            </body>
-        </html>
-      </>
-    }
-}
-
-pub fn index() -> RenderedPage {
-    RenderedPage::new(
-        "",
-        html! {
-          <Layout title={"Disconnected Systems"}>
-            <h1>{"Hello"}</h1>
-            {"Welcome!"}
-          </Layout>
-        },
-    )
-}
+use renderer::render;
 
 fn main() -> Result<()> {
-    let out_dir = OutputDirectory::new("dist");
-    let site_dir = SiteDirectory::new("site");
+    let site_dir = input::SiteDirectory::new("site");
+    let out_dir = output::OutputDirectory::new("dist");
 
     out_dir.clear()?;
 
     for page in site_dir.pages() {
-        let page = page?;
-        dbg!(page);
+        out_dir.write(&render(dbg!(page?))?)?;
     }
-
-    out_dir.write(&index())?;
 
     Ok(())
 }

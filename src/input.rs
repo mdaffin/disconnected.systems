@@ -1,13 +1,9 @@
+use crate::renderer::SourcePage;
 use std::path::PathBuf;
 use walkdir::WalkDir;
 
 #[derive(Debug)]
 pub struct SiteDirectory {
-    path: PathBuf,
-}
-
-#[derive(Debug)]
-pub struct PageSource {
     path: PathBuf,
 }
 
@@ -30,7 +26,7 @@ impl SiteDirectory {
 }
 
 impl<'site> Iterator for SiteIter<'site> {
-    type Item = Result<PageSource, walkdir::Error>;
+    type Item = Result<SourcePage, walkdir::Error>;
 
     fn next(&mut self) -> Option<Self::Item> {
         loop {
@@ -39,7 +35,7 @@ impl<'site> Iterator for SiteIter<'site> {
                     if entry.path().is_dir() {
                         continue;
                     }
-                    Some(Ok(PageSource {
+                    Some(Ok(SourcePage {
                         path: entry
                             .path()
                             .strip_prefix(&self.site.path)
@@ -57,8 +53,7 @@ impl<'site> Iterator for SiteIter<'site> {
 #[cfg(test)]
 mod tests {
     use super::SiteDirectory;
-    use std::fs::read_to_string;
-    use std::path::{Path, PathBuf};
+    use std::path::Path;
     use test_case::test_case;
 
     #[test]
