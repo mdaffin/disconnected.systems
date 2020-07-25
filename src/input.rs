@@ -1,4 +1,3 @@
-use crate::renderer::SourcePage;
 use std::path::PathBuf;
 use walkdir::WalkDir;
 
@@ -10,6 +9,12 @@ pub struct SiteDirectory {
 pub struct SiteIter<'site> {
     site: &'site SiteDirectory,
     walkdir: walkdir::IntoIter,
+}
+
+#[derive(Debug)]
+pub struct SourcePage {
+    pub source: PathBuf,
+    pub route: PathBuf,
 }
 
 impl SiteDirectory {
@@ -35,12 +40,16 @@ impl<'site> Iterator for SiteIter<'site> {
                     if entry.path().is_dir() {
                         continue;
                     }
+                    let path = entry.path();
+                    let route = path
+                        .strip_prefix(&self.site.path)
+                        .expect("root path did not match of file and site did not match");
                     Some(Ok(SourcePage {
-                        path: entry
-                            .path()
-                            .strip_prefix(&self.site.path)
-                            .expect("root path did not match of file and site did not match")
-                            .to_path_buf(),
+                        source: path.into(),
+                        route: match path.extension() {
+                            Some(e) if e == "md" => route.with_extension("html"),
+                            None | Some(_) => route.into(),
+                        },
                     }))
                 }
                 Some(Err(e)) => Some(Err(e)),
@@ -53,7 +62,7 @@ impl<'site> Iterator for SiteIter<'site> {
 #[cfg(test)]
 mod tests {
     use super::SiteDirectory;
-    use std::path::Path;
+    use std::path::{Path, PathBuf};
     use test_case::test_case;
 
     #[test]
@@ -71,23 +80,65 @@ mod tests {
     #[test_case("path/index.md" ; "markdown page in a directory")]
     #[test_case("path/main.css" ; "css file in a directory")]
     #[test_case("path/main.js" ; "javascript file in a directory")]
-    fn iterating_over_a_directory_produces_source_pages_with_paths_relative_to_the_site_dir(
-        file_path: &str,
-    ) {
+    fn iterating_over_a_directory_produces_source_pages_with_source_path(file_path: &str) {
         let temp_dir = tempfile::tempdir().unwrap();
         let full_path = temp_dir.path().join(file_path);
         std::fs::create_dir_all(full_path.parent().unwrap()).unwrap();
-        std::fs::write(full_path, b"content").unwrap();
+        std::fs::write(&full_path, b"content").unwrap();
         let site = SiteDirectory::new(temp_dir.path());
 
         assert_eq!(
-            &site
-                .pages()
+            site.pages()
                 .next()
                 .expect("no pages found")
                 .expect("error searching for file")
-                .path,
-            Path::new(file_path),
+                .source,
+            full_path,
         );
+    }
+
+    #[test_case("css" ; "css files")]
+    #[test_case("js" ; "js files")]
+    #[test_case("html" ; "html files")]
+    #[test_case("png" ; "png files")]
+    #[test_case("jpeg" ; "jpeg files")]
+    #[test_case("jpg" ; "jpg files")]
+    fn route_is_unmodified_with(extension: &str) {
+        for path in &["main", "section/main", "section/subsection/main"] {
+            let temp_dir = tempfile::tempdir().unwrap();
+            let route = format!("{}.{}", path, extension);
+            let full_path = temp_dir.path().join(&route);
+
+            std::fs::create_dir_all(full_path.parent().unwrap()).unwrap();
+            std::fs::write(full_path, b"content").unwrap();
+            let site = SiteDirectory::new(temp_dir.path());
+
+            let page = site
+                .pages()
+                .next()
+                .expect("no pages found")
+                .expect("error searching for file");
+            assert_eq!(&page.route, Path::new(&route));
+        }
+    }
+
+    #[test_case("md" ; "markdown files")]
+    fn creates_html_route_with(extension: &str) {
+        for path in &["main", "section/main", "section/subsection/main"] {
+            let temp_dir = tempfile::tempdir().unwrap();
+            let full_path = temp_dir.path().join(format!("{}.{}", path, extension));
+
+            std::fs::create_dir_all(full_path.parent().unwrap()).unwrap();
+            std::fs::write(full_path, b"content").unwrap();
+            let site = SiteDirectory::new(temp_dir.path());
+
+            let page = site
+                .pages()
+                .next()
+                .expect("no pages found")
+                .expect("error searching for file");
+
+            assert_eq!(page.route, PathBuf::from(format!("{}.html", path)));
+        }
     }
 }

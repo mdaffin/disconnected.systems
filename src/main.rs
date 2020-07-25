@@ -13,7 +13,7 @@ fn main() -> Result<()> {
     out_dir.clear()?;
 
     for page in site_dir.pages() {
-        out_dir.write(&render(dbg!(page?))?)?;
+        out_dir.write(&render(page?)?)?;
     }
 
     Ok(())

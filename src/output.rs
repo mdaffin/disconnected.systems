@@ -51,7 +51,7 @@ impl OutputDirectory {
 mod tests {
     use super::OutputDirectory;
     use crate::output::RenderedPage;
-    use std::fs::read_to_string;
+    use std::fs::read;
     use std::path::PathBuf;
     use test_case::test_case;
 
@@ -79,7 +79,7 @@ mod tests {
         out_dir.write(&page).unwrap();
 
         assert_eq!(
-            &read_to_string(out_path.join(route).join("index.html")).unwrap(),
+            &read(out_path.join(route).join("index.html")).unwrap(),
             &page.content
         );
     }
@@ -100,10 +100,7 @@ mod tests {
 
         out_dir.write(&page).unwrap();
 
-        assert_eq!(
-            &read_to_string(out_path.join(route)).unwrap(),
-            &page.content
-        );
+        assert_eq!(&read(out_path.join(route)).unwrap(), &page.content);
     }
 
     #[test]
@@ -131,7 +128,7 @@ mod tests {
         );
     }
 
-    fn rendered_page(route: impl Into<PathBuf>, content: impl Into<String>) -> RenderedPage {
+    fn rendered_page(route: impl Into<PathBuf>, content: impl Into<Vec<u8>>) -> RenderedPage {
         RenderedPage {
             route: route.into(),
             content: content.into(),
