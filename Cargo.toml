@@ -10,6 +10,11 @@ edition = "2018"
 anyhow = "1.0.31"
 render = { git = "https://github.com/render-rs/render.rs.git" }
 walkdir = "2.3.1"
+serde = { version = "1.0", features = ["derive"] }
+serde_yaml = "0.8.13"
+toml = "0.5.6"
+err-derive = "0.2.4"
+serde_json = "1.0.56"
 
 [dev-dependencies]
 tempfile = "3.1.0"
