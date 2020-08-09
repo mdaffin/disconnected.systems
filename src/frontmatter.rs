@@ -3,6 +3,9 @@ use serde;
 use serde::de::DeserializeOwned;
 use serde_json::{self, Deserializer};
 use serde_yaml;
+use std::fs::File;
+use std::io::{BufReader, Read};
+use std::path::Path;
 use toml;
 
 /// Extracts the frontmatter from the given content. It supports three types of frontmatter, YAML
@@ -68,6 +71,18 @@ where
             Ok(None)
         }
     }
+}
+
+pub fn parse_file<T>(path: impl AsRef<Path>) -> Result<(Option<T>, String), FrontmatterError>
+where
+    T: DeserializeOwned,
+{
+    let mut f = BufReader::new(File::open(path.as_ref())?);
+    let mut content = String::new();
+
+    let frontmatter = parse(&mut f)?;
+    f.read_to_string(&mut content)?;
+    Ok((frontmatter, content))
 }
 
 fn parse_func<T, R, F>(reader: &mut R, sep: &str, parser: F) -> Result<Option<T>, FrontmatterError>

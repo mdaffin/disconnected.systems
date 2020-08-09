@@ -1,5 +1,5 @@
 use crate::transform::SourcePage;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use walkdir::WalkDir;
 
 #[derive(Debug)]
@@ -15,10 +15,6 @@ pub struct SiteIter<'site> {
 impl SiteDirectory {
     pub fn new(path: impl Into<PathBuf>) -> Self {
         Self { path: path.into() }
-    }
-
-    pub fn path(&self) -> &Path {
-        &self.path
     }
 
     pub fn pages<'site>(&'site self) -> SiteIter<'site> {

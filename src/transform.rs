@@ -1,14 +1,16 @@
+use crate::frontmatter;
 use anyhow::Result;
-use std::fs::{create_dir_all, read, read_to_string, write};
+use serde::Deserialize;
+use std::fs::{create_dir_all, read, write};
 use std::path::{Path, PathBuf};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SourcePage {
     pub source: PathBuf,
     pub route: PathBuf,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Content {
     /// Html content that can be wrapped by a layout, need further processing before it can be
     /// written.
@@ -17,7 +19,7 @@ pub enum Content {
     Raw(WritableContent),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct HtmlContent {
     route: PathBuf,
     collection: Option<String>,
@@ -25,7 +27,7 @@ pub struct HtmlContent {
     content: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WritableContent {
     route: PathBuf,
     content: Vec<u8>,
@@ -33,13 +35,25 @@ pub struct WritableContent {
 
 impl SourcePage {
     pub fn read(self) -> Result<Content> {
+        #[derive(Deserialize)]
+        struct Frontmatter {
+            layout: Option<String>,
+            collection: Option<String>,
+        }
+
         Ok(match self.source.extension() {
             Some(extension) if extension == "html" || extension == "md" => {
+                let (frontmatter, content): (Option<Frontmatter>, String) =
+                    frontmatter::parse_file(&self.source)?;
+                let frontmatter = frontmatter.unwrap_or(Frontmatter {
+                    layout: None,
+                    collection: None,
+                });
                 Content::Html(HtmlContent {
                     route: self.route,
-                    collection: None,
-                    layout: None,
-                    content: read_to_string(self.source)?,
+                    collection: frontmatter.collection,
+                    layout: frontmatter.layout,
+                    content,
                 })
             }
             _ => Content::Raw(WritableContent {
@@ -51,6 +65,9 @@ impl SourcePage {
 }
 
 impl WritableContent {
+    pub fn new(route: PathBuf, content: Vec<u8>) -> Self {
+        Self { route, content }
+    }
     pub fn write(&self, out_dir: &Path) -> std::io::Result<()> {
         let path = out_dir.join(&self.route);
         if let Some(parent) = path.parent() {
@@ -154,5 +171,35 @@ mod tests {
             },
             route
         );
+    }
+
+    #[test_case( r#"---
+layout: "some-layout"
+---
+content
+"#; "yaml file")]
+    #[test_case( r#"+++
+layout = "some-layout"
++++
+content
+"#; "toml file")]
+    #[test_case( r#"{ "layout": "some-layout" }
+content
+"#; "json file")]
+    fn layout_is_loaded_from_frontmatter(content: &str) {
+        for route in &["main.html", "main.md"] {
+            let temp_dir = tempfile::tempdir().unwrap();
+
+            let page = SourcePage {
+                source: temp_dir.path().join(route),
+                route: PathBuf::from(route),
+            };
+            write(&page.source, content).unwrap();
+
+            match page.read().unwrap() {
+                Content::Html(html) => assert_eq!(html.layout, Some("some-layout".to_string())),
+                Content::Raw(_) => panic!("raw content returned"),
+            }
+        }
     }
 }

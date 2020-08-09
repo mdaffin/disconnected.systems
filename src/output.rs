@@ -1,6 +1,5 @@
-use crate::renderer::RenderedPage;
-use std::fs::{create_dir_all, remove_dir_all, remove_file, File};
-use std::io::prelude::*;
+use crate::transform::WritableContent;
+use std::fs::{create_dir_all, remove_dir_all, remove_file};
 use std::path::PathBuf;
 
 use anyhow::{Context, Result};
@@ -28,29 +27,15 @@ impl OutputDirectory {
         Ok(())
     }
 
-    pub fn write(&self, page: &RenderedPage) -> Result<()> {
-        let dest_file = self.path.join(&page.route);
-        let dest_file = match dest_file.extension() {
-            None => dest_file.join("index.html"),
-            _ => dest_file,
-        };
-
-        create_dir_all(dest_file.parent().expect("missing parent directory"))
-            .context("failed to create output directory")?;
-
-        File::create(dest_file)
-            .context("failed to create page")?
-            .write_all(page.content.as_ref())
-            .context("failed to write to page")?;
-
-        Ok(())
+    pub fn write(&self, content: &WritableContent) -> Result<()> {
+        Ok(content.write(&self.path)?)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::OutputDirectory;
-    use crate::output::RenderedPage;
+    use crate::transform::WritableContent;
     use std::fs::read;
     use std::path::PathBuf;
     use test_case::test_case;
@@ -66,24 +51,6 @@ mod tests {
         assert!(out_dir.path.is_dir());
     }
 
-    #[test_case("" ; "site root")]
-    #[test_case("page" ; "single directory")]
-    #[test_case("section/page" ; "nested directory")]
-    #[test_case("section/subsection/subsecion/subsection/page" ; "deeply nested directory")]
-    fn writing_a_page_with_no_extension_path_writes_to_index_file_in(route: &str) {
-        let temp_dir = tempfile::tempdir().unwrap();
-        let out_path = temp_dir.path().join("out_dir");
-        let out_dir = OutputDirectory::new(out_path.clone());
-        let page = rendered_page(route, "content");
-
-        out_dir.write(&page).unwrap();
-
-        assert_eq!(
-            &read(out_path.join(route).join("index.html")).unwrap(),
-            &page.content
-        );
-    }
-
     #[test_case("main.css" ; "site root with css")]
     #[test_case("section/main.css" ; "single directory with css")]
     #[test_case("section/subsection/main.css" ; "nested directory with css")]
@@ -96,11 +63,15 @@ mod tests {
         let temp_dir = tempfile::tempdir().unwrap();
         let out_path = temp_dir.path().join("out_dir");
         let out_dir = OutputDirectory::new(out_path.clone());
-        let page = rendered_page(route, "content");
+        let content = "content";
+        let page = rendered_page(route, content);
 
         out_dir.write(&page).unwrap();
 
-        assert_eq!(&read(out_path.join(route)).unwrap(), &page.content);
+        assert_eq!(
+            read(out_path.join(route)).unwrap().as_slice(),
+            content.as_bytes()
+        );
     }
 
     #[test]
@@ -108,7 +79,9 @@ mod tests {
         let temp_dir = tempfile::tempdir().unwrap();
         let out_dir = OutputDirectory::new(temp_dir.path().join("out_dir"));
 
-        out_dir.write(&rendered_page("", "content")).unwrap();
+        out_dir
+            .write(&rendered_page("index.html", "content"))
+            .unwrap();
         out_dir.write(&rendered_page("page1", "content")).unwrap();
         out_dir.write(&rendered_page("page2", "content")).unwrap();
         out_dir
@@ -128,10 +101,7 @@ mod tests {
         );
     }
 
-    fn rendered_page(route: impl Into<PathBuf>, content: impl Into<Vec<u8>>) -> RenderedPage {
-        RenderedPage {
-            route: route.into(),
-            content: content.into(),
-        }
+    fn rendered_page(route: impl Into<PathBuf>, content: impl Into<Vec<u8>>) -> WritableContent {
+        WritableContent::new(route.into(), content.into())
     }
 }

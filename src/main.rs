@@ -6,7 +6,7 @@ mod output;
 mod renderer;
 mod transform;
 
-use renderer::render;
+use crate::transform::Content;
 
 fn main() -> Result<()> {
     let site_dir = input::SiteDirectory::new("site");
@@ -14,8 +14,21 @@ fn main() -> Result<()> {
 
     out_dir.clear()?;
 
-    for page in site_dir.pages() {
-        out_dir.write(&render(page?)?)?;
+    let (html, raw) = site_dir
+        .pages()
+        .map(|page| -> Result<_> { Ok(page?.read()?) })
+        .fold(Ok((Vec::new(), Vec::new())), |acc: Result<_>, content| {
+            let (mut html_vec, mut raw_vec) = acc?;
+            match content? {
+                Content::Html(html) => html_vec.push(html),
+                Content::Raw(raw) => raw_vec.push(raw),
+            };
+            Ok((html_vec, raw_vec))
+        })?;
+
+    dbg!(html);
+    for content in dbg!(raw) {
+        out_dir.write(&content)?;
     }
 
     Ok(())
