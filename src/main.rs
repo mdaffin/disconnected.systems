@@ -13,7 +13,7 @@ fn main() -> Result<()> {
 
     out_dir.clear()?;
 
-    let (html, raw) = site_dir
+    let (_html, raw) = site_dir
         .pages()
         .map(|page| -> Result<_> { Ok(page?.read()?) })
         .fold(Ok((Vec::new(), Vec::new())), |acc: Result<_>, content| {
@@ -25,8 +25,7 @@ fn main() -> Result<()> {
             Ok((html_vec, raw_vec))
         })?;
 
-    dbg!(html);
-    for content in dbg!(raw) {
+    for content in raw {
         out_dir.write(&content)?;
     }
 

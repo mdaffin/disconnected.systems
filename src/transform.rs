@@ -56,10 +56,7 @@ impl SourcePage {
                     content,
                 })
             }
-            _ => Content::Raw(WritableContent {
-                route: self.route,
-                content: read(self.source)?,
-            }),
+            _ => Content::Raw(WritableContent::new(self.route, read(self.source)?)),
         })
     }
 }
@@ -68,6 +65,7 @@ impl WritableContent {
     pub fn new(route: PathBuf, content: Vec<u8>) -> Self {
         Self { route, content }
     }
+
     pub fn write(&self, out_dir: &Path) -> std::io::Result<()> {
         let path = out_dir.join(&self.route);
         if let Some(parent) = path.parent() {
@@ -80,7 +78,6 @@ impl WritableContent {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::convert::TryInto;
     use std::fs::{read, write};
     use std::path::PathBuf;
     use test_case::test_case;

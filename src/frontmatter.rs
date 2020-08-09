@@ -1,12 +1,9 @@
 use err_derive::Error;
-use serde;
 use serde::de::DeserializeOwned;
 use serde_json::{self, Deserializer};
-use serde_yaml;
 use std::fs::File;
 use std::io::{BufReader, Read};
 use std::path::Path;
-use toml;
 
 /// Extracts the frontmatter from the given content. It supports three types of frontmatter, YAML
 /// TOML and JSON. YAML frontmatter must start and end with the line `---`, TOML with the line
@@ -59,7 +56,7 @@ where
         "+++\n" => parse_func(reader, "+++", |content| {
             toml::from_str(content).map_err(FrontmatterError::TOMLError)
         }),
-        line if line.starts_with("{") => {
+        line if line.starts_with('{') => {
             reader.seek(std::io::SeekFrom::Start(0))?;
             let frontmatter = parse_json(reader)?;
             // skip the next new line, there is liekly a better way to do this

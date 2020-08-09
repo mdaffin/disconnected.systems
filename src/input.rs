@@ -17,7 +17,7 @@ impl SiteDirectory {
         Self { path: path.into() }
     }
 
-    pub fn pages<'site>(&'site self) -> SiteIter<'site> {
+    pub fn pages(&self) -> SiteIter<'_> {
         SiteIter {
             site: self,
             walkdir: WalkDir::new(&self.path).into_iter(),
