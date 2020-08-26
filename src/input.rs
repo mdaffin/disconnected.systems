@@ -41,10 +41,7 @@ impl<'site> Iterator for SiteIter<'site> {
                         .expect("root path did not match of file and site did not match");
                     Some(Ok(SourcePage {
                         source: path.into(),
-                        route: match path.extension() {
-                            Some(e) if e == "md" => route.with_extension("html"),
-                            None | Some(_) => route.into(),
-                        },
+                        route: route.into(),
                     }))
                 }
                 Some(Err(e)) => Some(Err(e)),
@@ -98,6 +95,7 @@ mod tests {
     #[test_case("png" ; "png files")]
     #[test_case("jpeg" ; "jpeg files")]
     #[test_case("jpg" ; "jpg files")]
+    #[test_case("md" ; "markdown files")]
     fn route_is_unmodified_with(extension: &str) {
         for path in &["main", "section/main", "section/subsection/main"] {
             let temp_dir = tempfile::tempdir().unwrap();
@@ -114,26 +112,6 @@ mod tests {
                 .expect("no pages found")
                 .expect("error searching for file");
             assert_eq!(&page.route, Path::new(&route));
-        }
-    }
-
-    #[test_case("md" ; "markdown files")]
-    fn creates_html_route_with(extension: &str) {
-        for path in &["main", "section/main", "section/subsection/main"] {
-            let temp_dir = tempfile::tempdir().unwrap();
-            let full_path = temp_dir.path().join(format!("{}.{}", path, extension));
-
-            std::fs::create_dir_all(full_path.parent().unwrap()).unwrap();
-            std::fs::write(full_path, b"content").unwrap();
-            let site = SiteDirectory::new(temp_dir.path());
-
-            let page = site
-                .pages()
-                .next()
-                .expect("no pages found")
-                .expect("error searching for file");
-
-            assert_eq!(page.route, PathBuf::from(format!("{}.html", path)));
         }
     }
 }

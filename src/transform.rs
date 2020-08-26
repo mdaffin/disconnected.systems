@@ -50,7 +50,7 @@ impl SourcePage {
                     collection: None,
                 });
                 Content::Html(HtmlContent {
-                    route: self.route,
+                    route: self.route.with_extension("html").into(),
                     collection: frontmatter.collection,
                     layout: frontmatter.layout,
                     content,
@@ -144,9 +144,6 @@ mod tests {
     #[test_case("main.jpg" ; "jpg file")]
     #[test_case("section/main.jpg" ; "jpg file in directory")]
     #[test_case("section/subsection/main.jpg" ; "jpg file in nested directory")]
-    #[test_case("main.md" ; "md file")]
-    #[test_case("section/main.md" ; "md file in directory")]
-    #[test_case("section/subsection/main.md" ; "md file in nested directory")]
     #[test_case("main.html" ; "html file")]
     #[test_case("section/main.html" ; "html file in directory")]
     #[test_case("section/subsection/main.html" ; "html file in nested directory")]
