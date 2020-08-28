@@ -15,6 +15,9 @@ serde_yaml = "0.8.13"
 toml = "0.5.6"
 err-derive = "0.2.4"
 serde_json = "1.0.56"
+log = "0.4.11"
+env_logger = "0.7.1"
+pulldown-cmark = "0.7.2"
 
 [dev-dependencies]
 tempfile = "3.1.0"

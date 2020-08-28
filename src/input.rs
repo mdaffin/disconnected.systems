@@ -1,10 +1,15 @@
-use crate::transform::SourcePage;
 use std::path::PathBuf;
 use walkdir::WalkDir;
 
 #[derive(Debug)]
 pub struct SiteDirectory {
     path: PathBuf,
+}
+
+#[derive(Debug, Clone)]
+pub struct SourcePage {
+    pub source: PathBuf,
+    pub route: PathBuf,
 }
 
 pub struct SiteIter<'site> {
@@ -35,13 +40,13 @@ impl<'site> Iterator for SiteIter<'site> {
                     if entry.path().is_dir() {
                         continue;
                     }
-                    let path = entry.path();
-                    let route = path
-                        .strip_prefix(&self.site.path)
-                        .expect("root path did not match of file and site did not match");
                     Some(Ok(SourcePage {
-                        source: path.into(),
-                        route: route.into(),
+                        source: entry.path().into(),
+                        route: entry
+                            .path()
+                            .strip_prefix(&self.site.path)
+                            .expect("root path did not match of file and site did not match")
+                            .into(),
                     }))
                 }
                 Some(Err(e)) => Some(Err(e)),
@@ -54,7 +59,7 @@ impl<'site> Iterator for SiteIter<'site> {
 #[cfg(test)]
 mod tests {
     use super::SiteDirectory;
-    use std::path::{Path, PathBuf};
+    use std::path::Path;
     use test_case::test_case;
 
     #[test]

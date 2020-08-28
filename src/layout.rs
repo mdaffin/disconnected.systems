@@ -1,7 +1,7 @@
 use render::{component, html, rsx, Render};
 
 #[component]
-fn Layout<'a, Children: Render>(title: &'a str, children: Children) {
+pub fn Layout<'a, Children: Render>(title: &'a str, children: Children) {
     rsx! {
       <>
         <html::HTML5Doctype />
@@ -22,16 +22,4 @@ fn Layout<'a, Children: Render>(title: &'a str, children: Children) {
         </html>
       </>
     }
-}
-
-pub fn index() -> RenderedPage {
-    RenderedPage::new(
-        "",
-        html! {
-          <Layout title={"Disconnected Systems"}>
-            <h1>{"Hello"}</h1>
-            {"Welcome!"}
-          </Layout>
-        },
-    )
 }
