@@ -6,7 +6,6 @@ use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 
 mod frontmatter;
-mod layout;
 
 pub struct OutputDirectory {
     path: PathBuf,
@@ -19,8 +18,8 @@ pub struct SiteDirectory {
 
 #[derive(Debug, Clone)]
 pub struct SourcePage {
-    source: PathBuf,
-    route: PathBuf,
+    pub path: PathBuf,
+    pub route: PathBuf,
 }
 
 pub struct SiteIter<'site> {
@@ -29,17 +28,24 @@ pub struct SiteIter<'site> {
 }
 
 #[derive(Debug)]
-pub struct Page {
-    route: PathBuf,
-    collection: Option<String>,
-    layout: Option<String>,
-    content: Content,
+pub enum Page {
+    Html(HtmlPage),
+    Raw(RawPage),
 }
 
 #[derive(Debug)]
-enum Content {
-    Html(String),
-    File(PathBuf),
+pub struct HtmlPage {
+    pub route: PathBuf,
+    pub collection: Option<String>,
+    pub layout: Option<String>,
+    pub path: PathBuf,
+    pub content: String,
+}
+
+#[derive(Debug)]
+pub struct RawPage {
+    route: PathBuf,
+    path: PathBuf,
 }
 
 #[derive(Debug)]
@@ -78,7 +84,7 @@ impl<'site> Iterator for SiteIter<'site> {
                         continue;
                     }
                     Some(Ok(SourcePage {
-                        source: entry.path().into(),
+                        path: entry.path().into(),
                         route: entry
                             .path()
                             .strip_prefix(&self.site.path)
@@ -109,57 +115,62 @@ impl SourcePage {
             }
         }
 
-        match self.source.extension().unwrap_or_default() {
+        match self.path.extension().unwrap_or_default() {
             ext if ext == "md" || ext == "html" || ext == "htm" => {
                 let (frontmatter, content): (Option<Frontmatter>, String) =
-                    frontmatter::parse_file(&self.source)?;
+                    frontmatter::parse_file(&self.path)?;
                 let frontmatter = frontmatter.unwrap_or(Frontmatter {
                     layout: None,
                     collection: None,
                 });
-                Ok(Page {
+                Ok(Page::Html(HtmlPage {
                     route: normalise_html_route(self.route),
                     collection: frontmatter.collection,
                     layout: frontmatter.layout,
+                    path: self.path.clone(),
                     content: {
                         if ext == "md" {
                             let parser = cmark::Parser::new_ext(&content, cmark::Options::all());
                             let mut html = String::new();
                             cmark::html::push_html(&mut html, parser);
-                            Content::Html(html)
+                            html
                         } else {
-                            Content::Html(content)
+                            content
                         }
                     },
-                })
+                }))
             }
-            _ => Ok(Page {
+            _ => Ok(Page::Raw(RawPage {
                 route: self.route,
-                collection: None,
-                layout: None,
-                content: Content::File(self.source),
-            }),
+                path: self.path,
+            })),
         }
     }
 }
 
 impl Page {
-    pub fn render_layout(&self, _pages: &[Page]) -> Result<RenderedPage> {
-        use layout::Layout;
-        use render::html;
+    pub fn path(&self) -> &Path {
+        match self {
+            Page::Html(page) => page.path.as_ref(),
+            Page::Raw(page) => page.path.as_ref(),
+        }
+    }
 
-        Ok(RenderedPage {
-            route: self.route.clone(),
-            content: match &self.content {
-                Content::File(p) => RenderedContent::File(p.clone()),
-                Content::Html(c) => RenderedContent::String(html! {
-                  <Layout title={"Disconnected Systems"}>
-                    <h1>{"Hello"}</h1>
-                    {c.clone()}
-                  </Layout>
-                }),
-            },
-        })
+    pub fn render_layout(
+        &self,
+        pages: &[Page],
+        render: impl Fn(&HtmlPage, &[Page]) -> crate::layout::Result<String>,
+    ) -> Result<RenderedPage> {
+        match self {
+            Page::Html(page) => Ok(RenderedPage {
+                route: page.route.clone(),
+                content: RenderedContent::String(render(page, pages)?),
+            }),
+            Page::Raw(page) => Ok(RenderedPage {
+                route: page.route.clone(),
+                content: RenderedContent::File(page.path.clone()),
+            }),
+        }
     }
 }
 
@@ -172,8 +183,8 @@ impl RenderedPage {
 
         match &self.content {
             RenderedContent::String(content) => write(dest, content)?,
-            RenderedContent::File(source) => {
-                copy(source, dest)?;
+            RenderedContent::File(path) => {
+                copy(path, dest)?;
             }
         }
         Ok(())
@@ -238,7 +249,7 @@ mod tests {
                 .next()
                 .expect("no pages found")
                 .expect("error searching for file")
-                .source,
+                .path,
             full_path,
         );
     }

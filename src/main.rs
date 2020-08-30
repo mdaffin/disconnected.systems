@@ -2,6 +2,7 @@ use anyhow::Result;
 use log::*;
 use std::fmt::Display;
 
+mod layout;
 mod ssg;
 
 use ssg::{OutputDirectory, Page, SiteDirectory, SourcePage};
@@ -18,11 +19,15 @@ fn main() -> Result<()> {
         .filter_map(log_error)
         .map(SourcePage::load)
         .filter_map(log_error)
+        .map(|page| {
+            info!("Loaded page {}", page.path().display());
+            page
+        })
         .collect();
 
     pages
         .iter()
-        .map(|page| page.render_layout(&pages))
+        .map(|page| page.render_layout(&pages, layout::render))
         .filter_map(log_error)
         .for_each(|page| {
             if let Err(err) = out_dir.write(&page) {
