@@ -125,7 +125,7 @@ devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)
 device=$(dialog --stdout --menu "Select installation disk" 0 0 0 ${devicelist}) || exit 1
 ```
 
-![dialog disk selection](/blog/archlinux-installer/01-dialog-disk.png)
+![dialog disk selection](./01-dialog-disk.png)
 
 In addition to looking fancy, this also reducing the amount of typing and
 therefore typos.
